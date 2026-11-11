@@ -6,15 +6,25 @@ import { t } from "@/lib/texts.sk";
 
 // Menu by role (MVP-03). Links are a convenience only; every page and
 // endpoint checks permissions again on the server.
-const NAV: { href: string; label: string; roles: Role[] }[] = [
-  { href: "/", label: t.nav.mySurveys, roles: ["EMPLOYEE", "MANAGER"] },
-  { href: "/hr/rounds", label: t.nav.hrRounds, roles: ["HR"] },
-  { href: "/rounds/new", label: t.nav.newRound, roles: ["MANAGER", "HR"] },
-];
+type NavItem = { href: string; label: string; roles: Role[] };
+
+function navFor(teamId: string | null): NavItem[] {
+  return [
+    { href: "/", label: t.nav.mySurveys, roles: ["EMPLOYEE", "MANAGER"] },
+    { href: "/hr/rounds", label: t.nav.hrRounds, roles: ["HR"] },
+    // HR has no team of its own; it reaches team pages from the round overview.
+    ...(teamId
+      ? [{ href: `/team/${teamId}`, label: t.nav.myTeam, roles: ["EMPLOYEE", "MANAGER"] as Role[] }]
+      : []),
+    { href: "/rounds/new", label: t.nav.newRound, roles: ["MANAGER", "HR"] },
+    { href: "/kudos/new", label: t.nav.sendKudos, roles: ["EMPLOYEE", "MANAGER", "HR"] },
+    { href: "/kudos/me", label: t.nav.myKudos, roles: ["EMPLOYEE", "MANAGER", "HR"] },
+  ];
+}
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const user = await requirePageUser();
-  const items = NAV.filter((item) => item.roles.includes(user.role));
+  const items = navFor(user.teamId).filter((item) => item.roles.includes(user.role));
 
   return (
     <div className="min-h-screen">

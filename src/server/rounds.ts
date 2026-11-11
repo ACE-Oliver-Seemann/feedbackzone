@@ -1,3 +1,4 @@
+import { parseLocalDate } from "@/lib/dates";
 import { db } from "@/lib/db";
 import { assertCanManageRounds, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
@@ -86,20 +87,6 @@ export async function listRounds(user: SessionUser): Promise<RoundListItem[]> {
   }));
 }
 
-/** Parses `YYYY-MM-DD` as the end of that day in server local time. */
-function parseDeadline(value: unknown): Date | null {
-  if (typeof value !== "string") return null;
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return null;
-  const [year, month, day] = match.slice(1).map(Number);
-  const date = new Date(year, month - 1, day, 23, 59, 59, 999);
-  // Reject overflow such as 2026-02-31.
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
-    return null;
-  }
-  return date;
-}
-
 /** POST /api/rounds — creates a draft (MVP-04). */
 export async function createRound(
   user: SessionUser,
@@ -122,7 +109,7 @@ export async function createRound(
         : null;
   if (!teamId) fields.teamId = "required";
 
-  const closesAt = parseDeadline(input.closesAt);
+  const closesAt = parseLocalDate(input.closesAt);
   if (!closesAt) fields.closesAt = "invalid";
   else if (closesAt.getTime() < Date.now()) fields.closesAt = "in_past";
 

@@ -101,3 +101,27 @@ export function dateInDays(days: number): string {
   const pad = (value: number) => String(value).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
+
+/** Creates a round directly in the database, in the given status. */
+export async function createRound(
+  fx: Fixture,
+  teamId: string,
+  status: "DRAFT" | "OPEN" | "CLOSED" = "OPEN",
+  questionCount = 4,
+) {
+  return db.round.create({
+    data: {
+      teamId,
+      name: "Pulse test",
+      status,
+      startsAt: status === "DRAFT" ? null : new Date(),
+      closesAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      questions: {
+        create: fx.questions.slice(0, questionCount).map((question, index) => ({
+          questionId: question.id,
+          position: index + 1,
+        })),
+      },
+    },
+  });
+}

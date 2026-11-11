@@ -38,6 +38,7 @@ Seed pripraví aj jedno uzavreté kolo Tímu Beta so 4 odpoveďami (pod prahom d
 |---|---|
 | `npm run dev` | Vývojový server |
 | `npm test` | Automatické testy |
+| `npm run acceptance` | Akceptačný scenár proti bežiacej aplikácii (čerstvý seed) |
 | `npm run typecheck` | Kontrola typov |
 | `npm run lint` | ESLint |
 | `npm run db:migrate` | Nová migrácia po zmene `prisma/schema.prisma` |
@@ -45,5 +46,13 @@ Seed pripraví aj jedno uzavreté kolo Tímu Beta so 4 odpoveďami (pod prahom d
 
 ## Stav
 
-Hotový je 1. deň plánu: prihlásenie a roly (MVP-01 až MVP-03), tvorba, spustenie a uzavretie kola (MVP-04, MVP-05),
-zoznam kôl podľa roly. Vypĺňanie, výsledky, kroky, stránka tímu a kudos ešte nie sú.
+Implementované sú všetky požiadavky MVP-01 až MVP-17 a NFR-01 až NFR-07 z `docs/requirements/mvp.md`.
+
+Overenie:
+
+- `npm test` – automatické testy vrátane povinných pre NFR-01, NFR-02 a NFR-03,
+- `npm run acceptance` – akceptačný scenár z mvp.md (kroky 1 až 6) proti bežiacej aplikácii.
+  Spusti ho nad čerstvým seedom: `npm run setup`, `npm run dev` a v druhom termináli `npm run acceptance`.
+
+Čo ešte treba spraviť ručne pred demom: prejsť vypĺňanie v prehliadači na šírke 360 px (MVP-08, NFR-07)
+a prejsť `docs/requirements/mvp-requirements.csv` ako kontrolný zoznam.

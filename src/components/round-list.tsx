@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { RoundTransitionButton } from "@/components/round-transition-button";
 import { formatDate, t } from "@/lib/texts.sk";
 import type { RoundListItem, RoundStatus } from "@/server/rounds";
@@ -23,7 +24,14 @@ export function StatusBadge({ status }: { status: RoundStatus }) {
 function RoundMeta({ round, showTeam }: { round: RoundListItem; showTeam?: boolean }) {
   return (
     <p className="mt-1 text-sm text-slate-600">
-      {showTeam && <>{round.teamName} · </>}
+      {showTeam && (
+        <>
+          <Link href={`/team/${round.teamId}`} className="font-medium text-teal-800 underline">
+            {round.teamName}
+          </Link>{" "}
+          ·{" "}
+        </>
+      )}
       {t.rounds.deadline(formatDate(round.closesAt))} · {t.rounds.questionCount(round.questionCount)}
     </p>
   );
@@ -47,6 +55,14 @@ export function MySurveyList({ rounds }: { rounds: RoundListItem[] }) {
             )}
           </div>
           <RoundMeta round={round} />
+          {!round.submitted && (
+            <Link
+              href={`/rounds/${round.id}/fill`}
+              className="mt-3 inline-block rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
+            >
+              {t.rounds.fill}
+            </Link>
+          )}
         </li>
       ))}
     </ul>
@@ -92,8 +108,22 @@ export function ManagedRoundList({
                 </>
               )}
             </span>
-            {round.status === "DRAFT" && <RoundTransitionButton roundId={round.id} action="open" />}
-            {round.status === "OPEN" && <RoundTransitionButton roundId={round.id} action="close" />}
+            <span className="flex flex-wrap items-start gap-2">
+              {round.status !== "DRAFT" && (
+                <Link
+                  href={`/rounds/${round.id}/results`}
+                  className="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+                >
+                  {t.rounds.showResults}
+                </Link>
+              )}
+              {round.status === "DRAFT" && (
+                <RoundTransitionButton roundId={round.id} action="open" />
+              )}
+              {round.status === "OPEN" && (
+                <RoundTransitionButton roundId={round.id} action="close" />
+              )}
+            </span>
           </div>
         </li>
       ))}

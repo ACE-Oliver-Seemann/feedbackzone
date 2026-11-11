@@ -53,6 +53,7 @@ v `node_modules/next/dist/docs/` (pozri `AGENTS.md`).
 | `npm run setup` | Vytvorí `.env` (ak chýba), aplikuje migrácie, naplní testovacie dáta. **Zmaže dáta v `prisma/dev.db`.** |
 | `npm run dev` | Vývojový server |
 | `npm test` | Testy (Vitest) nad `prisma/test.db`; databáza sa pred každým behom vytvorí nanovo z migrácií |
+| `npm run acceptance` | Akceptačný scenár z mvp.md (kroky 1–6) cez HTTP proti bežiacej aplikácii na čerstvom seede |
 | `npm run typecheck` | `next typegen` + `tsc --noEmit` |
 | `npm run lint` | ESLint |
 | `npm run build` | Produkčný build |
@@ -62,7 +63,7 @@ v `node_modules/next/dist/docs/` (pozri `AGENTS.md`).
 Testovacie účty sú v `prisma/seed.ts` (doména `example.test`, spoločné heslo `Heslo123`).
 
 ### Kde čo je
-- `src/config/privacy.ts` – `MIN_GROUP_SIZE` (NFR-02), jediné miesto.
+- `src/config/privacy.ts` – `MIN_GROUP_SIZE` (NFR-02), jediné miesto. `src/config/kudos.ts` – pravidlá kudos.
 - `src/lib/authz.ts` – matica oprávnení (NFR-03). `src/lib/session.ts` – podpísaná cookie, `requireUser`.
 - `src/lib/errors.ts` – `route()` obaľuje každý endpoint; loguje iba metódu, cestu a typ chyby (NFR-01).
 - `src/server/*` – logika. Volajú ju endpointy v `src/app/api/**/route.ts` aj serverové stránky; oprávnenia sa overujú tu.
