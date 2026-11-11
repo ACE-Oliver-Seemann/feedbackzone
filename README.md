@@ -54,5 +54,11 @@ Overenie:
 - `npm run acceptance` – akceptačný scenár z mvp.md (kroky 1 až 6) proti bežiacej aplikácii.
   Spusti ho nad čerstvým seedom: `npm run setup`, `npm run dev` a v druhom termináli `npm run acceptance`.
 
-Čo ešte treba spraviť ručne pred demom: prejsť vypĺňanie v prehliadači na šírke 360 px (MVP-08, NFR-07)
-a prejsť `docs/requirements/mvp-requirements.csv` ako kontrolný zoznam.
+Jednorazovo overené 11. 11. 2026 (nie je súčasťou automatických testov):
+
+- preklikanie v prehliadači Edge na šírke 360 px – prihlásenie, nové kolo, vyplnenie, výsledky, kroky,
+  stránka tímu, kudos; žiadna stránka nemá vodorovné posúvanie (MVP-08, NFR-07),
+- prechod `docs/requirements/mvp-requirements.csv`: položky Must sú splnené; výnimky sú iba známe rozpory
+  a duplicity uvedené v `CLAUDE.md` (NREQ_0026, NREQ_0044, NREQ_0045, FREQ_0024, FREQ_0080).
+
+Do definície hotového ešte chýba kontrola kódu druhým vývojárom a merge do `main`.
