@@ -41,7 +41,40 @@ Interná webová aplikácia Asseco CE: zamestnanec vyplní krátky pulse priesku
 ## Stack
 Next.js + TypeScript, SQLite cez Prisma, Tailwind CSS, heslá cez bcrypt, relácia v cookie (`HttpOnly`, `SameSite=Lax`).
 Ak tím zvolí Django, túto sekciu prepíšte skôr, ako začne vývoj.
-Príkazy (build, test, seed) sem doplň hneď po založení projektu.
+
+Verzie: Next.js 16.4 (App Router, `src/`), Prisma 6 (nie 8 RC), Vitest, `bcryptjs`. Overené na Node.js 26 LTS.
+**Next.js 16 sa líši od starších verzií** – pred písaním kódu pre Next si prečítaj príslušný návod
+v `node_modules/next/dist/docs/` (pozri `AGENTS.md`).
+
+### Príkazy
+| Príkaz | Čo robí |
+|---|---|
+| `npm run demo` | Všetko naraz: inštalácia, `.env`, migrácie, seed, spustenie na http://localhost:3000 |
+| `npm run setup` | Vytvorí `.env` (ak chýba), aplikuje migrácie, naplní testovacie dáta. **Zmaže dáta v `prisma/dev.db`.** |
+| `npm run dev` | Vývojový server |
+| `npm test` | Testy (Vitest) nad `prisma/test.db`; databáza sa pred každým behom vytvorí nanovo z migrácií |
+| `npm run typecheck` | `next typegen` + `tsc --noEmit` |
+| `npm run lint` | ESLint |
+| `npm run build` | Produkčný build |
+| `npm run db:migrate` | `prisma migrate dev` po zmene schémy |
+| `npm run db:seed` | Iba seed (zmaže a naplní `prisma/dev.db`) |
+
+Testovacie účty sú v `prisma/seed.ts` (doména `example.test`, spoločné heslo `Heslo123`).
+
+### Kde čo je
+- `src/config/privacy.ts` – `MIN_GROUP_SIZE` (NFR-02), jediné miesto.
+- `src/lib/authz.ts` – matica oprávnení (NFR-03). `src/lib/session.ts` – podpísaná cookie, `requireUser`.
+- `src/lib/errors.ts` – `route()` obaľuje každý endpoint; loguje iba metódu, cestu a typ chyby (NFR-01).
+- `src/server/*` – logika. Volajú ju endpointy v `src/app/api/**/route.ts` aj serverové stránky; oprávnenia sa overujú tu.
+- `src/lib/page-auth.ts` – ochrana stránok (bez relácie → `/login`, zlá rola → 403).
+- `src/lib/texts.sk.ts` – všetky texty UI (NFR-07, NFR-04).
+- `tests/` – testy volajú priamo handlery endpointov; `tests/helpers.ts` má fixtures.
+
+### Pozor pri zmene schémy (NFR-01)
+`prisma/migrations/*_init/migration.sql` je ručne upravená: tabuľky `Response` a `Participation` sú `WITHOUT ROWID`
+(inak by skrytý `rowid` prezradil poradie vkladania a odpovede by sa dali spárovať s účasťou) a `Response` má `CHECK`
+obmedzenia (hodnoty 1–5, komentár do 1 000 znakov). Prisma to nevie vygenerovať. Ak nová migrácia tieto tabuľky
+pretvára, doplň oboje ručne; `tests/schema.test.ts` na to upozorní.
 
 ## Ako pracovať
 - Pred väčšou úlohou najprv navrhni plán a počkaj na schválenie.
