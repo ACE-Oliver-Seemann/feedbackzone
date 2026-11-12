@@ -1,6 +1,7 @@
-import Link from "next/link";
 import { ActionList } from "@/components/action-list";
-import { FillNotice, FillWizard } from "@/components/fill-wizard";
+import { FillBackLink, FillNotice, FillWizard } from "@/components/fill-wizard";
+import { Page } from "@/components/ui/page";
+import { Section } from "@/components/ui/surface";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { t } from "@/lib/texts.sk";
 import { listLatestClosedRoundActions } from "@/server/actions";
@@ -14,15 +15,14 @@ export default async function FillPage({ params }: PageProps<"/rounds/[id]/fill"
 
   if (round.submitted || round.status !== "OPEN") {
     return (
-      <div className="mx-auto max-w-md">
+      <Page width="narrow">
         <FillNotice
+          kind={round.submitted ? "already" : "closed"}
           title={round.submitted ? t.fill.alreadySubmittedTitle : t.fill.closedTitle}
           text={round.submitted ? t.fill.alreadySubmittedText : t.fill.closedText}
         />
-        <Link href="/" className="mt-6 inline-block text-sm font-medium text-teal-800 underline">
-          {t.fill.backToSurveys}
-        </Link>
-      </div>
+        <FillBackLink />
+      </Page>
     );
   }
 
@@ -30,15 +30,17 @@ export default async function FillPage({ params }: PageProps<"/rounds/[id]/fill"
   const latest = await pageData(() => listLatestClosedRoundActions(user, round.teamId));
 
   return (
-    <div className="mx-auto max-w-md">
+    <Page width="narrow">
       <FillWizard roundId={round.id} roundName={round.name} questions={round.questions}>
         {latest && (
-          <section className="mt-8">
-            <h2 className="text-lg font-semibold">{t.fill.latestActionsTitle(latest.roundName)}</h2>
+          <Section
+            title={t.fill.latestActionsTitle(latest.roundName)}
+            className="animate-rise [animation-delay:120ms]"
+          >
             <ActionList actions={latest.actions} emptyText={t.fill.latestActionsEmpty} />
-          </section>
+          </Section>
         )}
       </FillWizard>
-    </div>
+    </Page>
   );
 }

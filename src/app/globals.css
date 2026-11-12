@@ -1,5 +1,385 @@
 @import "tailwindcss";
 
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+/*
+ * Design tokens – Asseco Central Europe identity.
+ * Colors sampled from ce.asseco.com and the official logo (Nov 2026).
+ * The official blue #00A3E0 (brand-500) has only 2.9:1 contrast on white, so
+ * it marks the brand (logo, bars, progress, indicators) while text, links and
+ * buttons with white text use the darker shades 600+ (WCAG AA).
+ */
+@theme {
+  /* Outfit: closest freely licensed match to the geometric sans of ce.asseco.com */
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+
+  --color-brand-50: #e8f6fc;
+  --color-brand-100: #ccedf9;
+  --color-brand-200: #99dbf3;
+  --color-brand-300: #5cc6ec;
+  --color-brand-400: #2bb4e6;
+  --color-brand-500: #00a3e0; /* official Asseco blue */
+  --color-brand-600: #0079b0; /* buttons, focus rings: 4.8:1 with white */
+  --color-brand-700: #006a9b; /* links, hover: 5.9:1 on white */
+  --color-brand-800: #005e8a;
+  --color-brand-900: #003d5a;
+
+  /* Neutrals: the website's near-black and clean greys */
+  --color-canvas: #f5f6f7;
+  --color-surface: #ffffff;
+  --color-ink: #1d1d1d; /* logo and text black */
+  --color-ink-soft: #3d4246;
+  --color-muted: #62676c;
+  --color-line: #e6e8ea;
+  --color-line-strong: #d3d6da;
+
+  --radius-control: 0.625rem;
+  --radius-panel: 1rem;
+
+  --shadow-panel: 0 1px 2px rgb(29 29 29 / 0.04), 0 2px 8px -2px rgb(29 29 29 / 0.05);
+  --shadow-raised: 0 1px 2px rgb(29 29 29 / 0.06), 0 12px 32px -8px rgb(29 29 29 / 0.18);
+
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --animate-rise: rise 260ms var(--ease-out-soft) both;
+  --animate-grow-x: grow-x 600ms var(--ease-out-soft) both;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+  /* Celebration kit (src/components/ui/celebrate.tsx) */
+  --animate-pop: pop 420ms var(--ease-out-soft) both;
+  --animate-draw: draw 560ms var(--ease-out-soft) 140ms both;
+  --animate-draw-late: draw 380ms var(--ease-out-soft) 520ms both;
+
+  @keyframes pop {
+    0% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.06);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  /* Stroke drawing: the element sets pathLength="1" and stroke-dasharray: 1. */
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+  }
+  ::selection {
+    background-color: var(--color-brand-100);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Loading placeholder */
+  .skeleton {
+    background: linear-gradient(90deg, #eceef0 25%, #f5f6f7 50%, #eceef0 75%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+    border-radius: 0.5rem;
+  }
+
+  /* Modal dialog: native <dialog> with open and close transitions */
+  .ui-dialog {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+    transition:
+      opacity 180ms var(--ease-out-soft),
+      transform 180ms var(--ease-out-soft),
+      overlay 180ms allow-discrete,
+      display 180ms allow-discrete;
+  }
+  .ui-dialog[open] {
+    opacity: 1;
+    transform: none;
+  }
+  @starting-style {
+    .ui-dialog[open] {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+  .ui-dialog::backdrop {
+    background-color: rgb(29 29 29 / 0);
+    transition:
+      background-color 180ms ease,
+      overlay 180ms allow-discrete,
+      display 180ms allow-discrete;
+  }
+  .ui-dialog[open]::backdrop {
+    background-color: rgb(29 29 29 / 0.32);
+  }
+  @starting-style {
+    .ui-dialog[open]::backdrop {
+      background-color: rgb(29 29 29 / 0);
+    }
+  }
+
+  /* Popover panel (src/components/motion-menu.tsx) */
+  .ui-popover {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+    transform-origin: top right;
+    transition:
+      opacity 150ms var(--ease-out-soft),
+      transform 150ms var(--ease-out-soft),
+      overlay 150ms allow-discrete,
+      display 150ms allow-discrete;
+  }
+  .ui-popover:popover-open {
+    opacity: 1;
+    transform: none;
+  }
+  @starting-style {
+    .ui-popover:popover-open {
+      opacity: 0;
+      transform: translateY(-4px) scale(0.97);
+    }
+  }
+
+  /* Toast (src/components/ui/toast.tsx): rises in, fades out. */
+  .ui-toast {
+    transition:
+      opacity 200ms var(--ease-out-soft),
+      transform 240ms var(--ease-out-soft);
+  }
+  @starting-style {
+    .ui-toast {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+  .ui-toast[data-leaving] {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+
+  /* Sliding active pill in the main navigation (src/components/app-nav.tsx).
+     It only animates once placed (data-animate), never on first paint. */
+  .nav-pill[data-animate] {
+    transition:
+      transform 300ms var(--ease-out-soft),
+      width 300ms var(--ease-out-soft);
+  }
+}
+
+/*
+ * Page transitions (src/components/ui/page-transition.tsx + transitionTypes
+ * from src/lib/page-motion.ts). Forward: the old page leaves to the left, the
+ * new one arrives from the right; back is mirrored. The root and the header
+ * stay still; untyped navigations (browser back, router.refresh) map to
+ * "none" and stay instant.
+ */
+::view-transition {
+  pointer-events: none; /* clicks during a transition reach the live page */
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+/* The app header (followed by <main id="main">) is anchored above the sliding content. */
+header:has(+ #main) {
+  view-transition-name: site-header;
+}
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+::view-transition-group(.nav-forward),
+::view-transition-group(.nav-back) {
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease-out-soft);
+}
+::view-transition-old(.nav-forward) {
+  animation: 140ms ease-in both vt-out-left;
+}
+::view-transition-new(.nav-forward) {
+  animation: 280ms var(--ease-out-soft) both vt-in-right;
+}
+::view-transition-old(.nav-back) {
+  animation: 140ms ease-in both vt-out-right;
+}
+::view-transition-new(.nav-back) {
+  animation: 280ms var(--ease-out-soft) both vt-in-left;
+}
+@keyframes vt-out-left {
+  to {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+@keyframes vt-out-right {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes vt-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes vt-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Fades an element out in place (inline success messages). */
+.fade-out {
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+/*
+ * Reduced motion. The effective mode is <html data-motion="full|reduce">
+ * (src/lib/motion.ts: in-app setting, else the OS). Under "reduce" nothing
+ * moves or scales, but short opacity fades stay so changes remain noticeable:
+ * - transitions keep only non-movement properties (transform/translate/scale/
+ *   width drop out, so pills, sliders and button presses jump);
+ * - rise/pop/grow animations become a 150 ms fade, stroke drawings and the
+ *   skeleton shimmer show their final/static state;
+ * - page transitions become a 150 ms crossfade.
+ * The same block is repeated below for the moment before JavaScript has set
+ * data-motion (or when it never runs) and the OS asks for reduced motion.
+ * New keyframes that move things need a line here too.
+ */
+:root[data-motion="reduce"] {
+  scroll-behavior: auto;
+
+  & *,
+  & *::before,
+  & *::after {
+    transition-property: opacity, color, background-color, border-color, outline-color, text-decoration-color,
+      fill, stroke, box-shadow !important;
+    scroll-behavior: auto !important;
+  }
+  & .ui-dialog,
+  & .ui-popover {
+    transition-property: opacity, overlay, display !important;
+  }
+  & .ui-dialog::backdrop {
+    transition-property: background-color, overlay, display;
+  }
+  & .ui-toast[data-leaving] {
+    transform: none;
+  }
+  & .animate-rise,
+  & .animate-pop,
+  & .animate-grow-x {
+    animation: fade-in 150ms ease-out both !important;
+  }
+  & .animate-draw,
+  & .animate-draw-late,
+  & .skeleton {
+    animation: none !important;
+  }
+}
+:root[data-motion="reduce"]::view-transition-group(*) {
+  animation-duration: 0s !important;
+}
+:root[data-motion="reduce"]::view-transition-old(.nav-forward),
+:root[data-motion="reduce"]::view-transition-old(.nav-back) {
+  animation: 150ms ease-out both fade-out !important;
+}
+:root[data-motion="reduce"]::view-transition-new(.nav-forward),
+:root[data-motion="reduce"]::view-transition-new(.nav-back) {
+  animation: 150ms ease-out both fade-in !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion]) {
+    scroll-behavior: auto;
+
+    & *,
+    & *::before,
+    & *::after {
+      transition-property: opacity, color, background-color, border-color, outline-color, text-decoration-color,
+        fill, stroke, box-shadow !important;
+      scroll-behavior: auto !important;
+    }
+    & .ui-dialog,
+    & .ui-popover {
+      transition-property: opacity, overlay, display !important;
+    }
+    & .animate-rise,
+    & .animate-pop,
+    & .animate-grow-x {
+      animation: fade-in 150ms ease-out both !important;
+    }
+    & .animate-draw,
+    & .animate-draw-late,
+    & .skeleton {
+      animation: none !important;
+    }
+  }
+  :root:not([data-motion])::view-transition-group(*) {
+    animation-duration: 0s !important;
+  }
+  :root:not([data-motion])::view-transition-old(.nav-forward),
+  :root:not([data-motion])::view-transition-old(.nav-back) {
+    animation: 150ms ease-out both fade-out !important;
+  }
+  :root:not([data-motion])::view-transition-new(.nav-forward),
+  :root:not([data-motion])::view-transition-new(.nav-back) {
+    animation: 150ms ease-out both fade-in !important;
+  }
 }

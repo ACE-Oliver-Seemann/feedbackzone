@@ -1,7 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState, type FormEvent } from "react";
+import { addTransitionType, startTransition, useMemo, useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { cx } from "@/components/ui/cx";
+import { Field, FieldError, Input, Select } from "@/components/ui/field";
+import { IconCheck } from "@/components/ui/icons";
+import { Notice } from "@/components/ui/notice";
+import { InsetList, Panel, Section } from "@/components/ui/surface";
+import { useToast } from "@/components/ui/toast";
+import { FORWARD } from "@/lib/page-motion";
 import { t } from "@/lib/texts.sk";
 
 // Mirrors MIN_QUESTIONS / MAX_QUESTIONS in src/server/rounds.ts. The server
@@ -29,6 +37,7 @@ export function NewRoundForm({
   redirectTo: string;
 }) {
   const router = useRouter();
+  const toast = useToast();
   const [selected, setSelected] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, true>>>({});
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +81,12 @@ export function NewRoundForm({
         }),
       });
       if (response.status === 201) {
-        router.push(redirectTo);
+        // The toast lives in the app shell, so it stays visible after the redirect.
+        toast.success(t.toasts.roundCreated);
+        startTransition(() => {
+          for (const type of FORWARD) addTransitionType(type);
+          router.push(redirectTo);
+        });
         router.refresh();
         return;
       }
@@ -90,58 +104,55 @@ export function NewRoundForm({
     setPending(false);
   }
 
-  const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
-  const fieldError = (field: FieldName) =>
-    fieldErrors[field] && (
-      <span role="alert" className="mt-1 block text-sm font-normal text-red-700">
-        {t.newRound.fieldErrors[field]}
-      </span>
-    );
+  const errorText = (field: FieldName) => fieldErrors[field] && t.newRound.fieldErrors[field];
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-5" noValidate>
-      <label className="block text-sm font-medium">
-        {t.newRound.name}
-        <input
-          name="name"
-          type="text"
-          maxLength={120}
-          placeholder={t.newRound.namePlaceholder}
-          className={inputClass}
-        />
-        {fieldError("name")}
-      </label>
+    <form onSubmit={onSubmit} noValidate>
+      <Section title={t.newRound.basicsTitle}>
+        <Panel className="space-y-5 p-5 sm:p-6">
+          <Field label={t.newRound.name} error={errorText("name")}>
+            <Input
+              name="name"
+              type="text"
+              maxLength={120}
+              placeholder={t.newRound.namePlaceholder}
+              aria-invalid={fieldErrors.name}
+            />
+          </Field>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field label={t.newRound.team} error={errorText("teamId")}>
+              <Select name="teamId" defaultValue={teams[0]?.id} aria-invalid={fieldErrors.teamId}>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <Field label={t.newRound.closesAt} error={errorText("closesAt")}>
+              <Input
+                name="closesAt"
+                type="date"
+                min={todayLocal()}
+                aria-invalid={fieldErrors.closesAt}
+              />
+            </Field>
+          </div>
+        </Panel>
+      </Section>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <label className="block text-sm font-medium">
-          {t.newRound.team}
-          <select name="teamId" className={inputClass} defaultValue={teams[0]?.id}>
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.name}
-              </option>
-            ))}
-          </select>
-          {fieldError("teamId")}
-        </label>
-        <label className="block text-sm font-medium">
-          {t.newRound.closesAt}
-          <input name="closesAt" type="date" min={todayLocal()} className={inputClass} />
-          {fieldError("closesAt")}
-        </label>
-      </div>
+      <fieldset className="mt-10">
+        <legend className="text-[1.0625rem] font-semibold tracking-[-0.01em] text-ink">
+          {t.newRound.questions}
+        </legend>
+        <p className="mt-0.5 text-sm text-muted">{t.newRound.questionsHint}</p>
+        {fieldErrors.questionIds && <FieldError>{t.newRound.fieldErrors.questionIds}</FieldError>}
 
-      <fieldset>
-        <legend className="text-sm font-medium">{t.newRound.questions}</legend>
-        <p className="mt-1 text-sm text-slate-600">{t.newRound.questionsHint}</p>
-        <div className="mt-3 space-y-4">
+        <div className="mt-5 space-y-6">
           {topics.map(([topic, items]) => (
             <div key={topic}>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {topic}
-              </p>
-              <ul className="mt-1 space-y-1">
+              <p className="mb-2 px-1 text-sm font-semibold text-ink-soft">{topic}</p>
+              <InsetList>
                 {items.map((question) => {
                   const position = selected.indexOf(question.id);
                   const checked = position !== -1;
@@ -149,53 +160,92 @@ export function NewRoundForm({
                   return (
                     <li key={question.id}>
                       <label
-                        className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2 text-sm ${
-                          checked ? "border-teal-600 bg-teal-50" : "border-slate-200 bg-white"
-                        } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
+                        className={cx(
+                          "flex items-start gap-3.5 px-4 py-3.5 text-[0.9375rem] leading-snug sm:px-5",
+                          "transition-colors duration-150",
+                          "has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-brand-600",
+                          checked ? "bg-brand-50/60 text-ink" : "text-ink-soft",
+                          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
+                          !checked && !disabled && "hover:bg-canvas",
+                        )}
                       >
                         <input
                           type="checkbox"
-                          className="mt-0.5 h-4 w-4 accent-teal-700"
+                          className="sr-only"
                           checked={checked}
                           disabled={disabled}
                           onChange={() => toggle(question.id)}
                         />
-                        <span className="flex-1">{question.text}</span>
-                        {checked && (
-                          <span className="rounded-full bg-teal-700 px-2 text-xs font-medium leading-5 text-white">
-                            {position + 1}
-                          </span>
-                        )}
+                        <span
+                          className={cx(
+                            "grid size-6 shrink-0 place-items-center rounded-full text-xs font-semibold tabular-nums",
+                            "transition-[background-color,box-shadow] duration-150",
+                            checked
+                              ? "bg-brand-600 text-white"
+                              : "ring-1 ring-inset ring-line-strong",
+                          )}
+                          aria-hidden="true"
+                        >
+                          {checked && (
+                            <span key={position} className="animate-rise">
+                              {position + 1}
+                            </span>
+                          )}
+                        </span>
+                        <span className="min-w-0 flex-1 pt-0.5">{question.text}</span>
                       </label>
                     </li>
                   );
                 })}
-              </ul>
+              </InsetList>
             </div>
           ))}
         </div>
-        <p
-          className={`mt-3 text-sm ${countValid ? "text-teal-800" : "text-slate-600"}`}
-          aria-live="polite"
-        >
-          {t.newRound.selected(selected.length)}
-        </p>
-        {fieldError("questionIds")}
       </fieldset>
 
       {error && (
-        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">
+        <Notice tone="error" role="alert" className="mt-6">
           {error}
-        </p>
+        </Notice>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
-      >
-        {pending ? t.newRound.submitting : t.newRound.submit}
-      </button>
+      {/* Stays in view while scrolling the question list: count + submit. */}
+      <div className="sticky bottom-4 z-20 mt-8 flex items-center justify-between gap-3 rounded-2xl bg-surface/90 px-4 py-3 shadow-[var(--shadow-raised)] ring-1 ring-line backdrop-blur-xl sm:px-5">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="hidden gap-1 sm:flex" aria-hidden="true">
+            {Array.from({ length: MAX_QUESTIONS }, (_, index) => (
+              <span
+                key={index}
+                className={cx(
+                  "h-1.5 w-4 rounded-full transition-colors duration-200",
+                  index < selected.length
+                    ? countValid
+                      ? "bg-brand-600"
+                      : "bg-brand-300"
+                    : "bg-line-strong",
+                )}
+              />
+            ))}
+          </span>
+          <p
+            className={cx(
+              "flex min-w-0 items-center gap-1.5 text-sm transition-colors duration-200",
+              countValid
+                ? "font-medium text-brand-700"
+                : fieldErrors.questionIds
+                  ? "text-red-700"
+                  : "text-muted",
+            )}
+            aria-live="polite"
+          >
+            {countValid && <IconCheck size={16} className="shrink-0 animate-rise" />}
+            {t.newRound.selected(selected.length)}
+          </p>
+        </div>
+        <Button type="submit" disabled={pending} pending={pending} className="shrink-0">
+          {pending ? t.newRound.submitting : t.newRound.submit}
+        </Button>
+      </div>
     </form>
   );
 }

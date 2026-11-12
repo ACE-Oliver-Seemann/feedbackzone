@@ -1,7 +1,11 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ManagedRoundList, MySurveyList } from "@/components/round-list";
+import { ButtonLink } from "@/components/ui/button";
+import { IconPlus } from "@/components/ui/icons";
+import { Page, PageHeader } from "@/components/ui/page";
+import { Section } from "@/components/ui/surface";
 import { pageData, requirePageUser } from "@/lib/page-auth";
+import { FORWARD } from "@/lib/page-motion";
 import { t } from "@/lib/texts.sk";
 import { listRounds } from "@/server/rounds";
 
@@ -13,28 +17,27 @@ export default async function HomePage() {
 
   const rounds = await pageData(() => listRounds(user));
   const openRounds = rounds.filter((round) => round.status === "OPEN");
+  const isManager = user.role === "MANAGER";
 
   return (
-    <>
-      <section>
-        <h1 className="text-xl font-semibold">{t.rounds.mySurveysTitle}</h1>
-        <MySurveyList rounds={openRounds} />
-      </section>
+    // The manager's round table needs the wide layout; employees get a calmer reading width.
+    <Page width={isManager ? "wide" : "default"}>
+      <PageHeader title={t.rounds.mySurveysTitle} />
+      <MySurveyList rounds={openRounds} />
 
-      {user.role === "MANAGER" && (
-        <section className="mt-10">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-xl font-semibold">{t.rounds.teamRoundsTitle}</h2>
-            <Link
-              href="/rounds/new"
-              className="rounded-md bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800"
-            >
+      {isManager && (
+        <Section
+          title={t.rounds.teamRoundsTitle}
+          actions={
+            <ButtonLink href="/rounds/new" transitionTypes={FORWARD} size="sm">
+              <IconPlus size={16} className="-ml-0.5" />
               {t.rounds.createFirst}
-            </Link>
-          </div>
+            </ButtonLink>
+          }
+        >
           <ManagedRoundList rounds={rounds} />
-        </section>
+        </Section>
       )}
-    </>
+    </Page>
   );
 }

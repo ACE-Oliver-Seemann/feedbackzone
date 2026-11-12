@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { buttonClass } from "@/components/ui/button";
+import { IconLogout } from "@/components/ui/icons";
 import { t } from "@/lib/texts.sk";
 
 export function LogoutButton() {
@@ -15,9 +17,11 @@ export function LogoutButton() {
     <button
       type="button"
       onClick={logout}
-      className="rounded-md border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
+      title={t.nav.logout}
+      className={buttonClass({ variant: "ghost", size: "sm", className: "text-ink-soft" })}
     >
-      {t.nav.logout}
+      <IconLogout size={16} />
+      <span className="sr-only sm:not-sr-only">{t.nav.logout}</span>
     </button>
   );
 }
