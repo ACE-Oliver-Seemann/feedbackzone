@@ -151,10 +151,20 @@ export async function createRound(
 
   const [team, knownQuestions] = await Promise.all([
     db.team.findUnique({ where: { id: teamId! }, select: { id: true } }),
-    db.question.count({ where: { id: { in: questionIds! } } }),
+    db.question.findMany({
+      where: { id: { in: questionIds! } },
+      select: { id: true, teamId: true },
+    }),
   ]);
   if (!team) throw validationError({ teamId: "unknown" });
-  if (knownQuestions !== questionIds!.length) throw validationError({ questionIds: "unknown" });
+  if (knownQuestions.length !== questionIds!.length) {
+    throw validationError({ questionIds: "unknown" });
+  }
+  // IT-07: an own question may be used only in rounds of the team that owns it.
+  // Reported like an unknown question, so nothing about other teams leaks.
+  if (knownQuestions.some((question) => question.teamId !== null && question.teamId !== team.id)) {
+    throw validationError({ questionIds: "unknown" });
+  }
 
   const round = await db.round.create({
     data: {

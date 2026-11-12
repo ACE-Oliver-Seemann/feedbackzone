@@ -6,7 +6,7 @@ import { POST as postKudos } from "@/app/api/kudos/route";
 import { GET as getHrOverview } from "@/app/api/hr/overview/route";
 import { POST as logout } from "@/app/api/logout/route";
 import { GET as getMe } from "@/app/api/me/route";
-import { GET as getQuestions } from "@/app/api/questions/route";
+import { GET as getQuestions, POST as postQuestion } from "@/app/api/questions/route";
 import { POST as postAction } from "@/app/api/rounds/[id]/actions/route";
 import { POST as closeRound } from "@/app/api/rounds/[id]/close/route";
 import { POST as openRound } from "@/app/api/rounds/[id]/open/route";
@@ -79,6 +79,16 @@ const CASES: Case[] = [
     name: "GET /api/questions",
     call: (as) => invoke(getQuestions, "/api/questions", as),
     expected: status([401, 403, 200, 403, 200, 200]),
+  },
+  {
+    // Each manager adds to their own team; nobody else may add at all.
+    name: "POST /api/questions",
+    call: (as) =>
+      invoke(postQuestion, "/api/questions", as, {
+        method: "POST",
+        body: { text: `Vlastná otázka ${as?.id ?? "anon"} je jasná.` },
+      }),
+    expected: status([401, 403, 201, 403, 201, 403]),
   },
   {
     name: "GET /api/rounds",

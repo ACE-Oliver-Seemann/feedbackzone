@@ -235,6 +235,26 @@ export const t = {
     starter: "Odporúčaná",
     starterHint: "Otázky označené „Odporúčaná“ sú štartovacia sada podľa výskumu.",
     selected: (count: number) => `Otázok v kole: ${count} (treba 3 až 5)`,
+    custom: {
+      title: "Pridať vlastnú otázku",
+      placeholder: "napr. Rozdelenie úloh v tíme je spravodlivé.",
+      // Checklist from docs/research/otazky-do-pulse.md, chapter 3.
+      rules: [
+        "Pýtaj sa na jednu vec, nie na dve naraz.",
+        "Napíš ju ako tvrdenie, s ktorým sa dá súhlasiť alebo nesúhlasiť (škála 1 až 5).",
+        "Pýtaj sa na niečo, čo vie tím alebo ty ovplyvniť.",
+        "Nepíš ju tak, aby sa podľa odpovede dal spoznať konkrétny človek.",
+      ],
+      permanent:
+        "Otázka zostane v knižnici tvojho tímu. Po pridaní sa nedá upraviť ani zmazať, lebo by sa zmenil význam starších výsledkov.",
+      add: "Pridať otázku",
+      adding: "Pridávam…",
+      errors: {
+        length: "Otázka musí mať 10 až 200 znakov.",
+        duplicate: "Takáto otázka už v knižnici je.",
+        generic: "Otázku sa nepodarilo pridať. Skús to znova.",
+      },
+    },
     submit: "Uložiť koncept",
     submitting: "Ukladám…",
     fieldErrors: {

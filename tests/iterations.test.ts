@@ -281,3 +281,110 @@ describe("HR overview of reaction to results [IT-05]", () => {
     }
   });
 });
+
+describe("a manager's own question [IT-07]", () => {
+  const add = async (as: User | undefined, text: unknown) => {
+    const { POST } = await import("@/app/api/questions/route");
+    return POST(request("/api/questions", { method: "POST", as, body: { text } }), undefined);
+  };
+  const library = async (as: User) =>
+    (await (await getQuestions(request("/api/questions", { as }), undefined)).json())
+      .questions as Array<{ id: string; text: string; teamId: string | null; topic: string }>;
+
+  const TEXT = "Rozdelenie úloh v tíme je spravodlivé.";
+
+  it("is stored for the manager's team with the agreement scale", async () => {
+    const response = await add(fx.a.manager, `  ${TEXT}  `);
+    expect(response.status).toBe(201);
+    expect((await response.json()).question).toMatchObject({
+      text: TEXT,
+      teamId: fx.a.team.id,
+      topic: "Vlastné otázky tímu",
+      scale: "AGREEMENT",
+      starter: false,
+      fixed: false,
+    });
+  });
+
+  it("is visible to its own manager and to HR, not to another manager", async () => {
+    const { question } = await (await add(fx.a.manager, TEXT)).json();
+    const ids = async (user: User) => (await library(user)).map((item) => item.id);
+
+    expect(await ids(fx.a.manager)).toContain(question.id);
+    expect(await ids(fx.hr)).toContain(question.id);
+    expect(await ids(fx.b.manager)).not.toContain(question.id);
+    // The shared library stays visible to everyone who may read it.
+    expect(await ids(fx.b.manager)).toContain(fx.questions[0].id);
+  });
+
+  it("can be used in a round of its own team and counts towards the limit", async () => {
+    const { question } = await (await add(fx.a.manager, TEXT)).json();
+    const response = await create(fx.a.manager, [...picked(2), question.id]);
+    expect(response.status).toBe(201);
+    const rows = await roundQuestions((await response.json()).round.id);
+    expect(rows.map((row) => row.questionId)).toEqual([...picked(2), question.id]);
+
+    expect((await create(fx.a.manager, [...picked(5), question.id])).status).toBe(400);
+  });
+
+  it("cannot be used in a round of another team — by its manager or by HR", async () => {
+    const { question } = await (await add(fx.a.manager, TEXT)).json();
+    const forTeamB = (as: User) =>
+      postRound(
+        request("/api/rounds", {
+          method: "POST",
+          as,
+          body: {
+            name: "Pulse",
+            teamId: fx.b.team.id,
+            closesAt: dateInDays(7),
+            questionIds: [...picked(2), question.id],
+          },
+        }),
+        undefined,
+      );
+    for (const user of [fx.b.manager, fx.hr]) {
+      const response = await forTeamB(user);
+      expect(response.status).toBe(400);
+      expect((await response.json()).fields.questionIds).toBe("unknown");
+    }
+    expect(await db.round.count()).toBe(0);
+  });
+
+  it("HR can use it in a round of the owning team", async () => {
+    const { question } = await (await add(fx.a.manager, TEXT)).json();
+    expect((await create(fx.hr, [...picked(2), question.id])).status).toBe(201);
+  });
+
+  it("only a manager may add one [NFR-03]", async () => {
+    expect((await add(undefined, TEXT)).status).toBe(401);
+    expect((await add(fx.a.employees[0], TEXT)).status).toBe(403);
+    expect((await add(fx.hr, TEXT)).status).toBe(403);
+    expect(await db.question.count({ where: { teamId: { not: null } } })).toBe(0);
+  });
+
+  it.each([
+    ["shorter than 10 characters", "Krátka?"],
+    ["longer than 200 characters", "x".repeat(201)],
+    ["empty", "   "],
+    ["a wrong type", 42],
+  ])("rejects a question that is %s", async (_label, text) => {
+    expect((await add(fx.a.manager, text)).status).toBe(400);
+    expect(await db.question.count({ where: { teamId: { not: null } } })).toBe(0);
+  });
+
+  it("rejects a duplicate within the team and of the shared library, ignoring case", async () => {
+    expect((await add(fx.a.manager, TEXT)).status).toBe(201);
+    const again = await add(fx.a.manager, TEXT.toUpperCase());
+    expect(again.status).toBe(400);
+    expect((await again.json()).fields.text).toBe("duplicate");
+    expect((await add(fx.a.manager, fx.questions[0].text)).status).toBe(400);
+    // Another team may have the same wording of its own.
+    expect((await add(fx.b.manager, TEXT)).status).toBe(201);
+  });
+
+  it("there is no way to edit or delete a question through the API", async () => {
+    const routeModule = await import("@/app/api/questions/route");
+    expect(Object.keys(routeModule).sort()).toEqual(["GET", "POST"]);
+  });
+});

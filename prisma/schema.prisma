@@ -38,6 +38,7 @@ model Team {
   manager   User   @relation("TeamManager", fields: [managerId], references: [id])
 
   members   User[]     @relation("TeamMembers")
+  questions Question[]
   rounds    Round[]
   responses Response[]
 }
@@ -51,6 +52,10 @@ model Question {
   scale   String  @default("AGREEMENT")
   // Recommended starting set, highlighted when a round is created (IT-03).
   starter Boolean @default(false)
+  // Null = shared library. Otherwise the question was written by the manager of
+  // this team and only this team may use it (IT-07).
+  teamId  String?
+  team    Team?   @relation(fields: [teamId], references: [id])
   // Trend question: added automatically as the first question of every round (IT-04).
   fixed   Boolean @default(false)
 

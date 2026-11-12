@@ -4,14 +4,25 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, type FormEvent } from "react";
 import { t } from "@/lib/texts.sk";
 
-// Mirrors MIN_QUESTIONS / MAX_QUESTIONS in src/server/rounds.ts. The server
-// validates again; this only keeps the form from sending an obvious mistake.
+// Mirrors MIN_QUESTIONS / MAX_QUESTIONS in src/server/rounds.ts and the custom
+// question limits in src/server/catalog.ts. The server validates again; this
+// only keeps the form from sending an obvious mistake.
 const MIN_QUESTIONS = 3;
 const MAX_QUESTIONS = 5;
+const CUSTOM_MAX_LENGTH = 200;
 
-type Question = { id: string; text: string; topic: string; starter: boolean; fixed: boolean };
+type Question = {
+  id: string;
+  text: string;
+  topic: string;
+  starter: boolean;
+  fixed: boolean;
+  /** Null for the shared library, otherwise the team that owns the question (IT-07). */
+  teamId: string | null;
+};
 type Team = { id: string; name: string };
 type FieldName = keyof typeof t.newRound.fieldErrors;
+type CustomError = keyof typeof t.newRound.custom.errors;
 
 function todayLocal(): string {
   const now = new Date();
@@ -23,26 +34,39 @@ export function NewRoundForm({
   questions,
   teams,
   redirectTo,
+  canAddQuestion,
 }: {
   questions: Question[];
   teams: Team[];
   redirectTo: string;
+  /** Only a manager writes own questions, and only for their own team (IT-07). */
+  canAddQuestion: boolean;
 }) {
   const router = useRouter();
+  const [allQuestions, setAllQuestions] = useState(questions);
+  const [teamId, setTeamId] = useState(teams[0]?.id ?? "");
   const [selected, setSelected] = useState<string[]>([]);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, true>>>({});
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [customText, setCustomText] = useState("");
+  const [customError, setCustomError] = useState<CustomError | null>(null);
+  const [customPending, setCustomPending] = useState(false);
 
+  // Shared questions plus the own questions of the chosen team.
+  const visible = useMemo(
+    () => allQuestions.filter((question) => question.teamId === null || question.teamId === teamId),
+    [allQuestions, teamId],
+  );
   // IT-04: fixed questions are part of every round and cannot be unticked.
-  const fixedQuestions = useMemo(() => questions.filter((question) => question.fixed), [questions]);
+  const fixedQuestions = useMemo(() => visible.filter((question) => question.fixed), [visible]);
   const topics = useMemo(() => {
     const groups = new Map<string, Question[]>();
-    for (const question of questions.filter((item) => !item.fixed)) {
+    for (const question of visible.filter((item) => !item.fixed)) {
       groups.set(question.topic, [...(groups.get(question.topic) ?? []), question]);
     }
     return [...groups.entries()];
-  }, [questions]);
+  }, [visible]);
 
   const total = fixedQuestions.length + selected.length;
   const countValid = total >= MIN_QUESTIONS && total <= MAX_QUESTIONS;
@@ -51,6 +75,49 @@ export function NewRoundForm({
     setSelected((current) =>
       current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
     );
+  }
+
+  function changeTeam(nextTeamId: string) {
+    setTeamId(nextTeamId);
+    // Own questions of another team must not stay ticked.
+    setSelected((current) =>
+      current.filter((id) => {
+        const question = allQuestions.find((item) => item.id === id);
+        return question && (question.teamId === null || question.teamId === nextTeamId);
+      }),
+    );
+  }
+
+  async function addCustomQuestion() {
+    setCustomPending(true);
+    setCustomError(null);
+    try {
+      const response = await fetch("/api/questions", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text: customText }),
+      });
+      if (response.status === 201) {
+        const { question } = (await response.json()) as { question: Question };
+        setAllQuestions((current) => [...current, question]);
+        // Tick it straight away if the round still has room.
+        setSelected((current) =>
+          fixedQuestions.length + current.length < MAX_QUESTIONS
+            ? [...current, question.id]
+            : current,
+        );
+        setCustomText("");
+      } else if (response.status === 400) {
+        const { fields } = await response.json();
+        const code = fields?.text as string | undefined;
+        setCustomError(code === "duplicate" ? "duplicate" : "length");
+      } else {
+        setCustomError("generic");
+      }
+    } catch {
+      setCustomError("generic");
+    }
+    setCustomPending(false);
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -69,7 +136,7 @@ export function NewRoundForm({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           name: form.get("name"),
-          teamId: form.get("teamId"),
+          teamId,
           closesAt: form.get("closesAt"),
           questionIds: selected,
         }),
@@ -119,7 +186,12 @@ export function NewRoundForm({
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block text-sm font-medium">
           {t.newRound.team}
-          <select name="teamId" className={inputClass} defaultValue={teams[0]?.id}>
+          <select
+            name="teamId"
+            className={inputClass}
+            value={teamId}
+            onChange={(event) => changeTeam(event.target.value)}
+          >
             {teams.map((team) => (
               <option key={team.id} value={team.id}>
                 {team.name}
@@ -197,6 +269,49 @@ export function NewRoundForm({
             </div>
           ))}
         </div>
+
+        {canAddQuestion && (
+          <div className="mt-4 rounded-md border border-slate-200 bg-white px-3 py-3">
+            <label className="block text-sm font-medium">
+              {t.newRound.custom.title}
+              <input
+                type="text"
+                value={customText}
+                maxLength={CUSTOM_MAX_LENGTH}
+                placeholder={t.newRound.custom.placeholder}
+                onChange={(event) => setCustomText(event.target.value)}
+                onKeyDown={(event) => {
+                  // Enter must not submit the whole round.
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    if (customText.trim() && !customPending) void addCustomQuestion();
+                  }
+                }}
+                className={inputClass}
+              />
+            </label>
+            <ul className="mt-2 list-disc space-y-0.5 pl-5 text-xs text-slate-600">
+              {t.newRound.custom.rules.map((rule) => (
+                <li key={rule}>{rule}</li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs text-slate-600">{t.newRound.custom.permanent}</p>
+            {customError && (
+              <p role="alert" className="mt-2 text-sm text-red-700">
+                {t.newRound.custom.errors[customError]}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={addCustomQuestion}
+              disabled={customPending || !customText.trim()}
+              className="mt-3 rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+            >
+              {customPending ? t.newRound.custom.adding : t.newRound.custom.add}
+            </button>
+          </div>
+        )}
+
         <p
           className={`mt-3 text-sm ${countValid ? "text-teal-800" : "text-slate-600"}`}
           aria-live="polite"

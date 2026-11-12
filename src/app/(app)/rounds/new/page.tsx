@@ -15,7 +15,12 @@ export default async function NewRoundPage() {
     <section className="max-w-2xl">
       <h1 className="text-xl font-semibold">{t.newRound.title}</h1>
       <p className="mt-1 text-sm text-slate-600">{t.newRound.intro}</p>
-      <NewRoundForm questions={questions} teams={teams} redirectTo={homePathFor(user.role)} />
+      <NewRoundForm
+        questions={questions}
+        teams={teams}
+        redirectTo={homePathFor(user.role)}
+        canAddQuestion={user.role === "MANAGER"}
+      />
     </section>
   );
 }
