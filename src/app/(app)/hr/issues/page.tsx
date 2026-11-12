@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { IssueControls } from "@/components/issue-controls";
 import { IssueForm } from "@/components/issue-form";
 import { ISSUE_STATUSES, OWNER_GROUPS } from "@/config/owner-groups";
 import { SubNav } from "@/components/sub-nav";
+import { Button } from "@/components/ui/button";
+import { Disclosure } from "@/components/ui/disclosure";
+import { Field, Select } from "@/components/ui/field";
+import { IconInbox } from "@/components/ui/icons";
+import { EmptyState, Page, PageHeader } from "@/components/ui/page";
+import { InsetList, InsetRow } from "@/components/ui/surface";
 import { pageData, requirePageUser } from "@/lib/page-auth";
+import { FORWARD } from "@/lib/page-motion";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listManageableTeams } from "@/server/catalog";
 import { ACTIVE_FILTER, ALL_FILTER, getIssuePrefill, listIssues } from "@/server/hr-issues";
@@ -11,8 +19,10 @@ import { ACTIVE_FILTER, ALL_FILTER, getIssuePrefill, listIssues } from "@/server
 const first = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
+const linkClass = "rounded font-medium text-brand-700 underline underline-offset-2 hover:text-brand-900";
+
 // Screen "Podnety" for HR (IT-10): list with filters and the form for a new issue.
-export const metadata = { title: t.issues.pageTitle };
+export const metadata: Metadata = { title: t.issues.pageTitle };
 
 export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issues">) {
   const user = await requirePageUser("HR");
@@ -35,10 +45,8 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
     ]),
   );
 
-  const selectClass = "rounded-md border border-slate-300 bg-white px-2 py-3 text-sm";
-
   return (
-    <section className="max-w-3xl">
+    <Page>
       <SubNav
         label={t.nav.hrIssues}
         current="/hr/issues"
@@ -47,25 +55,22 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
           { href: "/hr/notes", label: t.nav.hrNotes },
         ]}
       />
-      <h1 className="text-xl font-semibold">{t.issues.pageTitle}</h1>
-      <p className="mt-1 text-sm text-slate-600">{t.issues.intro}</p>
+      <PageHeader title={t.issues.pageTitle} description={t.issues.intro} />
 
       {/* Plain GET form: the filter works without JavaScript and is shareable as a link. */}
-      <form method="get" className="mt-4 flex flex-wrap items-end gap-3">
-        <label className="text-sm font-medium">
-          {t.issues.ownerGroup}
-          <select name="group" defaultValue={group} className={`${selectClass} mt-1 block`}>
+      <form method="get" className="flex flex-wrap items-end gap-3">
+        <Field label={t.issues.ownerGroup} className="w-full sm:w-56">
+          <Select name="group" defaultValue={group}>
             <option value="">{t.issues.filterAll}</option>
             {OWNER_GROUPS.map((item) => (
               <option key={item} value={item}>
                 {t.ownerGroups[item]}
               </option>
             ))}
-          </select>
-        </label>
-        <label className="text-sm font-medium">
-          {t.issues.status}
-          <select name="status" defaultValue={status} className={`${selectClass} mt-1 block`}>
+          </Select>
+        </Field>
+        <Field label={t.issues.status} className="w-full sm:w-56">
+          <Select name="status" defaultValue={status}>
             <option value={ACTIVE_FILTER}>{t.issues.filterActive}</option>
             <option value={ALL_FILTER}>{t.issues.filterAll}</option>
             {ISSUE_STATUSES.map((item) => (
@@ -73,76 +78,90 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
                 {t.issueStatuses[item]}
               </option>
             ))}
-          </select>
-        </label>
-        <button
-          type="submit"
-          className="rounded-md border border-teal-700 px-3 py-3 text-sm font-medium text-teal-800 hover:bg-teal-50"
-        >
+          </Select>
+        </Field>
+        <Button type="submit" variant="secondary" className="h-11 w-full sm:w-auto">
           {t.issues.filter}
-        </button>
+        </Button>
       </form>
 
-      {issues.length === 0 ? (
-        <p className="mt-4 text-slate-600">{t.issues.empty}</p>
-      ) : (
-        <ul className="mt-4 space-y-3">
-          {issues.map((issue) => (
-            <li key={issue.id} className="rounded-lg border border-slate-200 bg-white p-4">
-              <h2 className="font-medium">{issue.title}</h2>
-              {issue.description && (
-                <p className="mt-1 whitespace-pre-line text-sm text-slate-800">
-                  {issue.description}
+      <div className="mt-6">
+        {issues.length === 0 ? (
+          <EmptyState icon={<IconInbox size={20} />} title={t.issues.empty} />
+        ) : (
+          <InsetList>
+            {issues.map((issue) => (
+              <InsetRow key={issue.id} className="py-5">
+                <h2 className="text-[0.9375rem] leading-snug font-semibold break-words text-ink">
+                  {issue.title}
+                </h2>
+                {issue.description && (
+                  <p className="mt-1 text-sm leading-relaxed break-words whitespace-pre-line text-ink-soft">
+                    {issue.description}
+                  </p>
+                )}
+                <p className="mt-2 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted">
+                  <span>
+                    {t.issues.source}: {t.issueSources[issue.source]}
+                  </span>
+                  {issue.team && (
+                    <span>
+                      {t.issues.team}:{" "}
+                      <Link
+                        href={`/team/${issue.team.id}`}
+                        transitionTypes={FORWARD}
+                        className={linkClass}
+                      >
+                        {issue.team.name}
+                      </Link>
+                    </span>
+                  )}
+                  {issue.round && (
+                    <span>
+                      {t.issues.round}:{" "}
+                      <Link
+                        href={`/rounds/${issue.round.id}/results`}
+                        transitionTypes={FORWARD}
+                        className={linkClass}
+                      >
+                        {issue.round.name}
+                      </Link>
+                    </span>
+                  )}
+                  {issue.note && (
+                    <span>
+                      {t.issues.note}: {issue.note.title}
+                    </span>
+                  )}
+                  {issue.dueDate && <span>{t.actions.due(formatDate(issue.dueDate))}</span>}
+                  <span>{t.issues.created(formatDate(issue.createdAt))}</span>
                 </p>
-              )}
-              <p className="mt-2 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-slate-600">
-                <span>
-                  {t.issues.source}: {t.issueSources[issue.source]}
-                </span>
-                {issue.team && (
-                  <span>
-                    {t.issues.team}:{" "}
-                    <Link href={`/team/${issue.team.id}`} className="underline">
-                      {issue.team.name}
-                    </Link>
-                  </span>
-                )}
-                {issue.round && (
-                  <span>
-                    {t.issues.round}:{" "}
-                    <Link href={`/rounds/${issue.round.id}/results`} className="underline">
-                      {issue.round.name}
-                    </Link>
-                  </span>
-                )}
-                {issue.note && (
-                  <span>
-                    {t.issues.note}: {issue.note.title}
-                  </span>
-                )}
-                {issue.dueDate && <span>{t.actions.due(formatDate(issue.dueDate))}</span>}
-                <span>{t.issues.created(formatDate(issue.createdAt))}</span>
-              </p>
-              <div className="mt-3">
-                <IssueControls
-                  issueId={issue.id}
-                  status={issue.status}
-                  ownerGroup={issue.ownerGroup}
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+                <div className="mt-3">
+                  <IssueControls
+                    issueId={issue.id}
+                    status={issue.status}
+                    ownerGroup={issue.ownerGroup}
+                  />
+                </div>
+              </InsetRow>
+            ))}
+          </InsetList>
+        )}
+      </div>
 
       {/* Open straight away when HR came here to raise an issue from a round or a note. */}
-      <details className="mt-8" open={Boolean(prefill.round || prefill.note) || undefined}>
-        <summary className="inline-block cursor-pointer rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800">
-          {t.issues.submit}
-        </summary>
-        <h2 className="mt-4 text-lg font-semibold">{t.issues.newTitle}</h2>
-        <IssueForm teams={teams} prefill={prefill} />
-      </details>
-    </section>
+      <Disclosure
+        className="mt-10"
+        summary={t.issues.submit}
+        open={Boolean(prefill.round || prefill.note) || undefined}
+      >
+        <div className="px-4 py-5 sm:px-5">
+          <h2 className="text-[1.0625rem] font-semibold tracking-[-0.01em] text-ink">
+            {t.issues.newTitle}
+          </h2>
+          <IssueForm teams={teams} prefill={prefill} />
+        </div>
+      </Disclosure>
+    </Page>
   );
 }

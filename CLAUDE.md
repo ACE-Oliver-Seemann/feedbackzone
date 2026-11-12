@@ -84,6 +84,13 @@ Testovacie účty sú v `prisma/seed.ts` (doména `example.test`, spoločné hes
 - `src/server/*` – logika. Volajú ju endpointy v `src/app/api/**/route.ts` aj serverové stránky; oprávnenia sa overujú tu.
 - `src/lib/page-auth.ts` – ochrana stránok (bez relácie → `/login`, zlá rola → 403).
 - `src/lib/texts.sk.ts` – všetky texty UI (NFR-07, NFR-04).
+- `src/components/ui/*` – spoločné stavebné prvky vzhľadu (tlačidlá, polia, panely, hlásenia, oslava po odoslaní)
+  a `src/app/globals.css` – farby Asseco CE a animácie. Vzhľad vlastní kolega; nové obrazovky skladaj z týchto
+  prvkov, nepíš vlastné farby ani tlačidlá. Ovládacie prvky majú na dotykových obrazovkách aspoň 44 px
+  (`pointer-coarse:`).
+- `src/components/app-nav.tsx` – hlavné menu (položky podľa IT-12 sú v `src/app/(app)/layout.tsx`),
+  `src/components/sub-nav.tsx` – záložky v stránke. Kudos je jedna stránka `/kudos` s dvoma záložkami;
+  `/kudos/new` a `/kudos/me` na ňu presmerujú.
 - `tests/` – testy volajú priamo handlery endpointov; `tests/helpers.ts` má fixtures.
 
 ### Testovanie podľa TESTING_RULES.md

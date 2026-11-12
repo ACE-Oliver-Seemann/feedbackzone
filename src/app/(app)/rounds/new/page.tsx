@@ -1,8 +1,12 @@
+import type { Metadata } from "next";
 import { NewRoundForm } from "@/components/new-round-form";
+import { Page, PageHeader } from "@/components/ui/page";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { t } from "@/lib/texts.sk";
 import { listManageableTeams, listQuestions } from "@/server/catalog";
 import { suggestRoundQuestions } from "@/server/rounds";
+
+export const metadata: Metadata = { title: t.newRound.title };
 
 /** ISO 8601 week number, the way weeks are counted in Slovakia. */
 function isoWeek(date: Date): number {
@@ -13,8 +17,6 @@ function isoWeek(date: Date): number {
 }
 
 // Screen "Nové kolo" for manager and HR (MVP-04).
-export const metadata = { title: t.newRound.title };
-
 export default async function NewRoundPage() {
   const user = await requirePageUser("MANAGER", "HR");
   const [questions, teams] = await pageData(() =>
@@ -32,20 +34,24 @@ export default async function NewRoundPage() {
   closes.setDate(closes.getDate() + 7);
   const pad = (value: number) => String(value).padStart(2, "0");
   const defaultClosesAt = `${closes.getFullYear()}-${pad(closes.getMonth() + 1)}-${pad(closes.getDate())}`;
+  const listPath = user.role === "HR" ? "/hr/rounds" : "/rounds";
 
   return (
-    <section className="max-w-2xl">
-      <h1 className="text-xl font-semibold">{t.newRound.title}</h1>
-      <p className="mt-1 text-sm text-slate-600">{t.newRound.intro}</p>
+    <Page width="narrow">
+      <PageHeader
+        title={t.newRound.title}
+        description={t.newRound.intro}
+        back={{ href: listPath, label: t.nav.rounds }}
+      />
       <NewRoundForm
         questions={questions}
         teams={teams}
-        redirectTo={user.role === "HR" ? "/hr/rounds" : "/rounds"}
+        redirectTo={listPath}
         canAddQuestion={user.role === "MANAGER"}
         defaults={defaults}
         defaultName={t.newRound.defaultName(isoWeek(new Date()))}
         defaultClosesAt={defaultClosesAt}
       />
-    </section>
+    </Page>
   );
 }

@@ -47,7 +47,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
   const lastMeasured = segments.at(-1)?.at(-1);
 
   return (
-    <figure className="mt-3 rounded-lg border border-slate-200 bg-white p-4">
+    <figure className="rounded-[var(--radius-panel)] bg-surface p-4 shadow-[var(--shadow-panel)] ring-1 ring-line sm:p-5">
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         role="img"
@@ -62,7 +62,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
               x2={WIDTH - PAD.right}
               y1={y(tick)}
               y2={y(tick)}
-              className="stroke-slate-200"
+              className="stroke-line"
               strokeWidth={1}
             />
             <text
@@ -70,7 +70,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
               y={y(tick)}
               textAnchor="end"
               dominantBaseline="middle"
-              className="fill-slate-500 text-[14px]"
+              className="fill-muted text-[14px]"
             >
               {tick}
             </text>
@@ -81,7 +81,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
           <polyline
             key={index}
             fill="none"
-            className="stroke-teal-700"
+            className="stroke-brand-600"
             strokeWidth={2}
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -94,7 +94,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
             {point.value !== null ? (
               <>
                 {/* White ring keeps the marker readable where it sits on the line. */}
-                <circle cx={x(index)} cy={y(point.value)} r={5} className="fill-teal-700 stroke-white" strokeWidth={2} />
+                <circle cx={x(index)} cy={y(point.value)} r={5} className="fill-brand-600 stroke-surface" strokeWidth={2} />
                 {/* Larger invisible target carrying the tooltip. */}
                 <circle cx={x(index)} cy={y(point.value)} r={14} fill="transparent">
                   <title>{`${point.label} (${formatDate(point.date)}): ${number(point.value)}`}</title>
@@ -107,7 +107,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
                   x2={x(index)}
                   y1={PAD.top}
                   y2={HEIGHT - PAD.bottom}
-                  className="stroke-slate-300"
+                  className="stroke-line-strong"
                   strokeWidth={1}
                   strokeDasharray="3 4"
                 />
@@ -121,7 +121,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
               x={x(index)}
               y={HEIGHT - PAD.bottom + 18}
               textAnchor={index === 0 && points.length > 1 ? "start" : index === points.length - 1 && points.length > 1 ? "end" : "middle"}
-              className="fill-slate-500 text-[14px]"
+              className="fill-muted text-[14px]"
             >
               {formatDate(point.date)}
             </text>
@@ -134,13 +134,13 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
             x={x(lastMeasured.index)}
             y={y(lastMeasured.value) - 12}
             textAnchor={lastMeasured.index === points.length - 1 && points.length > 1 ? "end" : "middle"}
-            className="fill-slate-900 text-[15px] font-semibold"
+            className="fill-ink text-[15px] font-semibold"
           >
             {number(lastMeasured.value)}
           </text>
         )}
       </svg>
-      <figcaption className="mt-2 text-xs text-slate-600">{t.trend.chartCaption}</figcaption>
+      <figcaption className="mt-2 text-xs leading-relaxed text-muted">{t.trend.chartCaption}</figcaption>
     </figure>
   );
 }

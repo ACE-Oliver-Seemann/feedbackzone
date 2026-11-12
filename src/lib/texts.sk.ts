@@ -10,7 +10,31 @@ const dayCount = (days: number) => `${days} ${plural(days, "deň", "dni", "dní"
 export const t = {
   app: {
     name: "Feedback portál",
+    company: "Asseco Central Europe",
     testDataNotice: "Demo na testovacích dátach",
+  },
+  motion: {
+    menuButton: "Nastavenie animácií",
+    legend: "Animácie",
+    options: {
+      system: "Podľa systému",
+      on: "Zapnuté",
+      reduced: "Obmedzené",
+    },
+    hintSystemReduced: "Systém má animácie vypnuté. Voľbou „Zapnuté“ ich povolíš iba v tejto aplikácii.",
+    hintSystemFull: "Systém má animácie zapnuté.",
+    hintOn: "Animácie sú zapnuté bez ohľadu na systém.",
+    hintReduced: "Bez pohybu, iba krátke prelínanie.",
+    toastRegion: "Oznámenia",
+    toastDismiss: "Zavrieť oznámenie",
+  },
+  ui: {
+    skipToContent: "Preskočiť na obsah",
+    mainNav: "Hlavná navigácia",
+    subNav: "Časti stránky",
+    cancel: "Zrušiť",
+    loading: "Načítavam…",
+    back: "Späť",
   },
   roles: {
     EMPLOYEE: "Zamestnanec",
@@ -42,6 +66,9 @@ export const t = {
     password: "Heslo",
     submit: "Prihlásiť sa",
     submitting: "Prihlasujem…",
+    subtitle: "Prihlás sa svojím e-mailom a heslom.",
+    tagline: "Povedali ste, urobili sme.",
+    taglineDetail: "Krátke prieskumy v tíme, výsledky za celý tím a kroky, ktoré z nich vzniknú.",
     // MVP-01: one generic message, no hint which of the two was wrong.
     invalid: "Nesprávny e-mail alebo heslo.",
   },
@@ -54,6 +81,8 @@ export const t = {
     logoutFailed: "Odhlásenie sa nepodarilo. Skús to znova.",
     forbiddenTitle: "Sem nemáš prístup",
     forbiddenText: "Táto stránka nie je dostupná pre tvoju rolu alebo tím.",
+    forbiddenCode: "Chyba 403",
+    notFoundCode: "Chyba 404",
     backHome: "Späť na úvod",
   },
   // IT-11: what needs doing now. One sentence per task.
@@ -119,8 +148,14 @@ export const t = {
     awaitingAction: "Čaká na krok",
     open: "Spustiť",
     close: "Uzavrieť",
-    confirmOpen: "Spustiť kolo? Po spustení sa už nedá upravovať.",
-    confirmClose: "Uzavrieť kolo? Potom sa do neho už nedá odpovedať.",
+    confirmOpenTitle: "Spustiť kolo?",
+    confirmOpenText: "Po spustení sa už nedá upravovať.",
+    confirmCloseTitle: "Uzavrieť kolo?",
+    confirmCloseText: "Potom sa do neho už nedá odpovedať.",
+    summaryLabel: "Súhrn kôl",
+    summaryOpen: "Otvorené kolá",
+    summaryAwaiting: "Čakajú na krok",
+    summaryTotal: "Všetky kolá",
     invalidState: "Kolo medzitým zmenilo stav. Obnov stránku.",
     deadlinePassed: "Uzávierka kola už prešla, kolo sa nedá spustiť.",
     fill: "Vyplniť",
@@ -135,6 +170,7 @@ export const t = {
     introDuration: (count: number) => `${count} ${count >= 5 ? "otázok" : "otázky"}, zaberie to do 2 minút.`,
     start: "Začať",
     progress: (current: number, total: number) => `${current} z ${total}`,
+    progressLabel: (current: number, total: number) => `Otázka ${current} z ${total}`,
     scaleLegend: "Vyber hodnotu od 1 do 5",
     back: "Späť",
     next: "Ďalej",
@@ -154,6 +190,17 @@ export const t = {
     backToSurveys: "Späť na moje prieskumy",
     latestActionsTitle: (roundName: string) => `Čo sa urobilo po kole „${roundName}“`,
     latestActionsEmpty: "K poslednému uzavretému kolu zatiaľ nie je zapísaný žiadny krok.",
+    sessionExpiredTitle: "Prihlásenie vypršalo",
+    sessionExpiredText:
+      "Odpovede sa neodoslali. Prihlás sa znova v novej karte, potom sa sem vráť a klikni na „Odoslať“.",
+    sessionExpiredLink: "Prihlásiť sa v novej karte",
+    // One is picked at random after a successful submission.
+    cheers: [
+      "Výborne, prieskum je hotový!",
+      "Ďakujeme, tvoj hlas sa počíta.",
+      "Hotovo. Vďaka, že pomáhaš tímu napredovať.",
+      "Super, máš to za sebou. Tvoj názor pomáha celému tímu.",
+    ],
   },
   // Labels of the answer scales; keys match src/config/scales.ts (IT-03).
   scales: {
@@ -167,6 +214,8 @@ export const t = {
     title: "Výsledky kola",
     participation: (responded: number, teamSize: number) =>
       `Odpovedalo ${responded} z ${teamSize} členov tímu`,
+    participationValue: (responded: number, teamSize: number) => `${responded} z ${teamSize}`,
+    participationLabel: "členov tímu odpovedalo",
     notClosed: "Výsledky sa zobrazia až po uzavretí kola. Dovtedy je viditeľná iba účasť.",
     draft: "Kolo je koncept a ešte nebolo spustené.",
     insufficientTitle: "Nedostatok odpovedí",
@@ -327,6 +376,15 @@ export const t = {
     submit: "Pridať krok",
     submitting: "Ukladám…",
     invalid: "Vyplň tému, čo sa urobí a platný termín.",
+    // Per-field messages for the 400 response's `fields`.
+    fieldErrors: {
+      topic: "Zadaj tému (najviac 120 znakov).",
+      description: "Napíš, čo sa urobí (najviac 1 000 znakov).",
+      dueDate: "Zadaj platný termín.",
+      status: "Vyber stav.",
+    },
+    added: "Krok je pridaný.",
+    statusSaved: "Stav je uložený.",
   },
   team: {
     title: "Povedali ste, urobili sme",
@@ -344,6 +402,8 @@ export const t = {
     showTeamPage: "Stránka tímu",
   },
   kudos: {
+    hubTitle: "Kudos",
+    hubIntro: "Poďakuj kolegom za pomoc a pozri si, za čo ocenili teba.",
     newTitle: "Poslať kudos",
     newIntro: "Kudos je podpísané tvojím menom.",
     recipient: "Komu",
@@ -386,6 +446,23 @@ export const t = {
     myEmpty: "Zatiaľ tu nemáš žiadne kudos.",
     fromTo: (from: string, to: string) => `${from} → ${to}`,
     from: (from: string) => `Od: ${from}`,
+    // Kudos hub: tabs, summary and the "new kudos" moment
+    tabsLabel: "Kudos",
+    receivedLabel: "kudos od kolegov",
+    summaryLabel: "Kudos podľa hodnôt",
+    valueCount: (label: string, count: number) => `${label} ×${count}`,
+    newKudos: (count: number) => `Máš ${count} ${plural(count, "nové", "nové", "nových")} kudos`,
+    newKudosText: "Pozri si, čo ti kolegovia poslali.",
+    myEmptyHint: "Začni ty – poďakuj kolegovi, ktorý ti nedávno pomohol.",
+    // Live preview in the send form
+    previewTitle: "Náhľad",
+    previewHint: "Takto kudos uvidí príjemca.",
+    previewFor: (name: string) => `Pre: ${name}`,
+    previewRecipientEmpty: "Pre: vyber kolegu",
+    previewTextEmpty: "Sem sa zobrazí tvoje poďakovanie…",
+    sentText: "Príjemca ho uvidí vo svojich kudos.",
+    sendAnother: "Poslať ďalšie",
+    showReceived: "Pozrieť moje kudos",
   },
   hrOverview: {
     title: "Plnenie reakcie",
@@ -423,6 +500,7 @@ export const t = {
   newRound: {
     title: "Nové kolo",
     intro: "Kolo sa uloží ako koncept. Členovia tímu ho uvidia až po spustení.",
+    basicsTitle: "Základné údaje",
     name: "Názov kola",
     namePlaceholder: "napr. Pulse – 46. týždeň",
     team: "Tím",
@@ -470,10 +548,25 @@ export const t = {
       questionIds: "Kolo musí mať spolu 3 až 5 otázok.",
     },
   },
+  // Short confirmations after a successful operation (errors stay inline).
+  toasts: {
+    actionAdded: "Krok je pridaný.",
+    actionStatusSaved: "Stav kroku je uložený.",
+    roundOpened: "Kolo je spustené. Tím ho už vidí.",
+    roundClosed: "Kolo je uzavreté.",
+    roundCreated: "Koncept kola je uložený.",
+    issueAdded: "Podnet je pridaný.",
+    issueSaved: "Podnet je uložený.",
+    noteAdded: "Poznámka je uložená.",
+    questionAdded: "Otázka je pridaná do knižnice tímu.",
+  },
 } as const;
 
 export function formatDate(iso: string | Date): string {
-  return new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(iso));
+  // Fixed time zone: server and browser render the same date (no hydration mismatch).
+  return new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium", timeZone: "Europe/Bratislava" }).format(
+    new Date(iso),
+  );
 }
 
 /** Message for a failed request: an expired session gets its own wording (QA FE-003). */

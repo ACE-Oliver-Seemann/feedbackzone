@@ -2,11 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Field, Input, Textarea } from "@/components/ui/field";
+import { IconPlus } from "@/components/ui/icons";
+import { Notice } from "@/components/ui/notice";
+import { Panel } from "@/components/ui/surface";
+import { useToast } from "@/components/ui/toast";
 import { errorForStatus, t } from "@/lib/texts.sk";
 
 // Form "Nová poznámka zo stretnutia" for HR (IT-10). Typed text only.
 export function NoteForm() {
   const router = useRouter();
+  const toast = useToast();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +36,8 @@ export function NoteForm() {
       if (response.status === 201) {
         formElement.reset();
         router.refresh();
+        // The new note appears in the list below; the toast confirms it.
+        toast.success(t.toasts.noteAdded);
       } else {
         setError(response.status === 400 ? t.notes.invalid : errorForStatus(response.status));
       }
@@ -38,48 +47,38 @@ export function NoteForm() {
     setPending(false);
   }
 
-  const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
-
   return (
-    <form
-      onSubmit={onSubmit}
-      noValidate
-      className="mt-3 space-y-4 rounded-lg border border-slate-200 bg-white p-4"
-    >
-      <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-950">{t.notes.warning}</p>
-      <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
-        <label className="block text-sm font-medium">
-          {t.notes.title}
-          <input
-            name="title"
-            type="text"
-            maxLength={120}
-            placeholder={t.notes.titlePlaceholder}
-            className={inputClass}
-          />
-        </label>
-        <label className="block text-sm font-medium">
-          {t.notes.meetingDate}
-          <input name="meetingDate" type="date" className={inputClass} />
-        </label>
-      </div>
-      <label className="block text-sm font-medium">
-        {t.notes.text}
-        <textarea name="text" rows={6} maxLength={10000} className={inputClass} />
-      </label>
-      {error && (
-        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">
-          {error}
-        </p>
-      )}
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
-      >
-        {pending ? t.notes.submitting : t.notes.submit}
-      </button>
-    </form>
+    <Panel className="p-5 sm:p-6">
+      <form onSubmit={onSubmit} noValidate className="space-y-5">
+        <Notice tone="warning">{t.notes.warning}</Notice>
+        <div className="grid gap-5 sm:grid-cols-[2fr_1fr]">
+          <Field label={t.notes.title}>
+            <Input
+              name="title"
+              type="text"
+              maxLength={120}
+              placeholder={t.notes.titlePlaceholder}
+            />
+          </Field>
+          <Field label={t.notes.meetingDate}>
+            <Input name="meetingDate" type="date" />
+          </Field>
+        </div>
+        <Field label={t.notes.text}>
+          <Textarea name="text" rows={6} maxLength={10000} />
+        </Field>
+        {error && (
+          <Notice tone="error" role="alert">
+            {error}
+          </Notice>
+        )}
+        <div className="flex justify-end border-t border-line pt-5">
+          <Button type="submit" disabled={pending} pending={pending} className="w-full sm:w-auto">
+            {!pending && <IconPlus size={16} className="-ml-0.5" />}
+            {pending ? t.notes.submitting : t.notes.submit}
+          </Button>
+        </div>
+      </form>
+    </Panel>
   );
 }

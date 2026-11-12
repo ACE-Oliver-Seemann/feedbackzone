@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SubNav } from "@/components/sub-nav";
+import { Disclosure } from "@/components/ui/disclosure";
+import { IconChart } from "@/components/ui/icons";
+import { Notice } from "@/components/ui/notice";
+import { EmptyState, Page, PageHeader } from "@/components/ui/page";
+import { InsetList, InsetRow, Panel } from "@/components/ui/surface";
 import { pageData, requirePageUser } from "@/lib/page-auth";
+import { FORWARD } from "@/lib/page-motion";
 import { t } from "@/lib/texts.sk";
 import {
   getReactionOverview,
@@ -9,14 +16,18 @@ import {
 } from "@/server/hr-overview";
 
 // Screen "Plnenie reakcie" for HR (IT-05).
-export const metadata = { title: t.hrOverview.title };
+export const metadata: Metadata = { title: t.hrOverview.title };
+
+const linkClass =
+  "rounded font-medium text-brand-700 underline underline-offset-2 hover:text-brand-900";
 
 export default async function HrOverviewPage() {
   const user = await requirePageUser("HR");
   const overview = await pageData(() => getReactionOverview(user));
+  const someWaiting = overview.teams.some((team) => team.awaitingRounds.length > 0);
 
   return (
-    <section className="max-w-3xl">
+    <Page>
       <SubNav
         label={t.nav.hrInsights}
         current="/hr/overview"
@@ -25,64 +36,66 @@ export default async function HrOverviewPage() {
           { href: "/hr/heatmap", label: t.nav.hrHeatmap },
         ]}
       />
-      <h1 className="text-xl font-semibold">{t.hrOverview.title}</h1>
-      <p className="mt-1 text-sm text-slate-600">{t.hrOverview.intro}</p>
-      {overview.total.closedRounds > 0 && (
-        <p className="mt-3 rounded-lg border border-teal-200 bg-teal-50 p-4 font-medium text-teal-950">
-          {headline(overview)}
-        </p>
-      )}
+      <PageHeader title={t.hrOverview.title} description={t.hrOverview.intro} />
 
       {overview.total.closedRounds === 0 ? (
-        <p className="mt-4 text-slate-600">{t.hrOverview.empty}</p>
+        <EmptyState icon={<IconChart size={20} />} title={t.hrOverview.empty} />
       ) : (
         <>
-          <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4">
-            <h2 className="font-semibold">{t.hrOverview.totalTitle}</h2>
-            <SummaryFigures summary={overview.total} />
-          </div>
+          <Notice tone={someWaiting ? "warning" : "success"}>
+            <p className="font-medium">{headline(overview)}</p>
+          </Notice>
 
-          <ul className="mt-4 space-y-4">
+          <Panel className="mt-6 px-5 py-5 sm:px-6">
+            <h2 className="text-[1.0625rem] font-semibold tracking-[-0.01em] text-ink">
+              {t.hrOverview.totalTitle}
+            </h2>
+            <SummaryFigures summary={overview.total} />
+          </Panel>
+
+          <InsetList className="mt-6">
             {overview.teams.map((team) => (
-              <li key={team.teamId} className="rounded-lg border border-slate-200 bg-white p-4">
-                <h2 className="font-semibold">
-                  <Link href={`/team/${team.teamId}`} className="text-teal-800 underline">
+              <InsetRow key={team.teamId} className="py-5">
+                <h2 className="text-[0.9375rem] font-semibold text-ink">
+                  <Link href={`/team/${team.teamId}`} transitionTypes={FORWARD} className={linkClass}>
                     {team.teamName}
                   </Link>
                 </h2>
-                <p className="mt-1 text-sm">
+                <p className="mt-1 text-sm text-ink-soft">
                   {t.hrOverview.teamLine(team.roundsWithAction, team.closedRounds)}
                 </p>
-                <details className="mt-1">
-                  <summary className="cursor-pointer text-sm font-medium text-teal-800">
-                    {t.hrOverview.details}
-                  </summary>
+                <Disclosure variant="inline" summary={t.hrOverview.details} className="mt-1">
                   <SummaryFigures summary={team} />
-                </details>
+                </Disclosure>
                 {team.awaitingRounds.length > 0 && (
-                  <div className="mt-3 rounded-md bg-amber-50 px-3 py-2">
-                    <h3 className="text-sm font-medium text-amber-950">
-                      {t.hrOverview.awaitingRoundsTitle}
-                    </h3>
-                    <ul className="mt-1 space-y-0.5 text-sm text-amber-950">
+                  <Notice
+                    tone="warning"
+                    title={<span role="heading" aria-level={3}>{t.hrOverview.awaitingRoundsTitle}</span>}
+                    className="mt-3"
+                  >
+                    <ul className="space-y-0.5">
                       {team.awaitingRounds.map((round) => (
                         <li key={round.id}>
-                          <Link href={`/rounds/${round.id}/results`} className="underline">
+                          <Link
+                            href={`/rounds/${round.id}/results`}
+                            transitionTypes={FORWARD}
+                            className="rounded font-medium underline underline-offset-2"
+                          >
                             {round.name}
                           </Link>{" "}
                           ({t.hrOverview.awaitingSince(round.daysWaiting)})
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </Notice>
                 )}
-              </li>
+              </InsetRow>
             ))}
-          </ul>
-          <p className="mt-3 text-xs text-slate-500">{t.hrOverview.reactionTimeHint}</p>
+          </InsetList>
+          <p className="mt-3 text-xs leading-relaxed text-muted">{t.hrOverview.reactionTimeHint}</p>
         </>
       )}
-    </section>
+    </Page>
   );
 }
 
@@ -130,11 +143,11 @@ function SummaryFigures({ summary }: { summary: ReactionSummary }) {
     { label: t.hrOverview.overdue, value: String(summary.actions.overdue) },
   ];
   return (
-    <dl className="mt-2 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+    <dl className="mt-3 grid gap-x-8 text-sm sm:grid-cols-2">
       {figures.map((figure) => (
-        <div key={figure.label} className="flex justify-between gap-4 border-b border-slate-100 py-1">
-          <dt className="text-slate-600">{figure.label}</dt>
-          <dd className="text-right font-medium">{figure.value}</dd>
+        <div key={figure.label} className="flex justify-between gap-4 border-b border-line py-2">
+          <dt className="text-muted">{figure.label}</dt>
+          <dd className="text-right font-medium text-ink tabular-nums">{figure.value}</dd>
         </div>
       ))}
     </dl>

@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { TrendChart } from "@/components/trend-chart";
 import { SubNav } from "@/components/sub-nav";
+import { TrendChart } from "@/components/trend-chart";
+import { IconChart, IconUsers } from "@/components/ui/icons";
+import { Notice } from "@/components/ui/notice";
+import { EmptyState, Page, PageHeader } from "@/components/ui/page";
+import { Section } from "@/components/ui/surface";
 import { pageData, requirePageUser } from "@/lib/page-auth";
+import { FORWARD } from "@/lib/page-motion";
 import { formatDate, t } from "@/lib/texts.sk";
 import { FIXED_TOPIC_LABEL, getTeamTrend } from "@/server/trends";
 
@@ -9,7 +15,7 @@ const number = (value: number) =>
   value.toLocaleString("sk-SK", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 
 // Screen "Vývoj tímu" for the team's manager and HR (IT-08).
-export const metadata = { title: t.trend.title };
+export const metadata: Metadata = { title: t.trend.title };
 
 export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/trend">) {
   const user = await requirePageUser("MANAGER", "HR");
@@ -21,7 +27,7 @@ export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/tr
   const hasFixedColumn = withFixed.length > 0;
 
   return (
-    <section className="max-w-3xl">
+    <Page>
       <SubNav
         label={trend.team.name}
         current={`/team/${trend.team.id}/trend`}
@@ -30,24 +36,31 @@ export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/tr
           { href: `/team/${trend.team.id}/trend`, label: t.nav.teamTrend },
         ]}
       />
-      <p className="text-sm font-medium text-teal-800">{trend.team.name}</p>
-      <h1 className="mt-1 text-xl font-semibold">{t.trend.title}</h1>
-      <p className="mt-1 text-sm text-slate-600">{t.trend.intro}</p>
+      <PageHeader
+        title={t.trend.title}
+        context={
+          <span className="inline-flex items-center gap-1.5">
+            <IconUsers size={16} />
+            {trend.team.name}
+          </span>
+        }
+        description={t.trend.intro}
+      />
 
       {trend.points.length === 0 ? (
-        <p className="mt-4 text-slate-600">{t.trend.empty}</p>
+        <EmptyState icon={<IconChart size={20} />} title={t.trend.empty} />
       ) : (
         <>
-          <h2 className="mt-6 text-lg font-semibold">{t.trend.chartTitle}</h2>
+          <Section title={t.trend.chartTitle}>
           {withFixed.length === 0 ? (
-            <p className="mt-2 text-sm text-slate-600">{t.trend.noFixed}</p>
+            <Notice>{t.trend.noFixed}</Notice>
           ) : (
             <>
               {/* A line through one or two rounds looks more certain than it is. */}
               {withFixed.length < 3 && (
-                <p className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-950">
+                <Notice tone="warning" className="mb-3">
                   {t.trend.fewRounds(withFixed.length)}
-                </p>
+                </Notice>
               )}
               <TrendChart
                 title={t.trend.chartTitle}
@@ -59,20 +72,20 @@ export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/tr
               />
             </>
           )}
+          </Section>
 
-          <h2 className="mt-8 text-lg font-semibold">{t.trend.tableTitle}</h2>
-          <p className="mt-1 text-sm text-slate-600">{t.trend.tableHint}</p>
-          <p className="mt-1 text-xs text-slate-600">{t.trend.scrollHint}</p>
+          <Section title={t.trend.tableTitle} description={t.trend.tableHint}>
+          <p className="mb-2 text-xs text-muted">{t.trend.scrollHint}</p>
           <div
             // Focusable, so that the table can be scrolled with the keyboard (QA FE-011).
             tabIndex={0}
             role="region"
             aria-label={t.trend.tableTitle}
-            className="mt-2 overflow-x-auto rounded-lg border border-slate-200 bg-white"
+            className="overflow-x-auto rounded-[var(--radius-panel)] bg-surface shadow-[var(--shadow-panel)] ring-1 ring-line"
           >
             <table className="w-full min-w-max text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-left text-slate-600">
+                <tr className="border-b border-line bg-canvas/60 text-left text-xs text-muted">
                   <th scope="col" className="px-3 py-2 font-medium">
                     {t.trend.colRound}
                   </th>
@@ -94,12 +107,16 @@ export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/tr
               <tbody>
                 {/* Newest first: the latest round is what people look for. */}
                 {[...trend.points].reverse().map((point) => (
-                  <tr key={point.roundId} className="border-b border-slate-100 last:border-0">
+                  <tr key={point.roundId} className="border-b border-line last:border-0">
                     <th scope="row" className="px-3 py-2 text-left font-normal">
-                      <Link href={`/rounds/${point.roundId}/results`} className="underline">
+                      <Link
+                        href={`/rounds/${point.roundId}/results`}
+                        transitionTypes={FORWARD}
+                        className="rounded font-medium text-brand-700 hover:text-brand-900 hover:underline"
+                      >
                         {point.roundName}
                       </Link>
-                      <span className="block text-xs text-slate-500">
+                      <span className="block text-xs text-muted">
                         {formatDate(point.closedAt)}
                       </span>
                     </th>
@@ -130,8 +147,9 @@ export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/tr
               </tbody>
             </table>
           </div>
+          </Section>
         </>
       )}
-    </section>
+    </Page>
   );
 }

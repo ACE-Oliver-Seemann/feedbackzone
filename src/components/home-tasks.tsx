@@ -1,4 +1,7 @@
-import Link from "next/link";
+import { ButtonLink } from "@/components/ui/button";
+import { Notice } from "@/components/ui/notice";
+import { InsetList, InsetRow } from "@/components/ui/surface";
+import { FORWARD } from "@/lib/page-motion";
 import { t } from "@/lib/texts.sk";
 import type { HomeTask } from "@/server/home";
 
@@ -43,30 +46,33 @@ function describe(task: HomeTask): { text: string; action: string } {
 export function HomeTasks({ tasks, emptyText }: { tasks: HomeTask[]; emptyText: string }) {
   if (tasks.length === 0) {
     return (
-      <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-950">
-        <span className="font-semibold">{t.home.nothing}</span> {emptyText}
-      </p>
+      <Notice tone="success" title={t.home.nothing}>
+        {emptyText}
+      </Notice>
     );
   }
   return (
-    <ol className="mt-3 space-y-3">
+    <InsetList role="list">
       {tasks.map((task, index) => {
         const { text, action } = describe(task);
         return (
-          <li
+          <InsetRow
             key={`${task.kind}-${task.href}-${index}`}
-            className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-teal-200 bg-white p-4"
+            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
           >
-            <p className="min-w-0 flex-1 basis-48 font-medium">{text}</p>
-            <Link
+            <p className="min-w-0 text-[0.9375rem] leading-relaxed font-medium text-ink">{text}</p>
+            {/* The first task is the most urgent one, so only it gets the primary button. */}
+            <ButtonLink
               href={task.href}
-              className="rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800"
+              transitionTypes={FORWARD}
+              variant={index === 0 ? "primary" : "secondary"}
+              className="shrink-0 self-start sm:self-auto"
             >
               {action}
-            </Link>
-          </li>
+            </ButtonLink>
+          </InsetRow>
         );
       })}
-    </ol>
+    </InsetList>
   );
 }
