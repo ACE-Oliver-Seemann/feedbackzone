@@ -1,0 +1,127 @@
+// Data model per docs/requirements/mvp.md, section "Dátový model" (nine tables).
+//
+// NFR-01: Response has NO user column and NO timestamp. Who answered is stored
+// only in Participation. The initial migration additionally declares Response
+// and Participation as WITHOUT ROWID (so insertion order cannot be recovered
+// from SQLite's hidden rowid) and adds CHECK constraints. Prisma cannot express
+// either, so they live in prisma/migrations/*_init/migration.sql.
+// If a later migration redefines these tables, re-add both by hand.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String  @id @default(cuid())
+  name         String
+  email        String  @unique
+  passwordHash String
+  role         String // EMPLOYEE | MANAGER | HR
+  teamId       String?
+  team         Team?   @relation("TeamMembers", fields: [teamId], references: [id])
+
+  managedTeam    Team?           @relation("TeamManager")
+  participations Participation[]
+  kudosSent      Kudos[]         @relation("KudosFrom")
+  kudosReceived  Kudos[]         @relation("KudosTo")
+}
+
+model Team {
+  id        String @id @default(cuid())
+  name      String
+  managerId String @unique
+  manager   User   @relation("TeamManager", fields: [managerId], references: [id])
+
+  members   User[]     @relation("TeamMembers")
+  rounds    Round[]
+  responses Response[]
+}
+
+model Question {
+  id    String @id @default(cuid())
+  text  String
+  type  String @default("SCALE_1_5")
+  topic String
+
+  rounds RoundQuestion[]
+}
+
+model Round {
+  id       String    @id @default(cuid())
+  teamId   String
+  team     Team      @relation(fields: [teamId], references: [id])
+  name     String
+  startsAt DateTime? // set when the round is opened
+  closesAt DateTime
+  status   String    @default("DRAFT") // DRAFT | OPEN | CLOSED
+
+  questions      RoundQuestion[]
+  participations Participation[]
+  responses      Response[]
+  actions        Action[]
+}
+
+model RoundQuestion {
+  roundId    String
+  round      Round    @relation(fields: [roundId], references: [id])
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+  position   Int // 1..5, maps to Response.v1..v5
+
+  @@id([roundId, position])
+  @@unique([roundId, questionId])
+}
+
+// Only the fact that a user answered. No content, no timestamp (NFR-01).
+model Participation {
+  roundId String
+  round   Round  @relation(fields: [roundId], references: [id])
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+
+  @@id([roundId, userId])
+}
+
+// No user, no timestamp, UUID id (NFR-01). v1..v5 follow RoundQuestion.position.
+model Response {
+  id      String  @id @default(uuid())
+  roundId String
+  round   Round   @relation(fields: [roundId], references: [id])
+  teamId  String
+  team    Team    @relation(fields: [teamId], references: [id])
+  v1      Int
+  v2      Int
+  v3      Int
+  v4      Int?
+  v5      Int?
+  comment String?
+
+  @@index([roundId])
+}
+
+model Action {
+  id          String   @id @default(cuid())
+  roundId     String
+  round       Round    @relation(fields: [roundId], references: [id])
+  topic       String
+  description String
+  dueDate     DateTime
+  status      String   @default("PLANNED") // PLANNED | IN_PROGRESS | DONE
+}
+
+model Kudos {
+  id         String   @id @default(cuid())
+  fromUserId String
+  fromUser   User     @relation("KudosFrom", fields: [fromUserId], references: [id])
+  toUserId   String
+  toUser     User     @relation("KudosTo", fields: [toUserId], references: [id])
+  text       String
+  value      String
+  visibility String // TEAM | PRIVATE
+  createdAt  DateTime @default(now())
+}
