@@ -43,10 +43,16 @@ model Team {
 }
 
 model Question {
-  id    String @id @default(cuid())
-  text  String
-  type  String @default("SCALE_1_5")
-  topic String
+  id      String  @id @default(cuid())
+  text    String
+  type    String  @default("SCALE_1_5")
+  topic   String
+  // Which labels the five points carry; keys are in src/config/scales.ts (IT-03).
+  scale   String  @default("AGREEMENT")
+  // Recommended starting set, highlighted when a round is created (IT-03).
+  starter Boolean @default(false)
+  // Trend question: added automatically as the first question of every round (IT-04).
+  fixed   Boolean @default(false)
 
   rounds RoundQuestion[]
 }
@@ -58,6 +64,7 @@ model Round {
   name     String
   startsAt DateTime? // set when the round is opened
   closesAt DateTime
+  closedAt DateTime? // when it was actually closed; used for reaction time (IT-05)
   status   String    @default("DRAFT") // DRAFT | OPEN | CLOSED
 
   questions      RoundQuestion[]
@@ -112,6 +119,9 @@ model Action {
   description String
   dueDate     DateTime
   status      String   @default("PLANNED") // PLANNED | IN_PROGRESS | DONE
+  // Actions are written by the manager and are not confidential, so they may
+  // carry a timestamp. Response and Participation must never get one (NFR-01).
+  createdAt   DateTime @default(now())
 }
 
 model Kudos {

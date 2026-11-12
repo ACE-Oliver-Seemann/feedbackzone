@@ -1,4 +1,5 @@
 import { MIN_GROUP_SIZE } from "@/config/privacy";
+import type { ScaleKey } from "@/config/scales";
 import { db } from "@/lib/db";
 import { assertCanViewTeam } from "@/lib/authz";
 import { forbidden, notFound } from "@/lib/errors";
@@ -15,7 +16,10 @@ export type TeamRoundSummary = {
   participation: { responded: number; teamSize: number };
   /** Averages only at or above the threshold. Never distributions or comments. */
   results:
-    | { status: "ok"; questions: { position: number; text: string; average: number }[] }
+    | {
+        status: "ok";
+        questions: { position: number; text: string; scale: ScaleKey; average: number }[];
+      }
     | { status: "insufficient_responses" };
   actions: ActionItem[];
 };
@@ -55,7 +59,7 @@ export async function getTeamSummary(user: SessionUser, teamId: string): Promise
       closesAt: true,
       questions: {
         orderBy: { position: "asc" },
-        select: { position: true, question: { select: { text: true } } },
+        select: { position: true, question: { select: { text: true, scale: true } } },
       },
       responses: { select: { v1: true, v2: true, v3: true, v4: true, v5: true } },
       actions: {
@@ -84,7 +88,7 @@ export async function getTeamSummary(user: SessionUser, teamId: string): Promise
           ? {
               status: "ok" as const,
               questions: computeQuestionResults(round.questions, round.responses).map(
-                ({ position, text, average }) => ({ position, text, average }),
+                ({ position, text, scale, average }) => ({ position, text, scale, average }),
               ),
             }
           : { status: "insufficient_responses" as const },

@@ -31,10 +31,18 @@ export type RoundListItem = {
  * Called by every read that depends on round status.
  */
 export async function closeExpiredRounds(now = new Date()): Promise<void> {
-  await db.round.updateMany({
+  const expired = await db.round.findMany({
     where: { status: "OPEN", closesAt: { lt: now } },
-    data: { status: "CLOSED" },
+    select: { id: true, closesAt: true },
   });
+  for (const round of expired) {
+    // The round counts as closed at its deadline, not at the moment someone
+    // happened to load the page (IT-05 measures reaction time from here).
+    await db.round.updateMany({
+      where: { id: round.id, status: "OPEN" },
+      data: { status: "CLOSED", closedAt: round.closesAt },
+    });
+  }
 }
 
 /**
@@ -113,16 +121,31 @@ export async function createRound(
   if (!closesAt) fields.closesAt = "invalid";
   else if (closesAt.getTime() < Date.now()) fields.closesAt = "in_past";
 
-  const rawIds = Array.isArray(input.questionIds) ? input.questionIds : null;
-  const questionIds =
-    rawIds && rawIds.every((id): id is string => typeof id === "string") ? rawIds : null;
-  if (!questionIds) fields.questionIds = "invalid";
-  else if (new Set(questionIds).size !== questionIds.length) fields.questionIds = "duplicate";
-  else if (questionIds.length < MIN_QUESTIONS) fields.questionIds = "too_few";
-  else if (questionIds.length > MAX_QUESTIONS) fields.questionIds = "too_many";
-
   // Permission is checked before anything about the target team is revealed.
   if (teamId) assertCanManageRounds(user, teamId);
+
+  // IT-04: fixed (trend) questions open every round. The author picks the
+  // rest; the 3–5 limit from MVP-04 applies to the total.
+  const fixedIds = (
+    await db.question.findMany({
+      where: { fixed: true },
+      orderBy: { id: "asc" },
+      select: { id: true },
+    })
+  ).map((question) => question.id);
+
+  const rawIds = Array.isArray(input.questionIds) ? input.questionIds : null;
+  const pickedIds =
+    rawIds && rawIds.every((id): id is string => typeof id === "string") ? rawIds : null;
+  let questionIds: string[] | null = null;
+  if (!pickedIds) fields.questionIds = "invalid";
+  else if (new Set(pickedIds).size !== pickedIds.length) fields.questionIds = "duplicate";
+  else {
+    // A fixed question sent by the client is not counted twice.
+    questionIds = [...fixedIds, ...pickedIds.filter((id) => !fixedIds.includes(id))];
+    if (questionIds.length < MIN_QUESTIONS) fields.questionIds = "too_few";
+    else if (questionIds.length > MAX_QUESTIONS) fields.questionIds = "too_many";
+  }
 
   if (Object.keys(fields).length > 0) throw validationError(fields);
 
@@ -180,7 +203,7 @@ export async function closeRound(user: SessionUser, roundId: string): Promise<vo
 
   const updated = await db.round.updateMany({
     where: { id: round.id, status: "OPEN" },
-    data: { status: "CLOSED" },
+    data: { status: "CLOSED", closedAt: new Date() },
   });
   if (updated.count === 0) throw conflict("invalid_state");
 }

@@ -57,10 +57,10 @@ describe("team page 'Povedali ste, urobili sme' [MVP-14]", () => {
     expect(body.rounds[0].results).toEqual({
       status: "ok",
       questions: [
-        { position: 1, text: fx.questions[0].text, average: 4 },
-        { position: 2, text: fx.questions[1].text, average: 2 },
-        { position: 3, text: fx.questions[2].text, average: 5 },
-        { position: 4, text: fx.questions[3].text, average: 3 },
+        { position: 1, text: fx.questions[0].text, scale: "AGREEMENT", average: 4 },
+        { position: 2, text: fx.questions[1].text, scale: "AGREEMENT", average: 2 },
+        { position: 3, text: fx.questions[2].text, scale: "AGREEMENT", average: 5 },
+        { position: 4, text: fx.questions[3].text, scale: "AGREEMENT", average: 3 },
       ],
     });
     expect(body.rounds[0].actions).toHaveLength(1);

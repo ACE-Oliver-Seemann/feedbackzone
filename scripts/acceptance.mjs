@@ -56,7 +56,8 @@ const created = await hr("/api/rounds", "POST", {
   name: "Pulse – 46. týždeň",
   teamId: teamA,
   closesAt: deadline,
-  questionIds: questions.slice(0, 4).map((q) => q.id),
+  // The fixed trend question is added by the server (IT-04): 1 fixed + 3 picked = 4.
+  questionIds: questions.filter((q) => !q.fixed).slice(0, 3).map((q) => q.id),
 });
 check("1  HR creates a round with 4 questions for team A", created.status === 201);
 const roundId = created.json.round.id;

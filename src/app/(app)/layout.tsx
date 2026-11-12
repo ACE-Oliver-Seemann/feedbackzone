@@ -12,6 +12,7 @@ function navFor(teamId: string | null): NavItem[] {
   return [
     { href: "/", label: t.nav.mySurveys, roles: ["EMPLOYEE", "MANAGER"] },
     { href: "/hr/rounds", label: t.nav.hrRounds, roles: ["HR"] },
+    { href: "/hr/overview", label: t.nav.hrOverview, roles: ["HR"] },
     // HR has no team of its own; it reaches team pages from the round overview.
     ...(teamId
       ? [{ href: `/team/${teamId}`, label: t.nav.myTeam, roles: ["EMPLOYEE", "MANAGER"] as Role[] }]

@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { PATCH as patchAction } from "@/app/api/actions/[id]/route";
 import { GET as getMyKudos } from "@/app/api/kudos/me/route";
 import { POST as postKudos } from "@/app/api/kudos/route";
+import { GET as getHrOverview } from "@/app/api/hr/overview/route";
 import { POST as logout } from "@/app/api/logout/route";
 import { GET as getMe } from "@/app/api/me/route";
 import { GET as getQuestions } from "@/app/api/questions/route";
@@ -187,6 +188,11 @@ const CASES: Case[] = [
         },
       }),
     expected: status([401, 201, 201, 201, 201, 201]),
+  },
+  {
+    name: "GET /api/hr/overview",
+    call: (as) => invoke(getHrOverview, "/api/hr/overview", as),
+    expected: status([401, 403, 403, 403, 403, 200]),
   },
   {
     name: "GET /api/kudos/me",

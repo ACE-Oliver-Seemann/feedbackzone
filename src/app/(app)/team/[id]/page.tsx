@@ -1,6 +1,7 @@
 import { ActionList } from "@/components/action-list";
 import { KudosList } from "@/components/kudos-list";
 import { MIN_GROUP_SIZE } from "@/config/privacy";
+import { SCALES } from "@/config/scales";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { getTeamSummary } from "@/server/teams";
@@ -35,7 +36,14 @@ export default async function TeamPage({ params }: PageProps<"/team/[id]">) {
                       key={question.position}
                       className="flex items-start justify-between gap-4 px-4 py-3 text-sm"
                     >
-                      <span>{question.text}</span>
+                      <span>
+                        {question.text}
+                        {!SCALES[question.scale].higherIsBetter && (
+                          <span className="mt-0.5 block text-xs text-amber-800">
+                            {t.scales.lowerIsBetter}
+                          </span>
+                        )}
+                      </span>
                       <span
                         className="shrink-0 text-base font-semibold tabular-nums text-teal-800"
                         aria-label={t.team.average}

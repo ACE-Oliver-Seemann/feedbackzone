@@ -2,6 +2,7 @@ import { ActionForm } from "@/components/action-form";
 import { ActionList } from "@/components/action-list";
 import { Badge, StatusBadge } from "@/components/round-list";
 import { MIN_GROUP_SIZE } from "@/config/privacy";
+import { SCALES } from "@/config/scales";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listRoundActions } from "@/server/actions";
@@ -108,7 +109,12 @@ function QuestionCard({ question }: { question: QuestionResult }) {
   return (
     <li className="rounded-lg border border-slate-200 bg-white p-4">
       <div className="flex items-start justify-between gap-4">
-        <h3 className="font-medium leading-snug">{question.text}</h3>
+        <div>
+          <h3 className="font-medium leading-snug">{question.text}</h3>
+          {!SCALES[question.scale].higherIsBetter && (
+            <p className="mt-1 text-xs text-amber-800">{t.scales.lowerIsBetter}</p>
+          )}
+        </div>
         <p className="shrink-0 text-right">
           <span className="block text-xs text-slate-500">{t.results.average}</span>
           <span className="block text-2xl font-semibold tabular-nums text-teal-800">
@@ -125,6 +131,7 @@ function QuestionCard({ question }: { question: QuestionResult }) {
             key={index}
             className="flex items-center gap-2 text-sm"
             aria-label={t.results.distributionLabel(index + 1, count)}
+            title={t.scales[question.scale][index]}
           >
             <span className="w-3 text-slate-600">{index + 1}</span>
             <span className="h-3 flex-1 rounded-sm bg-slate-100">

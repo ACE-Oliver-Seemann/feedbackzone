@@ -9,7 +9,7 @@ import { t } from "@/lib/texts.sk";
 const MIN_QUESTIONS = 3;
 const MAX_QUESTIONS = 5;
 
-type Question = { id: string; text: string; topic: string };
+type Question = { id: string; text: string; topic: string; starter: boolean; fixed: boolean };
 type Team = { id: string; name: string };
 type FieldName = keyof typeof t.newRound.fieldErrors;
 
@@ -34,15 +34,18 @@ export function NewRoundForm({
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  // IT-04: fixed questions are part of every round and cannot be unticked.
+  const fixedQuestions = useMemo(() => questions.filter((question) => question.fixed), [questions]);
   const topics = useMemo(() => {
     const groups = new Map<string, Question[]>();
-    for (const question of questions) {
+    for (const question of questions.filter((item) => !item.fixed)) {
       groups.set(question.topic, [...(groups.get(question.topic) ?? []), question]);
     }
     return [...groups.entries()];
   }, [questions]);
 
-  const countValid = selected.length >= MIN_QUESTIONS && selected.length <= MAX_QUESTIONS;
+  const total = fixedQuestions.length + selected.length;
+  const countValid = total >= MIN_QUESTIONS && total <= MAX_QUESTIONS;
 
   function toggle(id: string) {
     setSelected((current) =>
@@ -134,7 +137,20 @@ export function NewRoundForm({
 
       <fieldset>
         <legend className="text-sm font-medium">{t.newRound.questions}</legend>
-        <p className="mt-1 text-sm text-slate-600">{t.newRound.questionsHint}</p>
+        <p className="mt-1 text-sm text-slate-600">
+          {t.newRound.questionsHint} {t.newRound.starterHint}
+        </p>
+        {fixedQuestions.length > 0 && (
+          <div className="mt-3 rounded-md border border-teal-200 bg-teal-50 px-3 py-2 text-sm">
+            <p className="font-semibold text-teal-900">{t.newRound.fixedTitle}</p>
+            {fixedQuestions.map((question) => (
+              <p key={question.id} className="mt-1">
+                {question.text}
+              </p>
+            ))}
+            <p className="mt-1 text-xs text-slate-600">{t.newRound.fixedHint}</p>
+          </div>
+        )}
         <div className="mt-3 space-y-4">
           {topics.map(([topic, items]) => (
             <div key={topic}>
@@ -145,7 +161,7 @@ export function NewRoundForm({
                 {items.map((question) => {
                   const position = selected.indexOf(question.id);
                   const checked = position !== -1;
-                  const disabled = !checked && selected.length >= MAX_QUESTIONS;
+                  const disabled = !checked && total >= MAX_QUESTIONS;
                   return (
                     <li key={question.id}>
                       <label
@@ -160,10 +176,17 @@ export function NewRoundForm({
                           disabled={disabled}
                           onChange={() => toggle(question.id)}
                         />
-                        <span className="flex-1">{question.text}</span>
+                        <span className="flex-1">
+                          {question.text}
+                          {question.starter && (
+                            <span className="ml-2 inline-block rounded-full bg-amber-100 px-2 text-xs font-medium leading-5 text-amber-900">
+                              {t.newRound.starter}
+                            </span>
+                          )}
+                        </span>
                         {checked && (
                           <span className="rounded-full bg-teal-700 px-2 text-xs font-medium leading-5 text-white">
-                            {position + 1}
+                            {fixedQuestions.length + position + 1}
                           </span>
                         )}
                       </label>
@@ -178,7 +201,7 @@ export function NewRoundForm({
           className={`mt-3 text-sm ${countValid ? "text-teal-800" : "text-slate-600"}`}
           aria-live="polite"
         >
-          {t.newRound.selected(selected.length)}
+          {t.newRound.selected(total)}
         </p>
         {fieldError("questionIds")}
       </fieldset>

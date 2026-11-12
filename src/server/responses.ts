@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { toScaleKey, type ScaleKey } from "@/config/scales";
 import { db } from "@/lib/db";
 import { assertCanFillRound, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
@@ -15,7 +16,7 @@ export type FillRound = {
   closesAt: string;
   /** Whether the current user already answered. */
   submitted: boolean;
-  questions: { position: number; text: string }[];
+  questions: { position: number; text: string; scale: ScaleKey }[];
 };
 
 async function loadFillableRound(user: SessionUser, roundId: string) {
@@ -31,7 +32,7 @@ async function loadFillableRound(user: SessionUser, roundId: string) {
       closesAt: true,
       questions: {
         orderBy: { position: "asc" },
-        select: { position: true, question: { select: { text: true } } },
+        select: { position: true, question: { select: { text: true, scale: true } } },
       },
     },
   });
@@ -60,6 +61,7 @@ export async function getRoundForFill(user: SessionUser, roundId: string): Promi
     questions: round.questions.map((item) => ({
       position: item.position,
       text: item.question.text,
+      scale: toScaleKey(item.question.scale),
     })),
   };
 }

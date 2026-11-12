@@ -46,7 +46,8 @@ Seed pripraví aj jedno uzavreté kolo Tímu Beta so 4 odpoveďami (pod prahom d
 
 ## Stav
 
-Implementované sú všetky požiadavky MVP-01 až MVP-17 a NFR-01 až NFR-07 z `docs/requirements/mvp.md`.
+MVP (MVP-01 až MVP-17, NFR-01 až NFR-07) je hotové a zlúčené v `main`. Ďalší vývoj ide po iteráciách,
+ktoré sú zapísané v [docs/requirements/iteracie.md](docs/requirements/iteracie.md).
 
 Overenie:
 
@@ -54,11 +55,4 @@ Overenie:
 - `npm run acceptance` – akceptačný scenár z mvp.md (kroky 1 až 6) proti bežiacej aplikácii.
   Spusti ho nad čerstvým seedom: `npm run setup`, `npm run dev` a v druhom termináli `npm run acceptance`.
 
-Jednorazovo overené 11. 11. 2026 (nie je súčasťou automatických testov):
-
-- preklikanie v prehliadači Edge na šírke 360 px – prihlásenie, nové kolo, vyplnenie, výsledky, kroky,
-  stránka tímu, kudos; žiadna stránka nemá vodorovné posúvanie (MVP-08, NFR-07),
-- prechod `docs/requirements/mvp-requirements.csv`: položky Must sú splnené; výnimky sú iba známe rozpory
-  a duplicity uvedené v `CLAUDE.md` (NREQ_0026, NREQ_0044, NREQ_0045, FREQ_0024, FREQ_0080).
-
-Do definície hotového ešte chýba kontrola kódu druhým vývojárom a merge do `main`.
+Podklady k otázkam v prieskumoch (výskum so zdrojmi) sú v [docs/research/otazky-do-pulse.md](docs/research/otazky-do-pulse.md).

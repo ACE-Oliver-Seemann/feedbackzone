@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
+import { SCALES, type ScaleKey } from "@/config/scales";
 import { t } from "@/lib/texts.sk";
 
 const MAX_COMMENT_LENGTH = 1000; // mirrors src/server/responses.ts
 const SCALE = [1, 2, 3, 4, 5] as const;
 
-type Question = { position: number; text: string };
+type Question = { position: number; text: string; scale: ScaleKey };
 type Step = "intro" | "questions" | "comment" | "done" | "already" | "closed";
 
 /**
@@ -144,34 +145,15 @@ export function FillWizard({
           <fieldset className="mt-6">
             <legend className="text-lg font-medium leading-snug">{questions[index].text}</legend>
             <p className="sr-only">{t.fill.scaleLegend}</p>
-            <div className="mt-5 grid grid-cols-5 gap-2">
-              {SCALE.map((value) => {
-                const selected = answers[index] === value;
-                return (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() =>
-                      setAnswers((current) =>
-                        current.map((item, position) => (position === index ? value : item)),
-                      )
-                    }
-                    className={`h-14 rounded-md border text-lg font-semibold ${
-                      selected
-                        ? "border-teal-700 bg-teal-700 text-white"
-                        : "border-slate-300 bg-white text-slate-800 hover:border-teal-600"
-                    }`}
-                  >
-                    {value}
-                  </button>
-                );
-              })}
-            </div>
-            <div className="mt-2 flex justify-between gap-4 text-xs text-slate-500">
-              <span>{t.fill.scaleLow}</span>
-              <span className="text-right">{t.fill.scaleHigh}</span>
-            </div>
+            <ScaleInput
+              scale={questions[index].scale}
+              value={answers[index]}
+              onChange={(value) =>
+                setAnswers((current) =>
+                  current.map((item, position) => (position === index ? value : item)),
+                )
+              }
+            />
           </fieldset>
           <div className="mt-8 flex gap-3">
             <button type="button" onClick={back} className={`${secondary} flex-1`}>
@@ -222,6 +204,82 @@ export function FillWizard({
         </>
       )}
     </div>
+  );
+}
+
+/**
+ * The five answer points. Agreement-style scales show numbers with the two
+ * end labels; scales where every point has its own meaning (how often…) show
+ * the five labels as a list, because the numbers alone would say nothing.
+ */
+function ScaleInput({
+  scale,
+  value,
+  onChange,
+}: {
+  scale: ScaleKey;
+  value: number | null;
+  onChange: (value: number) => void;
+}) {
+  const labels = t.scales[scale];
+
+  if (SCALES[scale].labelEveryPoint) {
+    return (
+      <div className="mt-5 space-y-2">
+        {SCALE.map((point) => {
+          const selected = value === point;
+          return (
+            <button
+              key={point}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(point)}
+              className={`block w-full rounded-md border px-4 py-3 text-left text-base font-medium ${
+                selected
+                  ? "border-teal-700 bg-teal-700 text-white"
+                  : "border-slate-300 bg-white text-slate-800 hover:border-teal-600"
+              }`}
+            >
+              {labels[point - 1]}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="mt-5 grid grid-cols-5 gap-2">
+        {SCALE.map((point) => {
+          const selected = value === point;
+          return (
+            <button
+              key={point}
+              type="button"
+              aria-pressed={selected}
+              aria-label={`${point} – ${labels[point - 1]}`}
+              onClick={() => onChange(point)}
+              className={`h-14 rounded-md border text-lg font-semibold ${
+                selected
+                  ? "border-teal-700 bg-teal-700 text-white"
+                  : "border-slate-300 bg-white text-slate-800 hover:border-teal-600"
+              }`}
+            >
+              {point}
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-2 flex justify-between gap-4 text-xs text-slate-500">
+        <span>{labels[0]}</span>
+        <span className="text-right">{labels[4]}</span>
+      </div>
+      {/* The meaning of the chosen number, so that 2 or 4 is not a guess. */}
+      <p className="mt-2 min-h-5 text-center text-sm font-medium text-teal-800" aria-live="polite">
+        {value !== null ? labels[value - 1] : ""}
+      </p>
+    </>
   );
 }
 
