@@ -6,6 +6,7 @@ import { t } from "@/lib/texts.sk";
 // Mirror src/config/kudos.ts; the server validates again.
 const VALUES = ["COLLABORATION", "QUALITY", "HELPING", "INNOVATION", "CUSTOMER"] as const;
 const VISIBILITIES = ["TEAM", "PRIVATE"] as const;
+const EMOJIS = ["👏", "🙌", "💪", "🎉", "❤️", "⭐"] as const;
 const MIN_LENGTH = 20;
 const MAX_LENGTH = 500;
 
@@ -15,6 +16,7 @@ type FieldName = keyof typeof t.kudos.fieldErrors;
 // Form "Poslať kudos" (MVP-16).
 export function KudosForm({ recipients }: { recipients: Recipient[] }) {
   const [text, setText] = useState("");
+  const [emoji, setEmoji] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, true>>>({});
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
@@ -35,6 +37,7 @@ export function KudosForm({ recipients }: { recipients: Recipient[] }) {
         body: JSON.stringify({
           toUserId: form.get("toUserId"),
           text,
+          emoji,
           value: form.get("value"),
           visibility: form.get("visibility"),
         }),
@@ -42,6 +45,7 @@ export function KudosForm({ recipients }: { recipients: Recipient[] }) {
       if (response.status === 201) {
         formElement.reset();
         setText("");
+        setEmoji(null);
         setSent(true);
       } else if (response.status === 400) {
         const { fields } = await response.json();
@@ -85,6 +89,31 @@ export function KudosForm({ recipients }: { recipients: Recipient[] }) {
         {fieldError("toUserId")}
       </label>
 
+      <fieldset>
+        <legend className="text-sm font-medium">{t.kudos.emoji}</legend>
+        <p className="mt-1 text-sm text-slate-600">{t.kudos.emojiHint}</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {EMOJIS.map((item) => {
+            const selected = emoji === item;
+            return (
+              <button
+                key={item}
+                type="button"
+                aria-pressed={selected}
+                aria-label={item}
+                onClick={() => setEmoji(selected ? null : item)}
+                className={`h-12 w-12 rounded-md border text-2xl ${
+                  selected ? "border-teal-700 bg-teal-50" : "border-slate-300 bg-white"
+                }`}
+              >
+                {item}
+              </button>
+            );
+          })}
+        </div>
+        {fieldError("emoji")}
+      </fieldset>
+
       <label className="block text-sm font-medium">
         {t.kudos.text}
         <textarea
@@ -95,8 +124,8 @@ export function KudosForm({ recipients }: { recipients: Recipient[] }) {
           className={inputClass}
         />
         <span className="mt-1 flex justify-between text-xs font-normal text-slate-500">
-          <span>{t.kudos.textHint}</span>
-          <span className={length >= MIN_LENGTH ? "text-teal-800" : ""}>
+          <span>{emoji ? t.kudos.textHintWithEmoji : t.kudos.textHint}</span>
+          <span className={emoji || length >= MIN_LENGTH ? "text-teal-800" : ""}>
             {t.kudos.textCounter(length)}
           </span>
         </span>

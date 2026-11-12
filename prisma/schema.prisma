@@ -133,5 +133,7 @@ model Kudos {
   text       String
   value      String
   visibility String // TEAM | PRIVATE
+  // Optional emoji from KUDOS_EMOJIS; with it the text may be empty (IT-06).
+  emoji      String?
   createdAt  DateTime @default(now())
 }

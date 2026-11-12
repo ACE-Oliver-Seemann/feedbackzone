@@ -162,8 +162,12 @@ export const t = {
     newIntro: "Kudos je podpísané tvojím menom.",
     recipient: "Komu",
     recipientPlaceholder: "Vyber kolegu",
+    emoji: "Rýchle kudos emotikonom",
+    emojiHint: "Nechce sa ti písať? Vyber emotikon a text môžeš vynechať.",
+    emojiNone: "Bez emotikonu",
     text: "Za čo",
     textHint: "20 až 500 znakov.",
+    textHintWithEmoji: "Nepovinné, najviac 500 znakov.",
     textCounter: (length: number) => `${length} / 500`,
     value: "Hodnota",
     values: {
@@ -187,7 +191,8 @@ export const t = {
     sent: "Kudos je odoslané.",
     fieldErrors: {
       toUserId: "Vyber kolegu (sebe sa kudos poslať nedá).",
-      text: "Text musí mať 20 až 500 znakov.",
+      text: "Napíš 20 až 500 znakov alebo vyber emotikon.",
+      emoji: "Vyber emotikon z ponuky.",
       value: "Vyber hodnotu.",
       visibility: "Vyber viditeľnosť.",
     },

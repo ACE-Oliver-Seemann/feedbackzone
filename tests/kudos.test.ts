@@ -84,6 +84,56 @@ describe("send kudos [MVP-16]", () => {
   });
 });
 
+describe("quick kudos with an emoji [IT-06]", () => {
+  it("an emoji alone is enough; the text may be empty", async () => {
+    const response = await send(fx.a.employees[0], { text: "", emoji: "👏" });
+    expect(response.status).toBe(201);
+    expect((await response.json()).kudos).toMatchObject({ emoji: "👏", text: "" });
+
+    const withoutText = await send(fx.a.employees[0], { text: undefined, emoji: "🎉" });
+    expect(withoutText.status).toBe(201);
+  });
+
+  it("an emoji can accompany a short or a long text", async () => {
+    expect((await send(fx.a.employees[0], { text: "Vďaka!", emoji: "❤️" })).status).toBe(201);
+    expect((await send(fx.a.employees[0], { emoji: "⭐" })).status).toBe(201); // default long text
+    const stored = await db.kudos.findMany({ orderBy: { createdAt: "asc" } });
+    expect(stored.map((item) => item.emoji).sort()).toEqual(["❤️", "⭐"].sort());
+  });
+
+  it("without an emoji the 20-character minimum still applies [MVP-16]", async () => {
+    expect((await send(fx.a.employees[0], { text: "Vďaka!" })).status).toBe(400);
+    expect((await send(fx.a.employees[0], { text: "", emoji: null })).status).toBe(400);
+    expect((await send(fx.a.employees[0], { text: "", emoji: "" })).status).toBe(400);
+    expect(await db.kudos.count()).toBe(0);
+  });
+
+  it.each([
+    ["an emoji outside the set", { text: "", emoji: "💩" }],
+    ["free text instead of an emoji", { text: "", emoji: "super" }],
+    ["two emoji", { text: "", emoji: "👏👏" }],
+    ["a wrong type", { text: "", emoji: 5 }],
+    ["text over 500 characters next to an emoji", { text: "x".repeat(501), emoji: "👏" }],
+  ])("rejects %s", async (_label, override) => {
+    expect((await send(fx.a.employees[0], override)).status).toBe(400);
+    expect(await db.kudos.count()).toBe(0);
+  });
+
+  it("the emoji shows in the team feed and in 'Moje kudos'", async () => {
+    await send(fx.a.employees[0], { text: "", emoji: "🙌" });
+    expect((await feed(fx.a.employees[2], fx.a.team.id))[0]).toMatchObject({
+      emoji: "🙌",
+      fromName: fx.a.employees[0].name,
+    });
+    expect((await mine(fx.a.employees[1]))[0]).toMatchObject({ emoji: "🙌", text: "" });
+  });
+
+  it("kudos without an emoji returns emoji null", async () => {
+    await send(fx.a.employees[0]);
+    expect((await mine(fx.a.employees[1]))[0].emoji).toBeNull();
+  });
+});
+
 describe("kudos feed and 'Moje kudos' [MVP-17]", () => {
   it("the team page shows public kudos of the team, newest first", async () => {
     await send(fx.a.employees[0], { text: "Prvé kudos pre kolegu z tímu." });

@@ -1,8 +1,10 @@
 import {
+  KUDOS_EMOJIS,
   KUDOS_MAX_LENGTH,
   KUDOS_MIN_LENGTH,
   KUDOS_VALUES,
   KUDOS_VISIBILITIES,
+  type KudosEmoji,
   type KudosValue,
   type KudosVisibility,
 } from "@/config/kudos";
@@ -16,7 +18,9 @@ export type KudosItem = {
   id: string;
   fromName: string;
   toName: string;
+  /** Empty when the kudos is an emoji only (IT-06). */
   text: string;
+  emoji: KudosEmoji | null;
   value: KudosValue;
   visibility: KudosVisibility;
   createdAt: string;
@@ -25,6 +29,7 @@ export type KudosItem = {
 const KUDOS_SELECT = {
   id: true,
   text: true,
+  emoji: true,
   value: true,
   visibility: true,
   createdAt: true,
@@ -35,6 +40,7 @@ const KUDOS_SELECT = {
 type KudosRow = {
   id: string;
   text: string;
+  emoji: string | null;
   value: string;
   visibility: string;
   createdAt: Date;
@@ -47,6 +53,7 @@ const toItem = (row: KudosRow): KudosItem => ({
   fromName: row.fromUser.name,
   toName: row.toUser.name,
   text: row.text,
+  emoji: row.emoji as KudosEmoji | null,
   value: row.value as KudosValue,
   visibility: row.visibility as KudosVisibility,
   createdAt: row.createdAt.toISOString(),
@@ -66,9 +73,22 @@ export async function sendKudos(
   if (!toUserId) fields.toUserId = "required";
   else if (toUserId === user.id) fields.toUserId = "self";
 
+  // IT-06: an emoji from the fixed set may stand in for the text.
+  let emoji: KudosEmoji | null = null;
+  if (input.emoji !== undefined && input.emoji !== null && input.emoji !== "") {
+    if (includes(KUDOS_EMOJIS, input.emoji)) emoji = input.emoji;
+    else fields.emoji = "invalid";
+  }
+
   const text = typeof input.text === "string" ? input.text.trim() : "";
-  if (text.length < KUDOS_MIN_LENGTH) fields.text = "too_short";
-  else if (text.length > KUDOS_MAX_LENGTH) fields.text = "too_long";
+  if (input.text !== undefined && input.text !== null && typeof input.text !== "string") {
+    fields.text = "invalid";
+  } else if (text.length > KUDOS_MAX_LENGTH) {
+    fields.text = "too_long";
+  } else if (emoji === null && !fields.emoji && text.length < KUDOS_MIN_LENGTH) {
+    // Without an emoji the MVP-16 minimum applies.
+    fields.text = "too_short";
+  }
 
   if (!includes(KUDOS_VALUES, input.value)) fields.value = "invalid";
   if (!includes(KUDOS_VISIBILITIES, input.visibility)) fields.visibility = "invalid";
@@ -83,6 +103,7 @@ export async function sendKudos(
       fromUserId: user.id,
       toUserId: recipient.id,
       text,
+      emoji,
       value: input.value as string,
       visibility: input.visibility as string,
     },

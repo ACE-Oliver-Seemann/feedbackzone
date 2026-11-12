@@ -37,7 +37,14 @@ export function KudosList({
               )}
             </span>
           </div>
-          <p className="mt-2 whitespace-pre-line text-sm text-slate-800">{item.text}</p>
+          {item.emoji && (
+            <p className="mt-2 text-3xl leading-none" aria-label={item.emoji}>
+              {item.emoji}
+            </p>
+          )}
+          {item.text && (
+            <p className="mt-2 whitespace-pre-line text-sm text-slate-800">{item.text}</p>
+          )}
           <p className="mt-2 text-xs text-slate-500">{formatDate(item.createdAt)}</p>
         </li>
       ))}
