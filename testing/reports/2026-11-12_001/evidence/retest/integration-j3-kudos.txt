@@ -1,0 +1,28 @@
+PASS  [J3] Kudos area opens from the menu; sender is told the kudos is signed  => tabs=Poslať kudos,Moje kudos
+PASS  [J3] Recipient list contains everyone except the sender, with team names  => options=12: Alena Testová (Tím Alfa), Barbora Skúšobná (Tím Alfa), Boris Testovací (Tím Beta), Cyril Ukážkový (Tím Alfa), Dana Príkladná (Tím Alfa), Emil Pokusný (Tím Alfa), Filip Vzorka (Tím Beta), G
+PASS  [J3] Empty form is refused with field messages  => text error=true, kudos rows=0
+PASS  [J3] Text of 19 characters without an emoji is refused and the typed data stays in the form  => rows=0, text kept='Vďaka za pomoc s QA', recipient kept=true
+PASS  [J3] Public text kudos with exactly 20 characters is sent and stored  => {"id":"cmwdv2gt0000dpk042t4go18f","fromUserId":"cmwdv2csv0017pk6spwdd8aow","toUserId":"cmwdv2ctl0019pk6smaj50ptx","text":"Vďaka za pomoc s QA.","value":"QUALITY","visibility":"TEAM","emoji":null,"crea
+PASS  [J3] Form is cleared after sending  => text='', recipient='', pressed emojis=0, counter='0 / 500'
+PASS  [J3] Emoji-only private kudos (no text)  => hint=true; row={"id":"cmwdv2h2b000fpk04nleq1742","fromUserId":"cmwdv2csv0017pk6spwdd8aow","toUserId":"cmwdv2ctl0019pk6smaj50ptx","text":"","value":"COLLABORATION","visibility":"PRIVATE","emoji":"👏","
+PASS  [J3] Private kudos with text  => {"id":"cmwdv2h86000hpk0401z31pgu","fromUserId":"cmwdv2csv0017pk6spwdd8aow","toUserId":"cmwdv2ctl0019pk6smaj50ptx","text":"QA súkromné kudos – toto smie vidieť iba príjemca.","value":"HELPING","visibil
+PASS  [J3] Public kudos with emoji + text (incl. HTML-like text) to a colleague in another team  => {"id":"cmwdv2hdh000jpk04bidpmatk","fromUserId":"cmwdv2csv0017pk6spwdd8aow","toUserId":"cmwdv2cww001kpk6so62vioqd","text":"QA verejné kudos pre kolegu z iného tímu <script>alert(1)</script>.","value":"
+PASS  [J3] Text longer than 500 characters cannot be typed; exactly 500 is accepted  => counter='500 / 500', stored length=500
+PASS  [J3] Whitespace-only text (25 spaces) is treated as empty  => rows before=5, after=5
+PASS  [J3] Server refuses kudos to oneself, an unknown emoji, an unknown recipient, 501 characters and an unknown value  => 400 {"toUserId":"self"}; 400 {"emoji":"invalid"}; 400 {"toUserId":"unknown"}; 400 {"text":"too_long"}; 400 {"value":"invalid"}; rows 5→5
+PASS  [J3] Team feed (sender's own team) shows the public kudos, newest first, signed, and no private ones  => feed items=2 (DB public for Alfa=2); private text in HTML=false; 👏 in HTML=false
+PASS  [J3] Kudos sent to another team is not in the sender's team feed (it belongs to the recipient's team page)  => present on Alfa page=false
+PASS  [J3] Sender's own view: 'Moje kudos' lists only received kudos  => dam Vzorový Zamestnanec Odhlásiť sa Domov Môj tím Kudos Poslať kudos Moje kudos Moje kudos Zatiaľ tu nemáš žiadne kudos.
+PASS  [J3] Recipient sees all four kudos (public and private) in 'Moje kudos', newest first, with sender, value, visibility and emoji  => cards=4, DB=4, order matches DB=true, public=2, private=2, horizontal overflow at 360px=false
+PASS  [J3] 'Moje kudos' at 360 px has no horizontal overflow even with a 500-character unbroken word  => scrollWidth=360, clientWidth=360
+PASS  [J3] Manager of the recipient's team cannot see the private kudos anywhere  => leaks [teamPage, myKudos, api me, api summary]=false,false,false,false; summary kudos=2; manager's own=0
+PASS  [J3] HR cannot see the private kudos anywhere  => leaks=false,false,false,false,false
+PASS  [J3] There is no API through which another user can read someone's received kudos  => me?userId → 200 (0 items); GET /api/kudos → 405; GET /api/kudos/:id → 404; leak=false
+PASS  [J3] Recipient in another team sees the kudos in 'Moje kudos' and on the Beta team feed; script text is shown as text  => mine=["Od: Adam Vzorový\n\nInovácia\nVerejné v tíme\n\n⭐\n\nQA verejné kudos pre kolegu z iného tímu <script>alert(1)</script>.\n\n12. 11. 2026"]; feed=1; dialogs=0
+PASS  [J3] HR sends public kudos to a manager; it shows on that team's feed  => row={"id":"cmwdv2p4s000npk049g5rappj","fromUserId":"cmwdv2crj0012pk6s25rwyfms","toUserId":"cmwdv2crt0013pk6saj0g17q5","text":"QA: ďakujem za rýchly krok po kole.","value":"COLLABORATION","visibility":
+FAIL  [J3] Public kudos sent to HR (who has no team): is it shown on any 'team page of the recipient' as the form promises?  => SCRIPT/RUNTIME ERROR: locator.waitFor: Timeout 30000ms exceeded. Call log: [2m - waiting for getByText('Kudos je odoslané.') to be visible[22m 
+FAIL  [J3] Kudos total in DB equals the number of successful sends (no duplicates, no lost rows)  => rows=6
+PASS  [J3] Unauthenticated request cannot send or read kudos  => POST 401, GET 401
+
+J3 done: 25 checks, 2 failed
+exit 0

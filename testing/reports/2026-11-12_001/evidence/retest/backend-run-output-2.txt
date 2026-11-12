@@ -1,0 +1,779 @@
+
+===== S1 Authentication & session =====
+BE-T001 PASS    [AUTH] login valid HR (hr@example.test) => 200 {"user":{"id":"cmwdvaxbx0012pkict8w0ybjp","name":"Hana Personálna","role":"HR","teamId":null},"home":"/"}
+BE-T002 PASS    [AUTH] login valid MANAGER (manazer.alfa@example.test) => 200 {"user":{"id":"cmwdvaxc40013pkic5w4jgf4n","name":"Alena Testová","role":"MANAGER","teamId":"cmwdvaxce0015pkico1n9wqmq"},"home":"/"}
+BE-T003 PASS    [AUTH] login valid EMPLOYEE (adam.alfa@example.test) => 200 {"user":{"id":"cmwdvaxcw0017pkicqz0tgskq","name":"Adam Vzorový","role":"EMPLOYEE","teamId":"cmwdvaxce0015pkico1n9wqmq"},"home":"/"}
+BE-T004 PASS    [AUTH] login cookie flags => fz_session=<token>; Path=/; Expires=Fri, 13 Nov 2026 02:14:56 GMT; Max-Age=28800; Secure; HttpOnly; SameSite=lax
+BE-T005 PASS    [AUTH] login response does not expose passwordHash or email => 200 {"user":{"id":"cmwdvaxbx0012pkict8w0ybjp","name":"Hana Personálna","role":"HR","teamId":null},"home":"/"}
+BE-T006 PASS    [AUTH] login e-mail in upper case => 200 {"user":{"id":"cmwdvaxbx0012pkict8w0ybjp","name":"Hana Personálna","role":"HR","teamId":null},"home":"/"}
+BE-T007 PASS    [AUTH] login e-mail padded with spaces => 200 {"user":{"id":"cmwdvaxbx0012pkict8w0ybjp","name":"Hana Personálna","role":"HR","teamId":null},"home":"/"}
+BE-T008 PASS    [AUTH] login wrong password => 401 {"error":"invalid_credentials"}
+BE-T009 PASS    [AUTH] login unknown e-mail gives the same answer as wrong password => 401 {"error":"invalid_credentials"} vs 401 {"error":"invalid_credentials"}
+BE-T010 PASS    [AUTH] login password with trailing space => 401 {"error":"invalid_credentials"}
+BE-T011 PASS    [AUTH] login password in different case => 401 {"error":"invalid_credentials"}
+BE-T012 PASS    [AUTH] login missing password => 401 {"error":"invalid_credentials"}
+BE-T013 PASS    [AUTH] login missing e-mail => 401 {"error":"invalid_credentials"}
+BE-T014 PASS    [AUTH] login empty object => 401 {"error":"invalid_credentials"}
+BE-T015 PASS    [AUTH] login empty strings => 401 {"error":"invalid_credentials"}
+BE-T016 PASS    [AUTH] login body: JSON null => 400 {"error":"invalid_json"}
+BE-T017 PASS    [AUTH] login body: JSON array => 400 {"error":"invalid_json"}
+BE-T018 PASS    [AUTH] login body: JSON string => 400 {"error":"invalid_json"}
+BE-T019 PASS    [AUTH] login body: JSON number => 400 {"error":"invalid_json"}
+BE-T020 PASS    [AUTH] login body: empty body => 400 {"error":"invalid_json"}
+BE-T021 PASS    [AUTH] login body: malformed JSON => 400 {"error":"invalid_json"}
+BE-T022 PASS    [AUTH] login body: plain text => 400 {"error":"invalid_json"}
+BE-T023 PASS    [AUTH] login body: form-urlencoded => 400 {"error":"invalid_json"}
+BE-T024 PASS    [AUTH] login body: XML => 400 {"error":"invalid_json"}
+BE-T025 PASS    [AUTH] login wrong type / injection: email number => 401 {"error":"invalid_credentials"}
+BE-T026 PASS    [AUTH] login wrong type / injection: email object {contains} => 401 {"error":"invalid_credentials"}
+BE-T027 PASS    [AUTH] login wrong type / injection: email array => 401 {"error":"invalid_credentials"}
+BE-T028 PASS    [AUTH] login wrong type / injection: password object {$ne:null} => 401 {"error":"invalid_credentials"}
+BE-T029 PASS    [AUTH] login wrong type / injection: password array => 401 {"error":"invalid_credentials"}
+BE-T030 PASS    [AUTH] login wrong type / injection: password true => 401 {"error":"invalid_credentials"}
+BE-T031 PASS    [AUTH] login wrong type / injection: SQLi e-mail ' OR '1'='1 => 401 {"error":"invalid_credentials"}
+BE-T032 PASS    [AUTH] login wrong type / injection: SQLi e-mail hr@example.test'-- => 401 {"error":"invalid_credentials"}
+BE-T033 PASS    [AUTH] login wrong type / injection: e-mail with NUL byte => 401 {"error":"invalid_credentials"}
+BE-T034 PASS    [AUTH] login wrong type / injection: e-mail with % wildcard => 401 {"error":"invalid_credentials"}
+BE-T035 PASS    [AUTH] login with 100 000-character password => 401 in 341.6 ms
+BE-T036 PASS    [AUTH] login with 1 MB e-mail => 401 in 467.3 ms
+BE-T037 PASS    [AUTH] login with Content-Type text/plain (CSRF-style simple request) => 200 (accepted without application/json: true)
+BE-T038 PASS    [AUTH] GET /api/login (unsupported method) => 405 
+BE-T039 PASS    [AUTH] PUT /api/login (unsupported method) => 405 
+BE-T040 PASS    [AUTH] DELETE /api/login (unsupported method) => 405 
+BE-T041 PASS    [AUTH] PATCH /api/login (unsupported method) => 405 
+BE-T042 PASS    [AUTH] bcrypt 72-byte truncation: password = correct + 64 extra chars => 401 {"error":"invalid_credentials"}
+BE-T043 PASS    [SESSION] GET /api/me without cookie => 401 {"error":"unauthorized"}
+BE-T044 PASS    [SESSION] GET /api/me with valid cookie => 200 {"user":{"id":"cmwdvaxcw0017pkicqz0tgskq","name":"Adam Vzorový","role":"EMPLOYEE","teamId":"cmwdvaxce0015pkico1n9wqmq"}}
+BE-T045 PASS    [SESSION] tampered cookie: signature last char flipped => 401 {"error":"unauthorized"}
+BE-T046 PASS    [SESSION] tampered cookie: payload last char flipped => 401 {"error":"unauthorized"}
+BE-T047 PASS    [SESSION] tampered cookie: payload only (no signature) => 401 {"error":"unauthorized"}
+BE-T048 PASS    [SESSION] tampered cookie: empty value => 401 {"error":"unauthorized"}
+BE-T049 PASS    [SESSION] tampered cookie: three segments => 401 {"error":"unauthorized"}
+BE-T050 PASS    [SESSION] tampered cookie: signature 'none' => 401 {"error":"unauthorized"}
+BE-T051 PASS    [SESSION] tampered cookie: empty signature => 401 {"error":"unauthorized"}
+BE-T052 PASS    [SESSION] tampered cookie: forged payload (HR uid, exp 2099) with old signature => 401 {"error":"unauthorized"}
+BE-T053 PASS    [SESSION] tampered cookie: forged payload for another user with another user's signature => 401 {"error":"unauthorized"}
+BE-T054 PASS    [SESSION] tampered cookie: payload of employee + signature of HR token => 401 {"error":"unauthorized"}
+BE-T055 PASS    [SESSION] tampered cookie: signature in standard base64 with padding => 401 {"error":"unauthorized"}
+BE-T056 PASS    [SESSION] tampered cookie: random garbage => 401 {"error":"unauthorized"}
+BE-T057 PASS    [SESSION] tampered cookie: SQL injection string => 401 {"error":"unauthorized"}
+BE-T058 PASS    [SESSION] tampered cookie: very long cookie (6 kB) => 401 {"error":"unauthorized"}
+BE-T059 PASS    [SESSION] tampered cookie: URL-encoded valid token with trailing %00 => 401 {"error":"unauthorized"}
+BE-T060 PASS    [SESSION] token sent as Authorization: Bearer instead of cookie => 401 {"error":"unauthorized"}
+BE-T061 PASS    [SESSION] token under a different cookie name => 401 {"error":"unauthorized"}
+BE-T062 PASS    [SESSION] two fz_session cookies: forged first, valid second => 200 {"user":{"id":"cmwdvaxbx0012pkict8w0ybjp","name":"Hana Personálna","role":"HR","
+BE-T063 PASS    [SESSION] correctly signed token: expired 1 s ago => 401 {"error":"unauthorized"}
+BE-T064 PASS    [SESSION] correctly signed token: expired 8 h ago => 401 {"error":"unauthorized"}
+BE-T065 PASS    [SESSION] correctly signed token: exp as string => 401 {"error":"unauthorized"}
+BE-T066 PASS    [SESSION] correctly signed token: exp missing => 401 {"error":"unauthorized"}
+BE-T067 PASS    [SESSION] correctly signed token: uid of a user that does not exist => 401 {"error":"unauthorized"}
+BE-T068 PASS    [SESSION] correctly signed token: uid as number => 401 {"error":"unauthorized"}
+BE-T069 PASS    [SESSION] correctly signed token: uid as object => 401 {"error":"unauthorized"}
+BE-T070 PASS    [SESSION] correctly signed token: payload is not JSON => 401 {"error":"unauthorized"}
+BE-T071 PASS    [SESSION] correctly signed token: extra claim role=HR on employee token => 200 {"user":{"id":"cmwdvaxcw0017pkicqz0tgskq","name":"Adam Vzorový","role":"EMPLOYEE","teamId":"cmwdvaxce0015pkico1n9wqmq"}}
+BE-T072 PASS    [SESSION] POST /api/logout without session => 401 {"error":"unauthorized"}
+BE-T073 PASS    [SESSION] GET /api/logout => 405 
+BE-T074 PASS    [SESSION] POST /api/logout clears the cookie => 200 fz_session=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=lax
+BE-T075 PASS    [SESSION] token is rejected after logout (replay of the old cookie) => 401 {"error":"unauthorized"} (old token still accepted: false)
+BE-T076 PASS    [SESSION] old token can still perform a write after logout => 401 {"error":"unauthorized"}
+BE-T077 PASS    [SESSION] two logins of the same user give independent valid sessions => 200/200, tokens differ: true
+BE-T078 PASS    [AUTH-SEC] timing: unknown e-mail vs wrong password (30 samples each, interleaved) => median unknown e-mail 270.7 ms, wrong password 269.6 ms, diff 1.1 ms
+BE-T079 PASS    [AUTH-SEC] timing: empty e-mail vs wrong password (20 samples each) => median empty e-mail 279.1 ms, wrong password 281.4 ms
+BE-T080 PASS    [AUTH-SEC] 40 consecutive failed logins for one account, then a correct login => failed attempts returned {401}; correct login afterwards 200; no rate limit / lockout observed: true
+BE-T081 PASS    [SESSION] session of a user deleted by a reseed => 401 {"error":"unauthorized"}
+
+===== S2 Authorization matrix (role x endpoint) =====
+BE-T082 PASS    [AUTHZ] GET /api/me as anonymous => 401 {"error":"unauthorized"}
+BE-T083 PASS    [AUTHZ] GET /api/me as employee Alfa => 200 {"user":{"id":"cmwdvcqxz0019pkpgxiy6yosc","name":"Barbora Skúšobná","role":"EMPLOYEE","teamId":"cmwdvcqwy0015pkpgnmy7ptfw"}}
+BE-T084 PASS    [AUTHZ] GET /api/me as employee Beta => 200 {"user":{"id":"cmwdvcr01001mpkpgyyu89k6e","name":"Gabriela Skúšková","role":"EMPLOYEE","teamId":"cmwdvcqzc001ipkpg2k3fgxh2"}}
+BE-T085 PASS    [AUTHZ] GET /api/me as manager Alfa => 200 {"user":{"id":"cmwdvcqwl0013pkpgk6ydqu2f","name":"Alena Testová","role":"MANAGER","teamId":"cmwdvcqwy0015pkpgnmy7ptfw"}}
+BE-T086 PASS    [AUTHZ] GET /api/me as manager Beta => 200 {"user":{"id":"cmwdvcqz2001gpkpglqs4q7g8","name":"Boris Testovací","role":"MANAGER","teamId":"cmwdvcqzc001ipkpg2k3fgxh2"}}
+BE-T087 PASS    [AUTHZ] GET /api/me as HR => 200 {"user":{"id":"cmwdvcqw80012pkpg2f8s59ia","name":"Hana Personálna","role":"HR","teamId":null}}
+BE-T088 PASS    [AUTHZ] GET /api/questions as anonymous => 401 {"error":"unauthorized"}
+BE-T089 PASS    [AUTHZ] GET /api/questions as employee Alfa => 403 {"error":"forbidden"}
+BE-T090 PASS    [AUTHZ] GET /api/questions as employee Beta => 403 {"error":"forbidden"}
+BE-T091 PASS    [AUTHZ] GET /api/questions as manager Alfa => 200 {"questions":[{"id":"cmwdvcqka0000pkpgw7azk23f","text":"Celkovo, aké boli pre mňa posledné dva týždne v práci?","type":"SCALE_1_5","topic":"
+BE-T092 PASS    [AUTHZ] GET /api/questions as manager Beta => 200 {"questions":[{"id":"cmwdvcqka0000pkpgw7azk23f","text":"Celkovo, aké boli pre mňa posledné dva týždne v práci?","type":"SCALE_1_5","topic":"
+BE-T093 PASS    [AUTHZ] GET /api/questions as HR => 200 {"questions":[{"id":"cmwdvcqka0000pkpgw7azk23f","text":"Celkovo, aké boli pre mňa posledné dva týždne v práci?","type":"SCALE_1_5","topic":"
+BE-T094 PASS    [AUTHZ] POST /api/questions (own question) as anonymous => 401 {"error":"unauthorized"}
+BE-T095 PASS    [AUTHZ] POST /api/questions (own question) as employee Alfa => 403 {"error":"forbidden"}
+BE-T096 PASS    [AUTHZ] POST /api/questions (own question) as employee Beta => 403 {"error":"forbidden"}
+BE-T097 PASS    [AUTHZ] POST /api/questions (own question) as manager Alfa => 201 {"question":{"id":"cmwdvd0k400cppk7cs6038swh","text":"QA vlastná otázka číslo 4 pre maticu?","type":"SCALE_1_5","topic":"Vlastné otázky tímu
+BE-T098 PASS    [AUTHZ] POST /api/questions (own question) as manager Beta => 201 {"question":{"id":"cmwdvd0l200crpk7cxw6fgojn","text":"QA vlastná otázka číslo 5 pre maticu?","type":"SCALE_1_5","topic":"Vlastné otázky tímu
+BE-T099 PASS    [AUTHZ] POST /api/questions (own question) as HR => 403 {"error":"forbidden"}
+BE-T100 PASS    [AUTHZ] GET /api/rounds as anonymous => 401 {"error":"unauthorized"}
+BE-T101 PASS    [AUTHZ] GET /api/rounds as employee Alfa => 200 {"rounds":[{"id":"cmwdvcw7b000ppkqcxpz1kijz","name":"Pulse – 48. týždeň","teamId":"cmwdvcqwy0015pkpgnmy7ptfw","teamName":"Tím Alfa","status"
+BE-T102 PASS    [AUTHZ] GET /api/rounds as employee Beta => 200 {"rounds":[]}
+BE-T103 PASS    [AUTHZ] GET /api/rounds as manager Alfa => 200 {"rounds":[{"id":"cmwdvcw7b000ppkqcxpz1kijz","name":"Pulse – 48. týždeň","teamId":"cmwdvcqwy0015pkpgnmy7ptfw","teamName":"Tím Alfa","status"
+BE-T104 PASS    [AUTHZ] GET /api/rounds as manager Beta => 200 {"rounds":[{"id":"cmwdvcr1g001upkpgtjnup0hn","name":"Pulse – záťaž a sústredenie","teamId":"cmwdvcqzc001ipkpg2k3fgxh2","teamName":"Tím Beta"
+BE-T105 PASS    [AUTHZ] GET /api/rounds as HR => 200 {"rounds":[{"id":"cmwdvcw7b000ppkqcxpz1kijz","name":"Pulse – 48. týždeň","teamId":"cmwdvcqwy0015pkpgnmy7ptfw","teamName":"Tím Alfa","status"
+BE-T106 PASS    [AUTHZ] POST /api/rounds (teamId = Alfa) as anonymous => 401 {"error":"unauthorized"}
+BE-T107 PASS    [AUTHZ] POST /api/rounds (teamId = Alfa) as employee Alfa => 403 {"error":"forbidden"}
+BE-T108 PASS    [AUTHZ] POST /api/rounds (teamId = Alfa) as employee Beta => 403 {"error":"forbidden"}
+BE-T109 PASS    [AUTHZ] POST /api/rounds (teamId = Alfa) as manager Alfa => 201 {"round":{"id":"cmwdvd0ur00ctpk7c63llp7y4"}}
+BE-T110 PASS    [AUTHZ] POST /api/rounds (teamId = Alfa) as manager Beta => 403 {"error":"forbidden"}
+BE-T111 PASS    [AUTHZ] POST /api/rounds (teamId = Alfa) as HR => 201 {"round":{"id":"cmwdvd0wc00cvpk7cwx3p8g3q"}}
+BE-T112 PASS    [AUTHZ] POST /api/rounds/:id/open (Alfa draft) as anonymous => 401 {"error":"unauthorized"}
+BE-T113 PASS    [AUTHZ] POST /api/rounds/:id/open (Alfa draft) as employee Alfa => 403 {"error":"forbidden"}
+BE-T114 PASS    [AUTHZ] POST /api/rounds/:id/open (Alfa draft) as employee Beta => 403 {"error":"forbidden"}
+BE-T115 PASS    [AUTHZ] POST /api/rounds/:id/open (Alfa draft) as manager Alfa => 200 {"ok":true}
+BE-T116 PASS    [AUTHZ] POST /api/rounds/:id/open (Alfa draft) as manager Beta => 403 {"error":"forbidden"}
+BE-T117 PASS    [AUTHZ] POST /api/rounds/:id/open (Alfa draft) as HR => 200 {"ok":true}
+BE-T118 PASS    [AUTHZ] POST /api/rounds/:id/close (Alfa open round) as anonymous => 401 {"error":"unauthorized"}
+BE-T119 PASS    [AUTHZ] POST /api/rounds/:id/close (Alfa open round) as employee Alfa => 403 {"error":"forbidden"}
+BE-T120 PASS    [AUTHZ] POST /api/rounds/:id/close (Alfa open round) as employee Beta => 403 {"error":"forbidden"}
+BE-T121 PASS    [AUTHZ] POST /api/rounds/:id/close (Alfa open round) as manager Alfa => 200 {"ok":true}
+BE-T122 PASS    [AUTHZ] POST /api/rounds/:id/close (Alfa open round) as manager Beta => 403 {"error":"forbidden"}
+BE-T123 PASS    [AUTHZ] POST /api/rounds/:id/close (Alfa open round) as HR => 200 {"ok":true}
+BE-T124 PASS    [AUTHZ] GET /api/rounds/:id (Alfa open round) as anonymous => 401 {"error":"unauthorized"}
+BE-T125 PASS    [AUTHZ] GET /api/rounds/:id (Alfa open round) as employee Alfa => 200 {"round":{"id":"cmwdvcw7b000ppkqcxpz1kijz","name":"Pulse – 48. týždeň","teamId":"cmwdvcqwy0015pkpgnmy7ptfw","status":"OPEN","closesAt":"2026
+BE-T126 PASS    [AUTHZ] GET /api/rounds/:id (Alfa open round) as employee Beta => 403 {"error":"forbidden"}
+BE-T127 PASS    [AUTHZ] GET /api/rounds/:id (Alfa open round) as manager Alfa => 200 {"round":{"id":"cmwdvcw7b000ppkqcxpz1kijz","name":"Pulse – 48. týždeň","teamId":"cmwdvcqwy0015pkpgnmy7ptfw","status":"OPEN","closesAt":"2026
+BE-T128 PASS    [AUTHZ] GET /api/rounds/:id (Alfa open round) as manager Beta => 403 {"error":"forbidden"}
+BE-T129 PASS    [AUTHZ] GET /api/rounds/:id (Alfa open round) as HR => 403 {"error":"forbidden"}
+BE-T130 PASS    [AUTHZ] POST /api/rounds/:id/responses (Alfa open round) as anonymous => 401 {"error":"unauthorized"}
+BE-T131 PASS    [AUTHZ] POST /api/rounds/:id/responses (Alfa open round) as employee Alfa => 201 {"ok":true}
+BE-T132 PASS    [AUTHZ] POST /api/rounds/:id/responses (Alfa open round) as employee Beta => 403 {"error":"forbidden"}
+BE-T133 PASS    [AUTHZ] POST /api/rounds/:id/responses (Alfa open round) as manager Alfa => 201 {"ok":true}
+BE-T134 PASS    [AUTHZ] POST /api/rounds/:id/responses (Alfa open round) as manager Beta => 403 {"error":"forbidden"}
+BE-T135 PASS    [AUTHZ] POST /api/rounds/:id/responses (Alfa open round) as HR => 403 {"error":"forbidden"}
+BE-T136 PASS    [AUTHZ] GET /api/rounds/:id/results (Alfa closed round) as anonymous => 401 {"error":"unauthorized"}
+BE-T137 PASS    [AUTHZ] GET /api/rounds/:id/results (Alfa closed round) as employee Alfa => 403 {"error":"forbidden"}
+BE-T138 PASS    [AUTHZ] GET /api/rounds/:id/results (Alfa closed round) as employee Beta => 403 {"error":"forbidden"}
+BE-T139 PASS    [AUTHZ] GET /api/rounds/:id/results (Alfa closed round) as manager Alfa => 200 {"round":{"id":"cmwdvcvzb000hpkqc14aq3ghk","name":"Pulse – 46. týždeň","teamId":"cmwdvcqwy0015pkpgnmy7ptfw","teamName":"Tím Alfa","status":"
+BE-T140 PASS    [AUTHZ] GET /api/rounds/:id/results (Alfa closed round) as manager Beta => 403 {"error":"forbidden"}
+BE-T141 PASS    [AUTHZ] GET /api/rounds/:id/results (Alfa closed round) as HR => 200 {"round":{"id":"cmwdvcvzb000hpkqc14aq3ghk","name":"Pulse – 46. týždeň","teamId":"cmwdvcqwy0015pkpgnmy7ptfw","teamName":"Tím Alfa","status":"
+BE-T142 PASS    [AUTHZ] GET /api/rounds/:id/suggestions (Alfa closed round) as anonymous => 401 {"error":"unauthorized"}
+BE-T143 PASS    [AUTHZ] GET /api/rounds/:id/suggestions (Alfa closed round) as employee Alfa => 403 {"error":"forbidden"}
+BE-T144 PASS    [AUTHZ] GET /api/rounds/:id/suggestions (Alfa closed round) as employee Beta => 403 {"error":"forbidden"}
+BE-T145 PASS    [AUTHZ] GET /api/rounds/:id/suggestions (Alfa closed round) as manager Alfa => 200 {"status":"ok","provider":"rules","suggestions":[{"topic":"Sústredenie, nástroje a tok práce","questionText":"Keď potrebujem review, rozhodn
+BE-T146 PASS    [AUTHZ] GET /api/rounds/:id/suggestions (Alfa closed round) as manager Beta => 403 {"error":"forbidden"}
+BE-T147 PASS    [AUTHZ] GET /api/rounds/:id/suggestions (Alfa closed round) as HR => 200 {"status":"ok","provider":"rules","suggestions":[{"topic":"Sústredenie, nástroje a tok práce","questionText":"Keď potrebujem review, rozhodn
+BE-T148 PASS    [AUTHZ] POST /api/rounds/:id/actions (Alfa closed round) as anonymous => 401 {"error":"unauthorized"}
+BE-T149 PASS    [AUTHZ] POST /api/rounds/:id/actions (Alfa closed round) as employee Alfa => 403 {"error":"forbidden"}
+BE-T150 PASS    [AUTHZ] POST /api/rounds/:id/actions (Alfa closed round) as employee Beta => 403 {"error":"forbidden"}
+BE-T151 PASS    [AUTHZ] POST /api/rounds/:id/actions (Alfa closed round) as manager Alfa => 201 {"action":{"id":"cmwdvd2p500dlpk7cmt7ecsc5","roundId":"cmwdvcvzb000hpkqc14aq3ghk","topic":"QA téma","description":"QA krok","dueDate":"2026-
+BE-T152 PASS    [AUTHZ] POST /api/rounds/:id/actions (Alfa closed round) as manager Beta => 403 {"error":"forbidden"}
+BE-T153 PASS    [AUTHZ] POST /api/rounds/:id/actions (Alfa closed round) as HR => 403 {"error":"forbidden"}
+BE-T154 PASS    [AUTHZ] PATCH /api/actions/:id (action of Alfa) as anonymous => 401 {"error":"unauthorized"}
+BE-T155 PASS    [AUTHZ] PATCH /api/actions/:id (action of Alfa) as employee Alfa => 403 {"error":"forbidden"}
+BE-T156 PASS    [AUTHZ] PATCH /api/actions/:id (action of Alfa) as employee Beta => 403 {"error":"forbidden"}
+BE-T157 PASS    [AUTHZ] PATCH /api/actions/:id (action of Alfa) as manager Alfa => 200 {"action":{"id":"cmwdvcvyw000fpkqc4prr001s","roundId":"cmwdvcvwh000dpkqc36fq3s7l","topic":"Rast, uznanie a silné stránky","description":"Na 
+BE-T158 PASS    [AUTHZ] PATCH /api/actions/:id (action of Alfa) as manager Beta => 403 {"error":"forbidden"}
+BE-T159 PASS    [AUTHZ] PATCH /api/actions/:id (action of Alfa) as HR => 403 {"error":"forbidden"}
+BE-T160 PASS    [AUTHZ] GET /api/teams/:id/summary (Alfa) as anonymous => 401 {"error":"unauthorized"}
+BE-T161 PASS    [AUTHZ] GET /api/teams/:id/summary (Alfa) as employee Alfa => 200 {"team":{"id":"cmwdvcqwy0015pkpgnmy7ptfw","name":"Tím Alfa"},"rounds":[{"id":"cmwdvd1wf00djpk7cb9c253xe","name":"QA kolo p93pjw","closesAt":
+BE-T162 PASS    [AUTHZ] GET /api/teams/:id/summary (Alfa) as employee Beta => 403 {"error":"forbidden"}
+BE-T163 PASS    [AUTHZ] GET /api/teams/:id/summary (Alfa) as manager Alfa => 200 {"team":{"id":"cmwdvcqwy0015pkpgnmy7ptfw","name":"Tím Alfa"},"rounds":[{"id":"cmwdvd1wf00djpk7cb9c253xe","name":"QA kolo p93pjw","closesAt":
+BE-T164 PASS    [AUTHZ] GET /api/teams/:id/summary (Alfa) as manager Beta => 403 {"error":"forbidden"}
+BE-T165 PASS    [AUTHZ] GET /api/teams/:id/summary (Alfa) as HR => 200 {"team":{"id":"cmwdvcqwy0015pkpgnmy7ptfw","name":"Tím Alfa"},"rounds":[{"id":"cmwdvd1wf00djpk7cb9c253xe","name":"QA kolo p93pjw","closesAt":
+BE-T166 PASS    [AUTHZ] GET /api/teams/:id/trend (Alfa) as anonymous => 401 {"error":"unauthorized"}
+BE-T167 PASS    [AUTHZ] GET /api/teams/:id/trend (Alfa) as employee Alfa => 403 {"error":"forbidden"}
+BE-T168 PASS    [AUTHZ] GET /api/teams/:id/trend (Alfa) as employee Beta => 403 {"error":"forbidden"}
+BE-T169 PASS    [AUTHZ] GET /api/teams/:id/trend (Alfa) as manager Alfa => 200 {"team":{"id":"cmwdvcqwy0015pkpgnmy7ptfw","name":"Tím Alfa"},"topics":["Jasnosť a priority","Rast, uznanie a silné stránky","Sústredenie, ná
+BE-T170 PASS    [AUTHZ] GET /api/teams/:id/trend (Alfa) as manager Beta => 403 {"error":"forbidden"}
+BE-T171 PASS    [AUTHZ] GET /api/teams/:id/trend (Alfa) as HR => 200 {"team":{"id":"cmwdvcqwy0015pkpgnmy7ptfw","name":"Tím Alfa"},"topics":["Jasnosť a priority","Rast, uznanie a silné stránky","Sústredenie, ná
+BE-T172 PASS    [AUTHZ] POST /api/kudos as anonymous => 401 {"error":"unauthorized"}
+BE-T173 PASS    [AUTHZ] POST /api/kudos as employee Alfa => 201 {"kudos":{"id":"cmwdvd36d00dnpk7c4ivwy4o4","fromName":"Barbora Skúšobná","toName":"Adam Vzorový","text":"","emoji":"👏","value":"QUALITY","v
+BE-T174 PASS    [AUTHZ] POST /api/kudos as employee Beta => 201 {"kudos":{"id":"cmwdvd37i00dppk7cqxwuzkth","fromName":"Gabriela Skúšková","toName":"Adam Vzorový","text":"","emoji":"👏","value":"QUALITY","
+BE-T175 PASS    [AUTHZ] POST /api/kudos as manager Alfa => 201 {"kudos":{"id":"cmwdvd38o00drpk7cxy3ccgle","fromName":"Alena Testová","toName":"Adam Vzorový","text":"","emoji":"👏","value":"QUALITY","visi
+BE-T176 PASS    [AUTHZ] POST /api/kudos as manager Beta => 201 {"kudos":{"id":"cmwdvd3a000dtpk7ctralrhi5","fromName":"Boris Testovací","toName":"Adam Vzorový","text":"","emoji":"👏","value":"QUALITY","vi
+BE-T177 PASS    [AUTHZ] POST /api/kudos as HR => 201 {"kudos":{"id":"cmwdvd3bi00dvpk7ce9zx3uuh","fromName":"Hana Personálna","toName":"Adam Vzorový","text":"","emoji":"👏","value":"QUALITY","vi
+BE-T178 PASS    [AUTHZ] GET /api/kudos/me as anonymous => 401 {"error":"unauthorized"}
+BE-T179 PASS    [AUTHZ] GET /api/kudos/me as employee Alfa => 200 {"kudos":[{"id":"cmwdvcw7n000qpkqcpkx6hp5c","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"Ďakujem za pomoc s nasadením novej
+BE-T180 PASS    [AUTHZ] GET /api/kudos/me as employee Beta => 200 {"kudos":[]}
+BE-T181 PASS    [AUTHZ] GET /api/kudos/me as manager Alfa => 200 {"kudos":[]}
+BE-T182 PASS    [AUTHZ] GET /api/kudos/me as manager Beta => 200 {"kudos":[]}
+BE-T183 PASS    [AUTHZ] GET /api/kudos/me as HR => 200 {"kudos":[]}
+BE-T184 PASS    [AUTHZ] GET /api/hr/overview as anonymous => 401 {"error":"unauthorized"}
+BE-T185 PASS    [AUTHZ] GET /api/hr/overview as employee Alfa => 403 {"error":"forbidden"}
+BE-T186 PASS    [AUTHZ] GET /api/hr/overview as employee Beta => 403 {"error":"forbidden"}
+BE-T187 PASS    [AUTHZ] GET /api/hr/overview as manager Alfa => 403 {"error":"forbidden"}
+BE-T188 PASS    [AUTHZ] GET /api/hr/overview as manager Beta => 403 {"error":"forbidden"}
+BE-T189 PASS    [AUTHZ] GET /api/hr/overview as HR => 200 {"total":{"closedRounds":10,"roundsWithAction":5,"sharePercent":50,"medianDaysToFirstAction":2,"actions":{"planned":1,"inProgress":2,"done":
+BE-T190 PASS    [AUTHZ] GET /api/hr/heatmap as anonymous => 401 {"error":"unauthorized"}
+BE-T191 PASS    [AUTHZ] GET /api/hr/heatmap as employee Alfa => 403 {"error":"forbidden"}
+BE-T192 PASS    [AUTHZ] GET /api/hr/heatmap as employee Beta => 403 {"error":"forbidden"}
+BE-T193 PASS    [AUTHZ] GET /api/hr/heatmap as manager Alfa => 403 {"error":"forbidden"}
+BE-T194 PASS    [AUTHZ] GET /api/hr/heatmap as manager Beta => 403 {"error":"forbidden"}
+BE-T195 PASS    [AUTHZ] GET /api/hr/heatmap as HR => 200 {"windowDays":90,"topics":["Stála otázka","Jasnosť a priority","Manažér a spätná väzba","Rast, uznanie a silné stránky","Sústredenie, nástro
+BE-T196 PASS    [AUTHZ] GET /api/hr/issues as anonymous => 401 {"error":"unauthorized"}
+BE-T197 PASS    [AUTHZ] GET /api/hr/issues as employee Alfa => 403 {"error":"forbidden"}
+BE-T198 PASS    [AUTHZ] GET /api/hr/issues as employee Beta => 403 {"error":"forbidden"}
+BE-T199 PASS    [AUTHZ] GET /api/hr/issues as manager Alfa => 403 {"error":"forbidden"}
+BE-T200 PASS    [AUTHZ] GET /api/hr/issues as manager Beta => 403 {"error":"forbidden"}
+BE-T201 PASS    [AUTHZ] GET /api/hr/issues as HR => 200 {"issues":[{"id":"cmwdvd0dl00cnpk7c16j1pfcl","title":"QA podnet matica","description":"","source":"OTHER","ownerGroup":"HR","status":"OPEN",
+BE-T202 PASS    [AUTHZ] POST /api/hr/issues as anonymous => 401 {"error":"unauthorized"}
+BE-T203 PASS    [AUTHZ] POST /api/hr/issues as employee Alfa => 403 {"error":"forbidden"}
+BE-T204 PASS    [AUTHZ] POST /api/hr/issues as employee Beta => 403 {"error":"forbidden"}
+BE-T205 PASS    [AUTHZ] POST /api/hr/issues as manager Alfa => 403 {"error":"forbidden"}
+BE-T206 PASS    [AUTHZ] POST /api/hr/issues as manager Beta => 403 {"error":"forbidden"}
+BE-T207 PASS    [AUTHZ] POST /api/hr/issues as HR => 201 {"issue":{"id":"cmwdvd3rj00dxpk7cber2mi9w","title":"QA podnet","description":"","source":"OTHER","ownerGroup":"HR","status":"OPEN","dueDate"
+BE-T208 PASS    [AUTHZ] PATCH /api/hr/issues/:id as anonymous => 401 {"error":"unauthorized"}
+BE-T209 PASS    [AUTHZ] PATCH /api/hr/issues/:id as employee Alfa => 403 {"error":"forbidden"}
+BE-T210 PASS    [AUTHZ] PATCH /api/hr/issues/:id as employee Beta => 403 {"error":"forbidden"}
+BE-T211 PASS    [AUTHZ] PATCH /api/hr/issues/:id as manager Alfa => 403 {"error":"forbidden"}
+BE-T212 PASS    [AUTHZ] PATCH /api/hr/issues/:id as manager Beta => 403 {"error":"forbidden"}
+BE-T213 PASS    [AUTHZ] PATCH /api/hr/issues/:id as HR => 200 {"issue":{"id":"cmwdvd0dl00cnpk7c16j1pfcl","title":"QA podnet matica","description":"","source":"OTHER","ownerGroup":"HR","status":"IN_PROGR
+BE-T214 PASS    [AUTHZ] GET /api/hr/notes as anonymous => 401 {"error":"unauthorized"}
+BE-T215 PASS    [AUTHZ] GET /api/hr/notes as employee Alfa => 403 {"error":"forbidden"}
+BE-T216 PASS    [AUTHZ] GET /api/hr/notes as employee Beta => 403 {"error":"forbidden"}
+BE-T217 PASS    [AUTHZ] GET /api/hr/notes as manager Alfa => 403 {"error":"forbidden"}
+BE-T218 PASS    [AUTHZ] GET /api/hr/notes as manager Beta => 403 {"error":"forbidden"}
+BE-T219 PASS    [AUTHZ] GET /api/hr/notes as HR => 200 {"notes":[{"id":"cmwdvcr37001wpkpghujjls0g","title":"Stretnutie s Tímom Beta","meetingDate":"2026-11-10T18:16:08.223Z","text":"V zasadačke n
+BE-T220 PASS    [AUTHZ] POST /api/hr/notes as anonymous => 401 {"error":"unauthorized"}
+BE-T221 PASS    [AUTHZ] POST /api/hr/notes as employee Alfa => 403 {"error":"forbidden"}
+BE-T222 PASS    [AUTHZ] POST /api/hr/notes as employee Beta => 403 {"error":"forbidden"}
+BE-T223 PASS    [AUTHZ] POST /api/hr/notes as manager Alfa => 403 {"error":"forbidden"}
+BE-T224 PASS    [AUTHZ] POST /api/hr/notes as manager Beta => 403 {"error":"forbidden"}
+BE-T225 PASS    [AUTHZ] POST /api/hr/notes as HR => 201 {"note":{"id":"cmwdvd43j00dzpk7ci3t9ogq3"}}
+BE-T226 PASS    [AUTHZ] POST /api/logout as anonymous => 401 {"error":"unauthorized"}
+BE-T227 PASS    [AUTHZ] POST /api/logout as employee Alfa => 200 {"ok":true}
+BE-T228 PASS    [AUTHZ] POST /api/logout as employee Beta => 200 {"ok":true}
+BE-T229 PASS    [AUTHZ] POST /api/logout as manager Alfa => 200 {"ok":true}
+BE-T230 PASS    [AUTHZ] POST /api/logout as manager Beta => 200 {"ok":true}
+BE-T231 PASS    [AUTHZ] POST /api/logout as HR => 200 {"ok":true}
+BE-T232 PASS    [AUTHZ] 403 body carries nothing but the error code => 403 {"error":"forbidden"}
+BE-T233 PASS    [AUTHZ] manager Beta cannot tell an existing Alfa round from a non-existent id (results) => 403 {"error":"forbidden"} / 403 {"error":"forbidden"}
+BE-T234 PASS    [AUTHZ] employee Beta cannot tell an existing Alfa team from a non-existent id (summary) => 403 {"error":"forbidden"}
+BE-T235 PASS    [AUTHZ] employee: existing DRAFT of own team vs non-existent round id (GET /api/rounds/:id) => draft 404 {"error":"not_found"} / unknown 403 {"error":"forbidden"}
+BE-T236 PASS    [AUTHZ-PAGE] page /hr/overview as a2 => HTTP 403
+BE-T237 PASS    [AUTHZ-PAGE] page /hr/issues as mA => HTTP 403
+BE-T238 PASS    [AUTHZ-PAGE] page /hr/heatmap as mA => HTTP 403
+BE-T239 PASS    [AUTHZ-PAGE] page /hr/notes as a2 => HTTP 403
+BE-T240 PASS    [AUTHZ-PAGE] page /rounds/:id/results as a2 => HTTP 403
+BE-T241 PASS    [AUTHZ-PAGE] page /rounds/:id/results as mB => HTTP 403
+BE-T242 PASS    [AUTHZ-PAGE] page /rounds/:id/results as mA => HTTP 200
+BE-T243 PASS    [AUTHZ-PAGE] page /team/:id as b2 => HTTP 403
+BE-T244 PASS    [AUTHZ-PAGE] page /team/:id as a2 => HTTP 200
+BE-T245 PASS    [AUTHZ-PAGE] page /rounds/new as a2 => HTTP 403
+BE-T246 PASS    [AUTHZ-PAGE] page /rounds/:id/fill as b2 => HTTP 403
+BE-T247 PASS    [AUTHZ-PAGE] page /rounds/:id/fill as hr => HTTP 403
+BE-T248 PASS    [AUTHZ-PAGE] page /rounds/:id/report as mB => HTTP 403
+BE-T249 PASS    [AUTHZ-PAGE] page /team/:id/trend as a2 => HTTP 403
+BE-T250 PASS    [AUTHZ-PAGE] page / without session => HTTP 307 location=/login
+BE-T251 PASS    [AUTHZ-PAGE] page /hr/overview without session => HTTP 307 location=/login
+
+===== S3 Rounds: creation, validation, lifecycle =====
+BE-T252 PASS    [ROUND-CREATE] HR creates a round with 3 picked questions => 201; DB status=DRAFT, questions=4, first is fixed=true
+BE-T253 PASS    [ROUND-CREATE] manager omits teamId => 201 {"round":{"id":"cmwdvdj5r00e5pk7ckq4nv6u3"}}
+BE-T254 PASS    [ROUND-CREATE] HR omits teamId => 400 {"error":"validation_error","fields":{"teamId":"required"}}
+BE-T255 PASS    [ROUND-CREATE] HR sends unknown teamId => 400 {"error":"validation_error","fields":{"teamId":"unknown"}}
+BE-T256 PASS    [ROUND-CREATE] manager sends unknown teamId => 403 {"error":"forbidden"}
+BE-T257 PASS    [ROUND-CREATE] teamId as number (HR) => 400 {"error":"validation_error","fields":{"teamId":"required"}}
+BE-T258 PASS    [ROUND-CREATE] teamId as array (manager Beta, Alfa id inside) => 201; Alfa rounds before/after 6/6
+BE-T259 PASS    [ROUND-CREATE] name missing => 400 {"error":"validation_error","fields":{"name":"required"}}
+BE-T260 PASS    [ROUND-CREATE] name empty => 400 {"error":"validation_error","fields":{"name":"required"}}
+BE-T261 PASS    [ROUND-CREATE] name whitespace only => 400 {"error":"validation_error","fields":{"name":"required"}}
+BE-T262 PASS    [ROUND-CREATE] name 121 characters => 400 {"error":"validation_error","fields":{"name":"too_long"}}
+BE-T263 PASS    [ROUND-CREATE] name number => 400 {"error":"validation_error","fields":{"name":"required"}}
+BE-T264 PASS    [ROUND-CREATE] name null => 400 {"error":"validation_error","fields":{"name":"required"}}
+BE-T265 PASS    [ROUND-CREATE] name array => 400 {"error":"validation_error","fields":{"name":"required"}}
+BE-T266 PASS    [ROUND-CREATE] name exactly 120 characters => 201 {"round":{"id":"cmwdvdjd300e9pk7cnaoshd9e"}}
+BE-T267 PASS    [ROUND-CREATE] name with unicode, emoji and HTML => 201 {"round":{"id":"cmwdvdjee00ebpk7c5utzkhrp"}}
+BE-T268 PASS    [ROUND-CREATE] name of 5 zero-width spaces (U+200B) => 400 {"error":"validation_error","fields":{"name":"required"}} (invisible name accepted: false)
+BE-T269 PASS    [ROUND-CREATE] closesAt missing => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T270 PASS    [ROUND-CREATE] closesAt 31 February => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T271 PASS    [ROUND-CREATE] closesAt dd.mm.yyyy => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T272 PASS    [ROUND-CREATE] closesAt ISO datetime => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T273 PASS    [ROUND-CREATE] closesAt yesterday => 400 {"error":"validation_error","fields":{"closesAt":"in_past"}}
+BE-T274 PASS    [ROUND-CREATE] closesAt number timestamp => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T275 PASS    [ROUND-CREATE] closesAt month 13 => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T276 PASS    [ROUND-CREATE] closesAt empty string => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T277 PASS    [ROUND-CREATE] closesAt year 0000 => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T278 PASS    [ROUND-CREATE] closesAt null => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T279 PASS    [ROUND-CREATE] closesAt trailing space => 400 {"error":"validation_error","fields":{"closesAt":"invalid"}}
+BE-T280 PASS    [ROUND-CREATE] closesAt today => 201 {"round":{"id":"cmwdvdjmn00edpk7ctbhz428w"}}
+BE-T281 PASS    [ROUND-CREATE] closesAt 9999-12-31 => 201 {"round":{"id":"cmwdvdjo700efpk7c9sxxp1bh"}}
+BE-T282 PASS    [ROUND-CREATE] closesAt 2028-02-29 (leap day) => 201 {"round":{"id":"cmwdvdjp700ehpk7cd2jfpuqg"}}
+BE-T283 PASS    [ROUND-CREATE] questionIds missing => 400 {"error":"validation_error","fields":{"questionIds":"invalid"}}
+BE-T284 PASS    [ROUND-CREATE] questionIds string instead of array => 400 {"error":"validation_error","fields":{"questionIds":"invalid"}}
+BE-T285 PASS    [ROUND-CREATE] questionIds array of numbers => 400 {"error":"validation_error","fields":{"questionIds":"invalid"}}
+BE-T286 PASS    [ROUND-CREATE] questionIds object => 400 {"error":"validation_error","fields":{"questionIds":"invalid"}}
+BE-T287 PASS    [ROUND-CREATE] questionIds empty array (only fixed = 1) => 400 {"error":"validation_error","fields":{"questionIds":"too_few"}}
+BE-T288 PASS    [ROUND-CREATE] questionIds 1 picked (total 2) => 400 {"error":"validation_error","fields":{"questionIds":"too_few"}}
+BE-T289 PASS    [ROUND-CREATE] questionIds 5 picked (total 6) => 400 {"error":"validation_error","fields":{"questionIds":"too_many"}}
+BE-T290 PASS    [ROUND-CREATE] questionIds 30 picked => 400 {"error":"validation_error","fields":{"questionIds":"too_many"}}
+BE-T291 PASS    [ROUND-CREATE] questionIds duplicate id => 400 {"error":"validation_error","fields":{"questionIds":"duplicate"}}
+BE-T292 PASS    [ROUND-CREATE] questionIds unknown id => 400 {"error":"validation_error","fields":{"questionIds":"unknown"}}
+BE-T293 PASS    [ROUND-CREATE] questionIds SQL-injection id => 400 {"error":"validation_error","fields":{"questionIds":"unknown"}}
+BE-T294 PASS    [ROUND-CREATE] questionIds nested array => 400 {"error":"validation_error","fields":{"questionIds":"invalid"}}
+BE-T295 PASS    [ROUND-CREATE] questionIds null element => 400 {"error":"validation_error","fields":{"questionIds":"invalid"}}
+BE-T296 PASS    [ROUND-CREATE] 2 picked (total 3 with fixed) – lower bound => 201 {"round":{"id":"cmwdvdjxa00ejpk7crosaj48l"}}
+BE-T297 PASS    [ROUND-CREATE] 4 picked (total 5 with fixed) – upper bound => 201 {"round":{"id":"cmwdvdjyf00elpk7cc46t00ws"}}
+BE-T298 PASS    [ROUND-CREATE] fixed question sent explicitly + 2 picked => 201 {"round":{"id":"cmwdvdjzb00enpk7c1n7nee14"}}
+BE-T299 PASS    [ROUND-CREATE] fixed question sent explicitly + 4 picked (5 total) => 201 {"round":{"id":"cmwdvdk0700eppk7cniycz68v"}}
+BE-T300 PASS    [ROUND-CREATE] only the fixed question sent twice => 400 {"error":"validation_error","fields":{"questionIds":"duplicate"}}
+BE-T301 PASS    [ROUND-CREATE] mass assignment: status, id, startsAt, closedAt, fixed => 201; status=DRAFT id=generated startsAt=null
+BE-T302 PASS    [ROUND-CREATE] all fields invalid at once => 400 {"error":"validation_error","fields":{"name":"required","teamId":"required","closesAt":"invalid","questionIds":"invalid"}}
+BE-T303 PASS    [ROUND-CREATE] non-object body (array) => 400 {"error":"invalid_json"}
+BE-T304 PASS    [ROUND-CREATE] failed validation creates no rows => 400 {"error":"validation_error","fields":{"questionIds":"unknown"}}
+BE-T305 PASS    [ROUND-LIFE] draft is not listed for an employee of the team => 200 {"rounds":[]}
+BE-T306 PASS    [ROUND-LIFE] employee submits to a DRAFT round => 404 {"error":"not_found"}
+BE-T307 PASS    [ROUND-LIFE] close a DRAFT round => 409 {"error":"invalid_state"}
+BE-T308 PASS    [ROUND-LIFE] results of a DRAFT round => 200 {"round":{"id":"cmwdvdk7b00etpk7c9rwafma8","name":"QA kolo d04rem","teamId":"cmwdvdb1r001ipkkwyqq9onf8","teamName":"Tím Beta","status":"DRAFT","cl…(+46 chars)
+BE-T309 PASS    [ROUND-LIFE] add an action to a DRAFT round => 409 {"error":"round_not_closed"}
+BE-T310 PASS    [ROUND-LIFE] open a DRAFT round (manager) => 200 {"ok":true}
+BE-T311 PASS    [ROUND-LIFE] open an already OPEN round => 409 {"error":"invalid_state"}
+BE-T312 PASS    [ROUND-LIFE] open round is listed for the employee with submitted=false and without participation numbers => {"id":"cmwdvdk7b00etpk7c9rwafma8","name":"QA kolo d04rem","teamId":"cmwdvdb1r001ipkkwyqq9onf8","teamName":"Tím Beta","status":"OPEN","closesAt":"2026-…(+57 chars)
+BE-T313 PASS    [ROUND-LIFE] manager's list shows participation and submitted for own team; HR's list shows no 'submitted' => mgr {"responded":0,"teamSize":6} submitted=false; HR keys id,name,teamId,teamName,status,closesAt,questionCount,participation,awaitingAction
+BE-T314 PASS    [ROUND-LIFE] manager's list contains only own team; HR's list contains both teams => 200 {"rounds":[{"id":"cmwdvdjo700efpk7c9sxxp1bh","name":"QA kolo","teamId":"cmwdvdb1r001ipkkwyqq9onf8","teamName":"Tím Beta","status":"DRAFT","closesA…(+48 chars)
+BE-T315 PASS    [ROUND-LIFE] a running round cannot be edited: PUT/PATCH/DELETE /api/rounds/:id => statuses 405,405,405
+BE-T316 PASS    [ROUND-LIFE] close an OPEN round (manager) => 200 {"ok":true}
+BE-T317 PASS    [ROUND-LIFE] close an already CLOSED round => 409 {"error":"invalid_state"}
+BE-T318 PASS    [ROUND-LIFE] re-open a CLOSED round => 409 {"error":"invalid_state"}
+BE-T319 PASS    [ROUND-LIFE] submit to a CLOSED round => 409 {"error":"round_closed"}
+BE-T320 PASS    [ROUND-LIFE] closed round without action is flagged awaitingAction for manager and HR => 200 {"rounds":[{"id":"cmwdvdjo700efpk7c9sxxp1bh","name":"QA kolo","teamId":"cmwdvdb1r001ipkkwyqq9onf8","teamName":"Tím Beta","status":"DRAFT","closesA…(+48 chars)
+BE-T321 PASS    [ROUND-LIFE] open/close with unknown id: HR vs manager => HR 404, manager 403
+BE-T322 PASS    [ROUND-LIFE] open with a request body trying to set status CLOSED => 200 {"ok":true}
+BE-T323 PASS    [ROUND-LIFE] open a draft whose deadline already passed => 409 {"error":"deadline_passed"}
+BE-T324 PASS    [ROUND-LIFE] submit to an OPEN round after its deadline (before anyone loaded a list) => 409 {"error":"round_closed"}
+BE-T325 PASS    [ROUND-LIFE] automatically closed round: DB status CLOSED and closedAt = deadline => status=CLOSED closedAt=2026-11-12T16:16:47.069Z deadline=2026-11-12T16:16:47.069Z
+BE-T326 PASS    [ROUND-LIFE] automatic closing is triggered by GET /api/rounds => 200 {"rounds":[{"id":"cmwdvdjo700efpk7c9sxxp1bh","name":"QA kolo","teamId":"cmwdvdb1r001ipkkwyqq9onf8","teamName":"Tím Beta","status":"DRAFT","closesA…(+48 chars)
+BE-T327 PASS    [ROUND-LIFE] manual close of a round whose deadline passed => 409 {"error":"invalid_state"}; closedAt=deadline: true
+BE-T328 PASS    [ROUND-CONC] two simultaneous open requests on one draft => statuses 200,409
+BE-T329 PASS    [ROUND-CONC] five simultaneous close requests on one open round => statuses 200,409,409,409,409
+BE-T330 PASS    [ROUND-CONC] simultaneous open and close on a draft => open 200, close 200, final CLOSED
+BE-T331 PASS    [ROUND-CONC] 10 simultaneous round creations => statuses 201,201,201,201,201,201,201,201,201,201
+BE-T332 PASS    [ROUND-DB] every round has 3–5 RoundQuestion rows with contiguous positions and the fixed question first => 41 rounds checked, 0 violating
+
+===== S4 Responses & confidentiality storage =====
+BE-T333 PASS    [FILL] GET /api/rounds/:id as team member => 200 keys=closesAt,id,name,questions,status,submitted,teamId q=4
+BE-T334 PASS    [FILL-VALID] invalid submission: answers missing => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T335 PASS    [FILL-VALID] invalid submission: answers not an array => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T336 PASS    [FILL-VALID] invalid submission: answers object => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T337 PASS    [FILL-VALID] invalid submission: too few answers (3 of 4) => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T338 PASS    [FILL-VALID] invalid submission: too many answers (5 of 4) => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T339 PASS    [FILL-VALID] invalid submission: value 0 => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T340 PASS    [FILL-VALID] invalid submission: value 6 => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T341 PASS    [FILL-VALID] invalid submission: value -1 => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T342 PASS    [FILL-VALID] invalid submission: value 3.5 => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T343 PASS    [FILL-VALID] invalid submission: value '3' (string) => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T344 PASS    [FILL-VALID] invalid submission: value null => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T345 PASS    [FILL-VALID] invalid submission: value true => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T346 PASS    [FILL-VALID] invalid submission: value [3] (nested) => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T347 PASS    [FILL-VALID] invalid submission: value 1e400 (Infinity) => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T348 PASS    [FILL-VALID] invalid submission: value 99999999999999999999 => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T349 PASS    [FILL-VALID] invalid submission: empty array => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T350 PASS    [FILL-VALID] invalid submission: comment as number => 400 {"error":"validation_error","fields":{"comment":"invalid"}} in 19.1 ms
+BE-T351 PASS    [FILL-VALID] invalid submission: comment as object => 400 {"error":"validation_error","fields":{"comment":"invalid"}} in 21.2 ms
+BE-T352 PASS    [FILL-VALID] invalid submission: comment as array => 400 {"error":"validation_error","fields":{"comment":"invalid"}} in 25.5 ms
+BE-T353 PASS    [FILL-VALID] invalid submission: comment 1001 characters => 400 {"error":"validation_error","fields":{"comment":"too_long"}} in 26.7 ms
+BE-T354 PASS    [FILL-VALID] invalid submission: comment 5 MB => 400 {"error":"validation_error","fields":{"comment":"too_long"}} in 359.5 ms
+BE-T355 PASS    [FILL-VALID] invalid submission: malformed JSON => 400 {"error":"invalid_json"}
+BE-T356 PASS    [FILL-VALID] invalid submission: empty body => 400 {"error":"invalid_json"}
+BE-T357 PASS    [FILL-VALID] invalid submission: JSON array body => 400 {"error":"invalid_json"}
+BE-T358 PASS    [FILL-VALID] invalid submission: text/plain garbage => 400 {"error":"invalid_json"}
+BE-T359 PASS    [FILL-DB] after 25 rejected submissions nothing is stored => participations=0 responses=0
+BE-T360 PASS    [FILL] valid submission with comment (b1) => 201 {"ok":true}
+BE-T361 PASS    [FILL] second submission by the same user => 409 {"error":"already_submitted"}
+BE-T362 PASS    [FILL] second submission with an invalid body => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T363 PASS    [FILL-DB] one Participation and one Response row; values and comment stored as sent => participations=1 responses=1 values=1,2,3,4,
+BE-T364 PASS    [FILL] GET /api/rounds/:id after submitting => 200 {"round":{"id":"cmwdvdz7h00fvpk7cni49l11u","name":"QA kolo w0wpz7","teamId":"cmwdvdrj7001ipklcjy8nw2ro","status":"OPEN","closesAt":"2026-11-19T22:…(+47 chars)
+BE-T365 PASS    [FILL] mass assignment in submission: id, userId, teamId, roundId, createdAt (b2) => 201; rows=2; all ids UUIDv4=true; participation recorded for sender only
+BE-T366 PASS    [FILL] comment exactly 1000 characters (b3) => 201 {"ok":true}
+BE-T367 PASS    [FILL] comment with unicode, emoji, HTML/script and SQL text (b4) => 201 {"ok":true}
+BE-T368 PASS    [FILL] whitespace-only comment is stored as NULL (b5) => 201 {"ok":true}
+BE-T369 PASS    [FILL] manager of the team fills in the round too (mB) => 201 {"ok":true}
+BE-T370 PASS    [FILL] unknown round id as employee => 403 {"error":"forbidden"}
+BE-T371 PASS    [NFR-01-DB] Response table has no user and no time column => id,roundId,teamId,v1,v2,v3,v4,v5,comment
+BE-T372 PASS    [NFR-01-DB] Participation table has only roundId,userId => roundId(pk=1),userId(pk=2)
+BE-T373 PASS    [NFR-01-DB] Response and Participation are WITHOUT ROWID in the live schema (all 5 migrations applied) => Participation: true; Response: true
+BE-T374 PASS    [NFR-01-DB] hidden rowid cannot be selected from Response => error: no such column rowid
+BE-T375 PASS    [NFR-01-DB] all Response ids are random UUID v4 => 47 rows, non-UUID: 0
+BE-T376 PASS    [NFR-01-DB] physical order of Response rows does not follow submission order => scan order 12,44,22,55,34,33; submission order 12,22,33,44,55,34
+BE-T377 PASS    [NFR-01-DB] no table other than Participation links a user to a round's response => tables: User,Team,Round,RoundQuestion,Participation,Response,Kudos,Action,Question,MeetingNote,Issue; triggers: 0
+BE-T378 PASS    [NFR-01-DB] for every round: number of Participation rows = number of Response rows => 10 rounds, mismatching: 0
+BE-T379 PASS    [NFR-01-LOG] server log does not contain the body of a submitted response => log size 2697 bytes; marker found: false
+BE-T380 PASS    [DB-CONSTRAINT] raw INSERT into Response with v1 = 0 => rejected: CHECK
+BE-T381 PASS    [DB-CONSTRAINT] raw INSERT into Response with v1 = 6 => rejected: CHECK
+BE-T382 PASS    [DB-CONSTRAINT] raw INSERT into Response with v2 = 2.5 (real) => rejected: CHECK
+BE-T383 PASS    [DB-CONSTRAINT] raw INSERT into Response with v3 = 'x' (text) => rejected: CHECK
+BE-T384 PASS    [DB-CONSTRAINT] raw INSERT into Response with v4 = 7 => rejected: CHECK
+BE-T385 PASS    [DB-CONSTRAINT] raw INSERT into Response with v5 = 0 => rejected: CHECK
+BE-T386 PASS    [DB-CONSTRAINT] raw INSERT into Response with v1 NULL => rejected: NOT NULL
+BE-T387 PASS    [DB-CONSTRAINT] raw INSERT into Response with comment of 1001 characters => rejected: CHECK
+BE-T388 PASS    [DB-CONSTRAINT] raw INSERT into Response with unknown roundId (foreign key) => rejected: FOREIGN
+BE-T389 PASS    [DB-CONSTRAINT] raw INSERT into Response with unknown teamId (foreign key) => rejected: FOREIGN
+BE-T390 PASS    [DB-CONSTRAINT] raw INSERT of a duplicate Participation (same round, same user) => rejected: UNIQUE/PK
+BE-T391 PASS    [DB-CONSTRAINT] raw INSERT of Participation for an unknown user (foreign key) => rejected: FOREIGN KEY
+BE-T392 PASS    [DB-CONSTRAINT] transaction rollback: Participation + invalid Response in one transaction => transaction failed=true; participations left=0
+BE-T393 PASS    [DB-CONSTRAINT] deleting a round that has responses is restricted => rejected: FOREIGN KEY
+BE-T394 PASS    [DB-CONSTRAINT] User.email is unique => rejected: UNIQUE
+BE-T395 PASS    [DB-CONSTRAINT] passwords are stored only as bcrypt hashes => 13 users, all bcrypt: true
+BE-T396 PASS    [DB-INTEGRITY] no orphaned rows in any relation => {"response_round":0,"response_team":0,"response_team_matches_round":0,"participation_user":0,"participation_other_team":0,"roundquestion":0,"action_ro…(+98 chars)
+BE-T397 PASS    [DB-INTEGRITY] foreign key enforcement is on for the application's connection type => [{"foreign_keys":1}]
+BE-T398 PASS    [FILL] 3-question round: 3 answers => 201 {"ok":true}
+BE-T399 PASS    [FILL] 3-question round: 4 answers => 400 {"error":"validation_error","fields":{"answers":"invalid"}}
+BE-T400 PASS    [FILL] comment containing a NUL character (\u0000) => 201 {"ok":true}
+BE-T401 PASS    [FILL] comment containing a lone surrogate (\ud800) => 400 {"error":"invalid_text"}
+BE-T402 PASS    [FILL] comment of 1000 emoji (2000 UTF-16 units, 1000 characters) => 201 {"ok":true} (server counts UTF-16 units, DB CHECK counts characters)
+BE-T403 PASS    [FILL] duplicate JSON key 'answers' (last one wins) => 201 {"ok":true}
+BE-T404 PASS    [FILL] __proto__ / constructor keys in the body => 200 {"user":{"id":"cmwdvdrjz001kpklcgqfpqqzg","name":"Filip Vzorka","role":"EMPLOYEE","teamId":"cmwdvdrj7001ipklcjy8nw2ro"}}
+BE-T405 PASS    [FILL-CONC] the same user sends 6 identical submissions at once => statuses 201,409,409,409,409,409; responses=1 participations=1
+BE-T406 PASS    [FILL-CONC] five different users submit at the same moment => statuses 201,201,201,201,201; responses in round=6
+BE-T407 PASS    [FILL-CONC] submission racing with closing the round => submit 409, close 200, rows=0
+BE-T408 PASS    [FILL-CONC] 30 parallel mixed reads while 5 users submit => {"200":30,"201":5}
+
+===== S5 Results, threshold 4 vs 5, suggestions, summary, trend, heatmap =====
+BE-T409 PASS    [RESULTS] OPEN round with 5 responses: results as manager => 200 keys=participation,round,status {"responded":5,"teamSize":6}
+BE-T410 PASS    [RESULTS] OPEN round: suggestions => 200 {"status":"not_closed"}
+BE-T411 PASS    [RESULTS] OPEN round is not on the team page nor in the trend => 200 {"team":{"id":"cmwdve50b001ipkdc5xj6fm54","name":"Tím Beta"},"topics":["Jasnosť a priority","Manažér a spätná väzba","Rast, uznanie a silné stránk…(+47 chars)
+BE-T412 PASS    [THRESHOLD] closed round with 4 responses: results as mB => 200 keys=participation,responseCount,round,status status=insufficient_responses count=4
+BE-T413 PASS    [THRESHOLD] closed round with 4 responses: results as hr => 200 keys=participation,responseCount,round,status status=insufficient_responses count=4
+BE-T414 PASS    [THRESHOLD] 4 responses: suggestions => {"status":"insufficient_responses","responseCount":4}
+BE-T415 PASS    [THRESHOLD] 4 responses: team summary as b5 => {"results":{"status":"insufficient_responses"},"participation":{"responded":4,"teamSize":6}}
+BE-T416 PASS    [THRESHOLD] 4 responses: team summary as mB => {"results":{"status":"insufficient_responses"},"participation":{"responded":4,"teamSize":6}}
+BE-T417 PASS    [THRESHOLD] 4 responses: team summary as hr => {"results":{"status":"insufficient_responses"},"participation":{"responded":4,"teamSize":6}}
+BE-T418 PASS    [THRESHOLD] 4 responses: trend point => {"roundId":"cmwdvec8g00g7pk7c8edsa0vq","roundName":"QA kolo krqww0","closedAt":"2026-11-12T18:17:23.153Z","responded":4,"status":"insufficient_respons…(+4 chars)
+BE-T419 PASS    [THRESHOLD] closed round with 0 responses => 200 {"status":"insufficient_responses","responseCount":0}
+BE-T420 PASS    [THRESHOLD] seed round of team Beta with 4 responses (acceptance scenario step 4) => 200 {"round":{"id":"cmwdve529001upkdckfr35x6z","name":"Pulse – záťaž a sústredenie","teamId":"cmwdve50b001ipkdc5xj6fm54","teamName":"Tím Beta","status…(+47 chars)
+BE-T421 PASS    [RESULTS] closed round with exactly 5 responses: results as manager => status=ok count=5 questions=4 comments=4
+BE-T422 PASS    [RESULTS] averages are computed correctly => 3.6,2,4.6,2.6
+BE-T423 PASS    [RESULTS] distributions are computed correctly and sum to the number of responses => [[0,1,1,2,1],[1,3,1,0,0],[0,0,0,2,3],[1,1,2,1,0]]
+BE-T424 PASS    [RESULTS] question order and scales => (no request)
+BE-T425 PASS    [RESULTS] question result shape => (no request)
+BE-T426 PASS    [RESULTS] comments are exactly the submitted comments, as plain strings => (no request)
+BE-T427 PASS    [RESULTS] comments come in random order (15 calls) => 11 distinct orders in 15 calls
+BE-T428 PASS    [RESULTS] HR sees the same results as the manager => 200 {"round":{"id":"cmwdveci600g9pk7ckpettv80","name":"QA kolo e8tqjx","teamId":"cmwdve50b001ipkdc5xj6fm54","teamName":"Tím Beta","status":"CLOSED","c…(+47 chars)
+BE-T429 PASS    [NFR-01-API] results expose no response id, user id, user name or e-mail => no identifiers found
+BE-T430 PASS    [NFR-01-API] team summary, trend, suggestions, heatmap and round list expose no response id or respondent identity => no identifiers found in 6 endpoints
+BE-T431 PASS    [NFR-01-API] comments appear only in results – not in summary, trend, suggestions, heatmap, round list, issues => not found in 11 endpoint/role combinations
+BE-T432 PASS    [NFR-01-API] printable report page of the round contains no comments => HTTP 200, comment text present: false
+BE-T433 PASS    [SUGGEST] 5 responses: two rule-based suggestions => {"status":"ok","provider":"rules","suggestions":[{"topic":"Záťaž a energia","questionText":"Ako často bolo za posledné dva týždne potrebné pracovať na…(+50 chars)
+BE-T434 PASS    [SUGGEST] weakest questions chosen with reversed scale flipped, from different topics, fixed question excluded => Záťaž a energia (4.6) | Manažér a spätná väzba (2.6)
+BE-T435 PASS    [SUGGEST] suggestions are deterministic => 200 {"status":"ok","provider":"rules","suggestions":[{"topic":"Záťaž a energia","questionText":"Ako často bolo za posledné dva týždne potrebné pracova…(+47 chars)
+BE-T436 PASS    [SUMMARY] 5 responses: team summary as employee shows averages only => {"status":"ok","questions":[{"position":1,"text":"Celkovo, aké boli pre mňa posledné dva týždne v práci?","scale":"QUALITY","average":3.6},{"position"…(+70 chars)
+BE-T437 PASS    [SUMMARY] summary shape and ordering => 200 {"team":{"id":"cmwdve50b001ipkdc5xj6fm54","name":"Tím Beta"},"rounds":[{"id":"cmwdved3n00gbpk7cmqjjnp98","name":"QA kolo ham66d","closesAt":"2026-…(+48 chars)
+BE-T438 PASS    [SUMMARY] summary for unknown team id: HR vs employee => HR 404, employee 403
+BE-T439 PASS    [TREND] trend point of the 5-response round => {"roundId":"cmwdveci600g9pk7ckpettv80","roundName":"QA kolo e8tqjx","closedAt":"2026-11-12T18:17:23.197Z","responded":5,"status":"ok","fixed":3.6,"top…(+58 chars)
+BE-T440 PASS    [TREND] trend of team Alfa: oldest first, 4-response round is a gap => 38.:ok 40.:ok 42.:insufficient_responses 44.:ok 46.:ok
+BE-T441 PASS    [TREND] trend topics list = topics of rounds above the threshold only => Jasnosť a priority | Rast, uznanie a silné stránky | Sústredenie, nástroje a tok práce | Tím a psychologické bezpečie | Záťaž a energia
+BE-T442 PASS    [TREND] trend for unknown team id: HR vs manager => 403 {"error":"forbidden"}
+BE-T443 PASS    [HEATMAP] heatmap shape => 200 {"windowDays":90,"topics":["Stála otázka","Jasnosť a priority","Manažér a spätná väzba","Rast, uznanie a silné stránky","Sústredenie, nástroje a t…(+47 chars)
+BE-T444 PASS    [HEATMAP] heatmap team Beta: rounds below the threshold contribute nothing => API counted=3 cell=3.91; DB expected counted=3 cell=3.91; value if small rounds leaked=3.85
+BE-T445 PASS    [HEATMAP] heatmap team Alfa: rounds below the threshold contribute nothing => API counted=4 cell=3.2; DB expected counted=4 cell=3.2; value if small rounds leaked=3.16
+BE-T446 PASS    [HEATMAP] round closed 91 days ago is outside the window => before 3, after 2
+BE-T447 PASS    [HEATMAP] round closed 89 days ago is inside the window => at 91 days 2, at 89 days 3
+BE-T448 PASS    [RESULTS] demo round with 6 responses: averages recomputed from the DB, rounded to 2 decimals => API 3.67,4.17,2.17,3.17 vs DB 3.67,4.17,2.17,3.17
+BE-T449 PASS    [RESULTS] participation.teamSize counts all 6 members including the manager => 200 {"round":{"id":"cmwdve7tb000dpk40bwbfm42h","name":"Pulse – 44. týždeň","teamId":"cmwdve4xj0015pkdcg76vhggp","teamName":"Tím Alfa","status":"CLOSED…(+47 chars)
+BE-T450 PASS    [RESULTS] results with unknown round id: HR vs manager => 403 {"error":"forbidden"}
+BE-T451 PASS    [THRESHOLD] differencing: a 5-response round and its 4-response twin never expose a single person's answer through any endpoint => no averages/distributions/scores for the 4-response round in 4 endpoints
+BE-T452 PASS    [THRESHOLD] MIN_GROUP_SIZE is defined once in src/config/privacy.ts and not hard-coded elsewhere => only src/config/privacy.ts defines the value
+
+===== S6 Actions and kudos =====
+BE-T453 PASS    [ACTION] round without action is awaitingAction before the first action => 200 {"rounds":[{"id":"cmwdvek9a000ppkkwl8eum012","name":"Pulse – 48. týždeň","teamId":"cmwdveh5e0015pk407ds01z0j","teamName":"Tím Alfa","status":"OPEN…(+48 chars)
+BE-T454 PASS    [ACTION] manager adds an action to a closed round => 201 {"action":{"id":"cmwdveodx00gdpk7cio61sqv5","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"QA téma","description":"QA opis kroku","dueDate":"2026-…(+45 chars)
+BE-T455 PASS    [ACTION] awaitingAction flips to false after the first action => 200 {"rounds":[{"id":"cmwdvek9a000ppkkwl8eum012","name":"Pulse – 48. týždeň","teamId":"cmwdveh5e0015pk407ds01z0j","teamName":"Tím Alfa","status":"OPEN…(+48 chars)
+BE-T456 PASS    [ACTION] employee sees the action on the team page => 200 {"team":{"id":"cmwdveh5e0015pk407ds01z0j","name":"Tím Alfa"},"rounds":[{"id":"cmwdvek1v000hpkkwrwpum05p","name":"Pulse – 46. týždeň","closesAt":"2…(+48 chars)
+BE-T457 PASS    [ACTION] several actions per round, explicit status at creation => 201 {"action":{"id":"cmwdveoi600gfpk7cw5pcdesm","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"QA druhý","description":"QA opis kroku","dueDate":"2026…(+45 chars)
+BE-T458 PASS    [ACTION-VALID] create action: topic missing => 400 {"error":"validation_error","fields":{"topic":"required"}}
+BE-T459 PASS    [ACTION-VALID] create action: topic whitespace => 400 {"error":"validation_error","fields":{"topic":"required"}}
+BE-T460 PASS    [ACTION-VALID] create action: topic 121 chars => 400 {"error":"validation_error","fields":{"topic":"too_long"}}
+BE-T461 PASS    [ACTION-VALID] create action: topic number => 400 {"error":"validation_error","fields":{"topic":"required"}}
+BE-T462 PASS    [ACTION-VALID] create action: description missing => 400 {"error":"validation_error","fields":{"description":"required"}}
+BE-T463 PASS    [ACTION-VALID] create action: description 1001 chars => 400 {"error":"validation_error","fields":{"description":"too_long"}}
+BE-T464 PASS    [ACTION-VALID] create action: dueDate missing => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE-T465 PASS    [ACTION-VALID] create action: dueDate 2027-02-30 => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE-T466 PASS    [ACTION-VALID] create action: dueDate ISO datetime => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE-T467 PASS    [ACTION-VALID] create action: status unknown => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T468 PASS    [ACTION-VALID] create action: status lower case => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T469 PASS    [ACTION-VALID] create action: status null => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T470 PASS    [ACTION-VALID] create action: status number => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T471 PASS    [ACTION-VALID] create action: topic 120 and description 1000 chars (upper bounds) => 201 {"action":{"id":"cmwdveoqr00ghpk7c80vboap1","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"ttttttttttttttttttttttttttttttttttttttttttttttttttttttt…(+48 chars)
+BE-T472 PASS    [ACTION-VALID] create action with a due date in the past => 201 (past due date accepted: true)
+BE-T473 PASS    [ACTION-VALID] create action: HTML/script in topic and description => 201 {"action":{"id":"cmwdveosz00glpk7cnfrwdx9k","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"<b>tučné</b><script>alert(1)</script>","description":"\…(+46 chars)
+BE-T474 PASS    [ACTION-VALID] create action: mass assignment roundId (Beta round), id, createdAt => 201 {"action":{"id":"cmwdveotx00gnpk7cm0l8xzu2","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"QA téma","description":"QA opis kroku","dueDate":"2026-…(+45 chars)
+BE-T475 PASS    [ACTION] add an action to an OPEN round => 409 {"error":"round_not_closed"}
+BE-T476 PASS    [ACTION] add an action to an unknown round => 403 {"error":"forbidden"}
+BE-T477 PASS    [ACTION] manager Beta adds an action to an Alfa round whose id he knows (IDOR) => 403 {"error":"forbidden"}
+BE-T478 PASS    [ACTION] action body: non-JSON => 400 {"error":"invalid_json"}
+BE-T479 PASS    [ACTION] change status to IN_PROGRESS => 200 {"action":{"id":"cmwdveodx00gdpk7cio61sqv5","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"QA téma","description":"QA opis kroku","dueDate":"2026-…(+46 chars)
+BE-T480 PASS    [ACTION] change status to DONE => 200 {"action":{"id":"cmwdveodx00gdpk7cio61sqv5","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"QA téma","description":"QA opis kroku","dueDate":"2026-…(+45 chars)
+BE-T481 PASS    [ACTION] change status to PLANNED => 200 {"action":{"id":"cmwdveodx00gdpk7cio61sqv5","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"QA téma","description":"QA opis kroku","dueDate":"2026-…(+45 chars)
+BE-T482 PASS    [ACTION-VALID] PATCH action: unknown status => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T483 PASS    [ACTION-VALID] PATCH action: status missing => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T484 PASS    [ACTION-VALID] PATCH action: status null => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T485 PASS    [ACTION-VALID] PATCH action: status array => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T486 PASS    [ACTION-VALID] PATCH action: status with spaces => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T487 PASS    [ACTION] PATCH action: attempt to change topic, description, dueDate, roundId along with status => 200 {"action":{"id":"cmwdveodx00gdpk7cio61sqv5","roundId":"cmwdvek1v000hpkkwrwpum05p","topic":"QA téma","description":"QA opis kroku","dueDate":"2026-…(+45 chars)
+BE-T488 PASS    [ACTION] PATCH unknown action id => 403 {"error":"forbidden"}
+BE-T489 PASS    [ACTION] manager Beta changes an Alfa action (IDOR) => 403 {"error":"forbidden"}
+BE-T490 PASS    [ACTION] DELETE / PUT / GET on /api/actions/:id => statuses 405,405,405
+BE-T491 PASS    [ACTION] summary action list is sorted by due date => 200 {"team":{"id":"cmwdveh5e0015pk407ds01z0j","name":"Tím Alfa"},"rounds":[{"id":"cmwdvek1v000hpkkwrwpum05p","name":"Pulse – 46. týždeň","closesAt":"2…(+48 chars)
+BE-T492 PASS    [KUDOS] send public kudos to a team-mate => 201 {"kudos":{"id":"cmwdvep8m00gppk7cv7qjt23a","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"Ďakujem za pomoc s testovaním!","emoji":n…(+46 chars)
+BE-T493 PASS    [KUDOS] public kudos appears in the team feed (first) and in recipient's 'my kudos' => 200 {"kudos":[{"id":"cmwdvep8m00gppk7cv7qjt23a","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"Ďakujem za pomoc s testovaním!","emoji":…(+47 chars)
+BE-T494 PASS    [KUDOS] kudos does not appear in the sender's 'my kudos' => 200 {"kudos":[{"id":"cmwdvek9p000spkkw2h7yirr4","fromName":"Alena Testová","toName":"Adam Vzorový","text":"Vďaka za pokojné zvládnutie incidentu minul…(+46 chars)
+BE-T495 PASS    [KUDOS] send private kudos => 201 {"kudos":{"id":"cmwdvepdn00grpk7c8zu42mb4","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"Súkromné poďakovanie za pomoc QA.","emoji…(+46 chars)
+BE-T496 PASS    [KUDOS] private kudos is visible only to the recipient => recipient sees it: true; leaks: none
+BE-T497 PASS    [KUDOS] team feed contains only TEAM kudos for members of that team, newest first => 200 {"team":{"id":"cmwdveh5e0015pk407ds01z0j","name":"Tím Alfa"},"rounds":[{"id":"cmwdvek1v000hpkkwrwpum05p","name":"Pulse – 46. týždeň","closesAt":"2…(+48 chars)
+BE-T498 PASS    [KUDOS] kudos items carry names only – no user ids or e-mails => 200 {"team":{"id":"cmwdveh5e0015pk407ds01z0j","name":"Tím Alfa"},"rounds":[{"id":"cmwdvek1v000hpkkwrwpum05p","name":"Pulse – 46. týždeň","closesAt":"2…(+48 chars)
+BE-T499 PASS    [KUDOS] kudos to yourself => 400 {"error":"validation_error","fields":{"toUserId":"self"}}
+BE-T500 PASS    [KUDOS] kudos to unknown user => 400 {"error":"validation_error","fields":{"toUserId":"unknown"}}
+BE-T501 PASS    [KUDOS] toUserId missing / number / array => 400 {"error":"validation_error","fields":{"toUserId":"required"}}
+BE-T502 PASS    [KUDOS-VALID] text without emoji: 19 characters => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T503 PASS    [KUDOS-VALID] text without emoji: empty => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T504 PASS    [KUDOS-VALID] text without emoji: missing => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T505 PASS    [KUDOS-VALID] text without emoji: 20 spaces => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T506 PASS    [KUDOS-VALID] text without emoji: 19 chars padded with spaces to 30 => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T507 PASS    [KUDOS-VALID] text without emoji: 501 characters => 400 {"error":"validation_error","fields":{"text":"too_long"}}
+BE-T508 PASS    [KUDOS-VALID] text without emoji: number => 400 {"error":"validation_error","fields":{"text":"invalid"}}
+BE-T509 PASS    [KUDOS-VALID] text without emoji: array => 400 {"error":"validation_error","fields":{"text":"invalid"}}
+BE-T510 PASS    [KUDOS-VALID] text exactly 20 characters => 201 {"kudos":{"id":"cmwdveptp00gtpk7csfzzqvgg","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"yyyyyyyyyyyyyyyyyyyy","emoji":null,"value…(+46 chars)
+BE-T511 PASS    [KUDOS-VALID] text exactly 500 characters => 201 {"kudos":{"id":"cmwdvepun00gvpk7c4weri05a","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy…(+47 chars)
+BE-T512 PASS    [KUDOS-VALID] text of 20 zero-width spaces (U+200B), no emoji => 400 (invisible text accepted: false)
+BE-T513 PASS    [KUDOS-VALID] value unknown => 400 {"error":"validation_error","fields":{"value":"invalid"}}
+BE-T514 PASS    [KUDOS-VALID] value Slovak label => 400 {"error":"validation_error","fields":{"value":"invalid"}}
+BE-T515 PASS    [KUDOS-VALID] value lower case => 400 {"error":"validation_error","fields":{"value":"invalid"}}
+BE-T516 PASS    [KUDOS-VALID] value missing => 400 {"error":"validation_error","fields":{"value":"invalid"}}
+BE-T517 PASS    [KUDOS-VALID] visibility unknown => 400 {"error":"validation_error","fields":{"visibility":"invalid"}}
+BE-T518 PASS    [KUDOS-VALID] visibility missing => 400 {"error":"validation_error","fields":{"visibility":"invalid"}}
+BE-T519 PASS    [KUDOS-VALID] visibility lower case => 400 {"error":"validation_error","fields":{"visibility":"invalid"}}
+BE-T520 PASS    [KUDOS-VALID] all five values are accepted => statuses 201,201,201,201,201
+BE-T521 PASS    [KUDOS-EMOJI] emoji only, no text => 201 {"kudos":{"id":"cmwdveq4i00h7pk7ckt5uk36s","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"","emoji":"👏","value":"QUALITY","visibil…(+46 chars)
+BE-T522 PASS    [KUDOS-EMOJI] all six emoji of the fixed set are accepted => statuses 201,201,201,201,201,201
+BE-T523 PASS    [KUDOS-EMOJI] emoji with a short text (5 chars) => 201 {"kudos":{"id":"cmwdveqbm00hlpk7cwffhnpsy","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"Super","emoji":"🎉","value":"HELPING","vi…(+46 chars)
+BE-T524 PASS    [KUDOS-EMOJI] emoji with a 501-character text => 400 {"error":"validation_error","fields":{"text":"too_long"}}
+BE-T525 PASS    [KUDOS-EMOJI] invalid emoji: unknown emoji 😀 => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE-T526 PASS    [KUDOS-EMOJI] invalid emoji: two emoji 👏👏 => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE-T527 PASS    [KUDOS-EMOJI] invalid emoji: text 'clap' => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE-T528 PASS    [KUDOS-EMOJI] invalid emoji: number => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE-T529 PASS    [KUDOS-EMOJI] invalid emoji: array => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE-T530 PASS    [KUDOS-EMOJI] invalid emoji: object => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE-T531 PASS    [KUDOS-EMOJI] invalid emoji: heart without variation selector ❤ => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE-T532 PASS    [KUDOS-EMOJI] invalid emoji: emoji with trailing space => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE-T533 PASS    [KUDOS-EMOJI] emoji '' or null with short text falls back to the 20-character rule => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T534 PASS    [KUDOS-EMOJI] emoji is shown in the team feed and in 'my kudos' => 200 {"kudos":[{"id":"cmwdveqbm00hlpk7cwffhnpsy","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"Super","emoji":"🎉","value":"HELPING","v…(+48 chars)
+BE-T535 PASS    [KUDOS] mass assignment: fromUserId, id, createdAt, fromName => 201; fromUserId is sender: true; fromName=Adam Vzorový
+BE-T536 PASS    [KUDOS] cross-team public kudos (Beta employee → Alfa employee) => 200 {"team":{"id":"cmwdveh7s001ipk40a9bc0akt","name":"Tím Beta"},"rounds":[{"id":"cmwdveh9z001upk405aacs65o","name":"Pulse – záťaž a sústredenie","clo…(+48 chars)
+BE-T537 FAIL    [KUDOS] HR sends kudos; public kudos to HR (no team) is visible only in HR's 'my kudos' => EXCEPTION in test: Cannot read properties of undefined (reading 'id')
+BE-T538 PASS    [KUDOS] text with HTML/script and SQL is stored verbatim => 201 {"kudos":{"id":"cmwdveqno00htpk7c79ofs23h","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"<script>alert('k')</script> '; DELETE FRO…(+46 chars)
+BE-T539 PASS    [KUDOS] text is trimmed => 201 {"kudos":{"id":"cmwdveqov00hvpk7c561j1lsf","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"Ďakujem veľmi pekne za všetko.","emoji":n…(+46 chars)
+BE-T540 PASS    [KUDOS] 10 kudos sent in parallel => statuses 201,201,201,201,201,201,201,201,201,201
+BE-T541 PASS    [KUDOS] GET /api/kudos (no list endpoint) and DELETE /api/kudos/me => 405 
+BE-T542 PASS    [KUDOS] /api/kudos/me ignores a userId query parameter (IDOR) => 200 {"kudos":[{"id":"cmwdvek9o000rpkkw47eb1om3","fromName":"Barbora Skúšobná","toName":"Cyril Ukážkový","text":"","emoji":"👏","value":"QUALITY","visi…(+46 chars)
+
+===== S7 Question library, own questions, HR issues/notes/overview, home tasks =====
+BE-T543 PASS    [QUESTIONS] library as manager => count=38 fixed=1 starters=12 topics=8
+BE-T544 PASS    [QUESTIONS] question item shape => 200 {"questions":[{"id":"cmwdvetg90000pko8k2n6i2ga","text":"Celkovo, aké boli pre mňa posledné dva týždne v práci?","type":"SCALE_1_5","topic":"Stála …(+48 chars)
+BE-T545 PASS    [QUESTIONS] seeded question texts never contain 'anonym' => 200 {"questions":[{"id":"cmwdvetg90000pko8k2n6i2ga","text":"Celkovo, aké boli pre mňa posledné dva týždne v práci?","type":"SCALE_1_5","topic":"Stála …(+48 chars)
+BE-T546 PASS    [QUESTIONS] manager creates an own question => 201 {"question":{"id":"cmwdvf0v700ihpk7cskwjwquj","text":"Vyhovuje mi rozdelenie úloh v našom QA tíme?","type":"SCALE_1_5","topic":"Vlastné otázky tím…(+46 chars)
+BE-T547 PASS    [QUESTIONS] mass assignment: teamId (Beta), fixed, starter, scale, topic, type, id => {"id":"cmwdvf0wc00ijpk7cjqr4zupx","text":"Pokus o hromadné priradenie polí otázky?","type":"SCALE_1_5","topic":"Vlastné otázky tímu","scale":"AGREEMEN…(+50 chars)
+BE-T548 PASS    [QUESTIONS] exactly one fixed question still exists after the attempt => (no request)
+BE-T549 PASS    [QUESTIONS-VALID] own question text 9 characters => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T550 PASS    [QUESTIONS-VALID] own question text empty => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T551 PASS    [QUESTIONS-VALID] own question text missing => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T552 PASS    [QUESTIONS-VALID] own question text number => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T553 PASS    [QUESTIONS-VALID] own question text 201 characters => 400 {"error":"validation_error","fields":{"text":"too_long"}}
+BE-T554 PASS    [QUESTIONS-VALID] own question text 9 chars + many spaces => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T555 PASS    [QUESTIONS-VALID] own question text array => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE-T556 PASS    [QUESTIONS-VALID] own question exactly 10 characters => 201 {"question":{"id":"cmwdvf13r00ilpk7clanckuwv","text":"Je to tak?","type":"SCALE_1_5","topic":"Vlastné otázky tímu","scale":"AGREEMENT","starter":f…(+46 chars)
+BE-T557 PASS    [QUESTIONS-VALID] own question exactly 200 characters => 201 {"question":{"id":"cmwdvf14x00inpk7c6mg736y5","text":"pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp…(+47 chars)
+BE-T558 PASS    [QUESTIONS-VALID] whitespace is collapsed => 201 {"question":{"id":"cmwdvf16300ippk7cdzh2w0yi","text":"Mám dosť informácií k práci?","type":"SCALE_1_5","topic":"Vlastné otázky tímu","scale":"AGRE…(+46 chars)
+BE-T559 PASS    [QUESTIONS-VALID] duplicate of an own question (different case) => 400 {"error":"validation_error","fields":{"text":"duplicate"}}
+BE-T560 PASS    [QUESTIONS-VALID] duplicate of a shared-library question => 400 {"error":"validation_error","fields":{"text":"duplicate"}}
+BE-T561 PASS    [QUESTIONS-VALID] own question of 10 zero-width spaces (U+200B) => 400 (invisible question accepted: false)
+BE-T562 PASS    [QUESTIONS] the same wording may exist in another team => 201 {"question":{"id":"cmwdvf19r00irpk7cywe5dgmb","text":"Vyhovuje mi rozdelenie úloh v našom QA tíme?","type":"SCALE_1_5","topic":"Vlastné otázky tím…(+46 chars)
+BE-T563 PASS    [QUESTIONS] another manager does not see the own question; HR sees own questions of all teams => 200 {"questions":[{"id":"cmwdvetg90000pko8k2n6i2ga","text":"Celkovo, aké boli pre mňa posledné dva týždne v práci?","type":"SCALE_1_5","topic":"Stála …(+48 chars)
+BE-T564 PASS    [QUESTIONS] manager Beta uses Alfa's own question in a Beta round => 400 {"error":"validation_error","fields":{"questionIds":"unknown"}}
+BE-T565 PASS    [QUESTIONS] HR uses Alfa's own question in a Beta round => 400 {"error":"validation_error","fields":{"questionIds":"unknown"}}
+BE-T566 PASS    [QUESTIONS] own question in a round of its own team counts towards the 3–5 limit => 201 / 400 {"error":"validation_error","fields":{"questionIds":"too_many"}}
+BE-T567 PASS    [QUESTIONS] own question cannot be edited or deleted => statuses 405,404,405,404,405,404
+BE-T568 PASS    [QUESTIONS] 5 identical own questions posted in parallel => statuses 400,201,400,400,400; rows with this text for the team: 1
+BE-T569 PASS    [HR-ISSUE] create issue with all optional fields empty => 201 {"issue":{"id":"cmwdvf1pw00j5pk7cud1d5tu9","title":"QA minimálny podnet","description":"","source":"OTHER","ownerGroup":"OTHER","status":"OPEN","d…(+46 chars)
+BE-T570 PASS    [HR-ISSUE] create issue from a round: team is derived from the round => 201 {"issue":{"id":"cmwdvf1r600j7pk7c9unzquwa","title":"QA podnet","description":"Opis podnetu","source":"SURVEY","ownerGroup":"FACILITY","status":"OP…(+47 chars)
+BE-T571 PASS    [HR-ISSUE] round of Alfa + teamId of Beta in one request => 201 {"issue":{"id":"cmwdvf1sb00j9pk7ck8kkzgo7","title":"QA podnet","description":"Opis podnetu","source":"MEETING","ownerGroup":"FACILITY","status":"O…(+47 chars)
+BE-T572 PASS    [HR-ISSUE] issue with team only => 201 {"issue":{"id":"cmwdvf1th00jbpk7clada5ovl","title":"QA podnet","description":"Opis podnetu","source":"MEETING","ownerGroup":"FACILITY","status":"O…(+47 chars)
+BE-T573 PASS    [HR-ISSUE-VALID] create issue: unknown roundId => 400 {"error":"validation_error","fields":{"roundId":"unknown"}}
+BE-T574 PASS    [HR-ISSUE-VALID] create issue: unknown teamId => 400 {"error":"validation_error","fields":{"teamId":"unknown"}}
+BE-T575 PASS    [HR-ISSUE-VALID] create issue: unknown noteId => 400 {"error":"validation_error","fields":{"noteId":"unknown"}}
+BE-T576 PASS    [HR-ISSUE-VALID] create issue: title 2 chars => 400 {"error":"validation_error","fields":{"title":"too_short"}}
+BE-T577 PASS    [HR-ISSUE-VALID] create issue: title missing => 400 {"error":"validation_error","fields":{"title":"too_short"}}
+BE-T578 PASS    [HR-ISSUE-VALID] create issue: title 121 chars => 400 {"error":"validation_error","fields":{"title":"too_long"}}
+BE-T579 PASS    [HR-ISSUE-VALID] create issue: title number => 400 {"error":"validation_error","fields":{"title":"too_short"}}
+BE-T580 PASS    [HR-ISSUE-VALID] create issue: description 2001 chars => 400 {"error":"validation_error","fields":{"description":"too_long"}}
+BE-T581 PASS    [HR-ISSUE-VALID] create issue: source unknown => 400 {"error":"validation_error","fields":{"source":"invalid"}}
+BE-T582 PASS    [HR-ISSUE-VALID] create issue: source missing => 400 {"error":"validation_error","fields":{"source":"invalid"}}
+BE-T583 PASS    [HR-ISSUE-VALID] create issue: ownerGroup unknown => 400 {"error":"validation_error","fields":{"ownerGroup":"invalid"}}
+BE-T584 PASS    [HR-ISSUE-VALID] create issue: ownerGroup missing => 400 {"error":"validation_error","fields":{"ownerGroup":"invalid"}}
+BE-T585 PASS    [HR-ISSUE-VALID] create issue: dueDate 2026-13-40 => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE-T586 PASS    [HR-ISSUE-VALID] create issue: dueDate number => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE-T587 PASS    [HR-ISSUE-VALID] create issue: title 3 and 120 chars, description 2000 chars (bounds) => 201 {"issue":{"id":"cmwdvf24100jfpk7cejl0ykld","title":"tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt…(+48 chars)
+BE-T588 PASS    [HR-ISSUE-VALID] create issue: roundId sent as a number => 400; issue created without the round: false
+BE-T589 PASS    [HR-ISSUE-VALID] create issue: teamId sent as an array => 400; issue created without the team: false
+BE-T590 PASS    [HR-ISSUE-VALID] create issue: description sent as an object => 400; stored description: undefined
+BE-T591 PASS    [HR-ISSUE] mass assignment: status DONE, createdById, createdAt, id => 201 {"issue":{"id":"cmwdvf26k00jhpk7c916l16d0","title":"QA podnet","description":"Opis podnetu","source":"MEETING","ownerGroup":"FACILITY","status":"O…(+46 chars)
+BE-T592 PASS    [HR-ISSUE] issue JSON does not expose who created it => 200 {"issues":[{"id":"cmwdvf26k00jhpk7c916l16d0","title":"QA podnet","description":"Opis podnetu","source":"MEETING","ownerGroup":"FACILITY","status":…(+48 chars)
+BE-T593 PASS    [HR-ISSUE] PATCH status → IN_PROGRESS → DONE => 200 {"issue":{"id":"cmwdvf1pw00j5pk7cud1d5tu9","title":"QA minimálny podnet","description":"","source":"OTHER","ownerGroup":"OTHER","status":"DONE","d…(+46 chars)
+BE-T594 PASS    [HR-ISSUE] PATCH ownerGroup and dueDate, then clear dueDate with null and '' => 200 {"issue":{"id":"cmwdvf1pw00j5pk7cud1d5tu9","title":"QA minimálny podnet","description":"","source":"OTHER","ownerGroup":"IT_SUPPORT","status":"DON…(+46 chars)
+BE-T595 PASS    [HR-ISSUE-VALID] PATCH issue: status unknown => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T596 PASS    [HR-ISSUE-VALID] PATCH issue: ownerGroup unknown => 400 {"error":"validation_error","fields":{"ownerGroup":"invalid"}}
+BE-T597 PASS    [HR-ISSUE-VALID] PATCH issue: dueDate invalid => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE-T598 PASS    [HR-ISSUE-VALID] PATCH issue: status null => 400 {"error":"validation_error","fields":{"status":"invalid"}}
+BE-T599 PASS    [HR-ISSUE-VALID] PATCH issue: empty object => 400 {"error":"validation_error","fields":{"status":"required"}}
+BE-T600 PASS    [HR-ISSUE] PATCH issue: title, description, roundId, createdById cannot be changed => 400 {"error":"validation_error","fields":{"status":"required"}}
+BE-T601 PASS    [HR-ISSUE] PATCH unknown issue id => 404 {"error":"not_found"}
+BE-T602 PASS    [HR-ISSUE] partially invalid PATCH changes nothing => 400 {"error":"validation_error","fields":{"ownerGroup":"invalid"}}
+BE-T603 PASS    [HR-ISSUE-FILTER] filter by group => 200 {"issues":[{"id":"cmwdvf26k00jhpk7c916l16d0","title":"QA podnet","description":"Opis podnetu","source":"MEETING","ownerGroup":"FACILITY","status":…(+48 chars)
+BE-T604 PASS    [HR-ISSUE-FILTER] filter by status DONE => 200 {"issues":[{"id":"cmwdvf1pw00j5pk7cud1d5tu9","title":"QA minimálny podnet","description":"","source":"OTHER","ownerGroup":"IT_SUPPORT","status":"D…(+46 chars)
+BE-T605 PASS    [HR-ISSUE-FILTER] filter status=ACTIVE => 200 {"issues":[{"id":"cmwdvf26k00jhpk7c916l16d0","title":"QA podnet","description":"Opis podnetu","source":"MEETING","ownerGroup":"FACILITY","status":…(+48 chars)
+BE-T606 PASS    [HR-ISSUE-FILTER] combined filter group + status => 200 {"issues":[{"id":"cmwdvf26k00jhpk7c916l16d0","title":"QA podnet","description":"Opis podnetu","source":"MEETING","ownerGroup":"FACILITY","status":…(+48 chars)
+BE-T607 PASS    [HR-ISSUE-FILTER] unknown filter values (group=NOPE, status=NOPE) => 400; returned undefined of 9 issues (filter ignored: false)
+BE-T608 FAIL    [HR-ISSUE-FILTER] SQL-injection string in the filter => 400 {"error":"validation_error","fields":{"group":"invalid","status":"invalid"}}
+BE-T609 PASS    [HR-ISSUE-FILTER] list is sorted newest first => 200 {"issues":[{"id":"cmwdvf26k00jhpk7c916l16d0","title":"QA podnet","description":"Opis podnetu","source":"MEETING","ownerGroup":"FACILITY","status":…(+48 chars)
+BE-T610 PASS    [HR-ISSUE] DELETE / PUT on issues => 405 
+BE-T611 PASS    [HR-NOTE] create a note => 201 {"note":{"id":"cmwdvf2q500jjpk7c8n4npoq4"}}
+BE-T612 PASS    [HR-NOTE] issue created from the note is listed under the note => 200 {"notes":[{"id":"cmwdvf2q500jjpk7c8n4npoq4","title":"QA stretnutie","meetingDate":"2026-11-10T22:59:59.999Z","text":"Poznámka zo stretnutia.","cre…(+47 chars)
+BE-T613 PASS    [HR-NOTE-VALID] create note: title 2 chars => 400 {"error":"validation_error","fields":{"title":"too_short"}}
+BE-T614 PASS    [HR-NOTE-VALID] create note: title 121 chars => 400 {"error":"validation_error","fields":{"title":"too_long"}}
+BE-T615 PASS    [HR-NOTE-VALID] create note: text missing => 400 {"error":"validation_error","fields":{"text":"required"}}
+BE-T616 PASS    [HR-NOTE-VALID] create note: text whitespace => 400 {"error":"validation_error","fields":{"text":"required"}}
+BE-T617 PASS    [HR-NOTE-VALID] create note: text 10 001 chars => 400 {"error":"validation_error","fields":{"text":"too_long"}}
+BE-T618 PASS    [HR-NOTE-VALID] create note: text number => 400 {"error":"validation_error","fields":{"text":"required"}}
+BE-T619 PASS    [HR-NOTE-VALID] create note: meetingDate missing => 400 {"error":"validation_error","fields":{"meetingDate":"invalid"}}
+BE-T620 PASS    [HR-NOTE-VALID] create note: meetingDate 31.12.2026 => 400 {"error":"validation_error","fields":{"meetingDate":"invalid"}}
+BE-T621 PASS    [HR-NOTE-VALID] create note: text exactly 10 000 chars => 201 {"note":{"id":"cmwdvf2x300jnpk7cnvzny9ee"}}
+BE-T622 PASS    [HR-NOTE] mass assignment createdById in note => 201 {"note":{"id":"cmwdvf2y200jppk7cvnk4ehib"}}
+BE-T623 PASS    [HR-NOTE] notes list sorted by meeting date, newest first => 200 {"notes":[{"id":"cmwdvf2y200jppk7cvnk4ehib","title":"QA stretnutie","meetingDate":"2026-11-10T22:59:59.999Z","text":"Poznámka zo stretnutia.","cre…(+48 chars)
+BE-T624 PASS    [HR-NOTE] note with a meeting date far in the future => 201 (future meeting date accepted: true)
+BE-T625 PASS    [HR-OVERVIEW] overview shape => 200 {"total":{"closedRounds":8,"roundsWithAction":4,"sharePercent":50,"medianDaysToFirstAction":2.5,"actions":{"planned":1,"inProgress":1,"done":3,"ov…(+47 chars)
+BE-T626 PASS    [HR-OVERVIEW] numbers recomputed from the DB => matches DB (total closed 8, with action 4)
+BE-T627 PASS    [HR-OVERVIEW] median days to first action for team Alfa (demo: actions after 2, 3 and 1 days) => median=2
+BE-T628 PASS    [HR-OVERVIEW] awaiting rounds are sorted longest waiting first; automatically closed round counts from its deadline => [14,3,3] auto-closed: 3
+BE-T629 PASS    [HR-OVERVIEW] overview contains nothing from responses => 200 {"total":{"closedRounds":9,"roundsWithAction":4,"sharePercent":44,"medianDaysToFirstAction":2.5,"actions":{"planned":1,"inProgress":1,"done":3,"ov…(+47 chars)
+BE-T630 PASS    [HOME] employee with an open, unanswered round sees a link to fill it in => 200 <!DOCTYPE html><html lang="sk" class="h-full"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><l…(+48 chars)
+BE-T631 PASS    [HOME] employee of a team without an open round has no fill task => 200 <!DOCTYPE html><html lang="sk" class="h-full"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><l…(+48 chars)
+BE-T632 PASS    [HOME] manager Alfa is sent to the closed round without an action => 200 <!DOCTYPE html><html lang="sk" class="h-full"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><l…(+48 chars)
+BE-T633 PASS    [HOME] manager never gets a task that points to another team's round => 200 <!DOCTYPE html><html lang="sk" class="h-full"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><l…(+48 chars)
+BE-T634 PASS    [HOME] HR home links to the overview of rounds awaiting an action => 200 <!DOCTYPE html><html lang="sk" class="h-full"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><l…(+48 chars)
+BE-T635 PASS    [HOME] home page never uses the word 'anonym' => 200 <!DOCTYPE html><html lang="sk" class="h-full"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><l…(+48 chars)
+
+===== S8 HTTP methods, headers, injection, error handling =====
+BE-T636 PASS    [HTTP-METHOD] POST /api/me => 405 
+BE-T637 PASS    [HTTP-METHOD] DELETE /api/me => 405 
+BE-T638 PASS    [HTTP-METHOD] PUT /api/rounds => 405 
+BE-T639 PASS    [HTTP-METHOD] DELETE /api/rounds => 405 
+BE-T640 PASS    [HTTP-METHOD] POST /api/rounds/:id/results => 405 
+BE-T641 PASS    [HTTP-METHOD] GET /api/rounds/:id/responses => 405 
+BE-T642 PASS    [HTTP-METHOD] DELETE /api/rounds/:id/responses => 405 
+BE-T643 PASS    [HTTP-METHOD] GET /api/rounds/:id/open => 405 
+BE-T644 PASS    [HTTP-METHOD] GET /api/rounds/:id/actions => 405 
+BE-T645 PASS    [HTTP-METHOD] POST /api/teams/:id/summary => 405 
+BE-T646 PASS    [HTTP-METHOD] POST /api/hr/overview => 405 
+BE-T647 PASS    [HTTP-METHOD] POST /api/hr/heatmap => 405 
+BE-T648 PASS    [HTTP-METHOD] DELETE /api/hr/notes => 405 
+BE-T649 PASS    [HTTP-METHOD] PATCH /api/kudos => 405 
+BE-T650 PASS    [HTTP-METHOD] GET /api/rounds/:id/responses must never list responses => 405 
+BE-T651 PASS    [HTTP-METHOD] HEAD /api/me => 200 
+BE-T652 PASS    [HTTP-METHOD] OPTIONS /api/rounds from a foreign origin (CORS preflight) => 204; ACAO=null; allow=GET, HEAD, OPTIONS, POST
+BE-T653 PASS    [HTTP-METHOD] X-HTTP-Method-Override: DELETE on GET /api/rounds => 200 {"rounds":[{"id":"cmwdvfaq2000ppk2gf8li0mxw","name":"Pulse – 48. týždeň","teamId":"cmwdvf7730015pkfwprbvrs67","teamName":"Tím Alfa","status":"OPEN…(+48 chars)
+BE-T654 PASS    [HTTP-METHOD] unknown API path => 404 <!DOCTYPE html><html lang="sk" class="h-full"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><l…(+48 chars)
+BE-T655 PASS    [HTTP-METHOD] no user-listing endpoint is exposed => statuses 404,404,404,404,404
+BE-T656 PASS    [HEADER] x-middleware-subrequest header (Next.js middleware bypass trick) without a session => 401 {"error":"unauthorized"}
+BE-T657 PASS    [HEADER] spoofed identity headers (X-User-Id, X-Role, X-Forwarded-User) without a session => 401 {"error":"unauthorized"}
+BE-T658 PASS    [HEADER] spoofed role headers with an employee session => 200 {"user":{"id":"cmwdvf77v0017pkfwl18n9oy7","name":"Adam Vzorový","role":"EMPLOYEE","teamId":"cmwdvf7730015pkfwprbvrs67"}}
+BE-T659 PASS    [HEADER] Host header spoofed => 200 {"user":{"id":"cmwdvf7690012pkfw6o3401yi","name":"Hana Personálna","role":"HR","teamId":null}}
+BE-T660 PASS    [HEADER] session cookie flags again on every login: Secure present in production build => fz_session=<token>; Path=/; Expires=Fri, 13 Nov 2026 02:18:12 GMT; Max-Age=28800; Secure; HttpOnly; SameSite=lax
+BE-T661 PASS    [HEADER] API responses and caching => cache-control: (absent); vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+BE-T662 PASS    [HEADER] security response headers on API and pages => API: x-content-type-options=absent, x-frame-options=absent, content-security-policy=absent, referrer-policy=absent, strict-transport-security=absent, …(+195 chars)
+BE-T663 PASS    [CSRF] state-changing request with a session cookie, text/plain body and a foreign Origin => 201 – accepted with foreign Origin and text/plain: true
+BE-T664 PASS    [CSRF] state-changing GET does not exist: GET on open/close/logout => statuses 405,405,405,405
+BE-T665 PASS    [ID-INJECTION] GET /api/rounds/<path traversal ..%2F..%2Fetc%2Fpasswd>/results as HR => 404 {"error":"not_found"}
+BE-T666 PASS    [ID-INJECTION] GET /api/rounds/<SQL injection ' OR '1'='1>/results as HR => 404 {"error":"not_found"}
+BE-T667 PASS    [ID-INJECTION] GET /api/rounds/<SQL injection 1; DROP TABLE Round;-->/results as HR => 404 {"error":"not_found"}
+BE-T668 PASS    [ID-INJECTION] GET /api/rounds/<NUL byte %00>/results as HR => 404 {"error":"not_found"}
+BE-T669 PASS    [ID-INJECTION] GET /api/rounds/<unicode / emoji>/results as HR => 404 {"error":"not_found"}
+BE-T670 PASS    [ID-INJECTION] GET /api/rounds/<4 000-character id>/results as HR => 404 {"error":"not_found"}
+BE-T671 PASS    [ID-INJECTION] GET /api/rounds/<percent-encoded slash id%2Fresults>/results as HR => 404 {"error":"not_found"}
+BE-T672 PASS    [ID-INJECTION] GET /api/rounds/<wildcard %25>/results as HR => 404 {"error":"not_found"}
+BE-T673 FAIL    [ID-INJECTION] GET /api/rounds/<malformed percent-encoding %E0%A4%A>/results as HR => 500 Internal Server Error
+BE-T674 PASS    [ID-INJECTION] GET /api/rounds/<NoSQL-style object [$ne]>/results as HR => 404 {"error":"not_found"}
+BE-T675 PASS    [ID-INJECTION] GET /api/rounds/<upper-cased real id>/results as HR => 404 {"error":"not_found"}
+BE-T676 PASS    [ID-INJECTION] GET /api/rounds/<real id with trailing space>/results as HR => 404 {"error":"not_found"}
+BE-T677 PASS    [ID-INJECTION] GET /api/teams/<path traversal ..%2F..%2Fetc%2Fpasswd>/summary as employee => 403 {"error":"forbidden"}
+BE-T678 PASS    [ID-INJECTION] GET /api/teams/<SQL injection ' OR '1'='1>/summary as employee => 403 {"error":"forbidden"}
+BE-T679 PASS    [ID-INJECTION] GET /api/teams/<SQL injection 1; DROP TABLE Round;-->/summary as employee => 403 {"error":"forbidden"}
+BE-T680 PASS    [ID-INJECTION] GET /api/teams/<NUL byte %00>/summary as employee => 403 {"error":"forbidden"}
+BE-T681 PASS    [ID-INJECTION] GET /api/teams/<unicode / emoji>/summary as employee => 403 {"error":"forbidden"}
+BE-T682 PASS    [ID-INJECTION] GET /api/teams/<4 000-character id>/summary as employee => 403 {"error":"forbidden"}
+BE-T683 PASS    [ID-INJECTION] PATCH /api/actions/<path traversal ..%2F..%2Fetc%2Fpasswd> as manager => 403 {"error":"forbidden"}
+BE-T684 PASS    [ID-INJECTION] PATCH /api/actions/<SQL injection ' OR '1'='1> as manager => 403 {"error":"forbidden"}
+BE-T685 PASS    [ID-INJECTION] PATCH /api/actions/<SQL injection 1; DROP TABLE Round;--> as manager => 403 {"error":"forbidden"}
+BE-T686 PASS    [ID-INJECTION] PATCH /api/actions/<NUL byte %00> as manager => 403 {"error":"forbidden"}
+BE-T687 PASS    [ID-INJECTION] database is intact after the injection attempts => {"rounds":9,"users":13,"responses":41}
+BE-T688 PASS    [ID-INJECTION] API path in different case /API/ME and with trailing slash /api/me/ => statuses 404,308,308,401
+BE-T689 PASS    [BODY] deeply nested JSON (10 000 levels) to POST /api/kudos => 400; server alive afterwards: true
+BE-T690 PASS    [BODY] 20 MB JSON body to POST /api/kudos => 400 in 865.7 ms (no body-size limit before parsing: true); server alive: true
+BE-T691 PASS    [BODY] JSON with UTF-8 BOM => 200 {"user":{"id":"cmwdvf7690012pkfw6o3401yi","name":"Hana Personálna","role":"HR","teamId":null},"home":"/"}
+BE-T692 PASS    [BODY] UTF-16 encoded JSON body => 400 {"error":"invalid_json"}
+BE-T693 PASS    [BODY] Content-Type multipart/form-data with JSON text => 400 {"error":"invalid_json"}
+BE-T694 PASS    [BODY] prototype pollution attempt through POST /api/kudos => 403 {"error":"forbidden"}
+BE-T695 PASS    [ERROR] error bodies have a uniform shape and leak no internals => 401:{"error":"unauthorized"} | 403:{"error":"forbidden"} | 400:{"error":"validation_error","fields":{"n | 400:{"error":"invalid_json"} | 404:{"error":…(+40 chars)
+BE-T696 PASS    [ERROR] server log: only method, path and error class on failures; no bodies, passwords or tokens => log 2697 bytes; sensitive strings found: none; [api] failure lines: 35 e.g. [api] POST /api/rounds/cmwdqnsqr003jpkt8qy2qll5m/responses failed: PrismaC…(+183 chars)
+BE-T697 PASS    [ERROR] no API response in this run contained a password hash => 200 {"team":{"id":"cmwdvf7730015pkfwprbvrs67","name":"Tím Alfa"},"rounds":[{"id":"cmwdvfajn000hpk2gg985slv0","name":"Pulse – 46. týždeň","closesAt":"2…(+48 chars)
+BE-T698 PASS    [NFR-06] all accounts use the reserved example.test domain => 13 users; non-test domains: 0
+BE-T699 PASS    [MVP-02] seed: 2 teams of 6 (1 manager + 5 employees) and 1 HR => (no request)
+BE-T700 PASS    [MVP-02] no registration / password reset / user management endpoints => statuses 404,404,404,404
+
+===== S9 Deep probes: invalid unicode, races, pages, load =====
+BE-T701 PASS    [UNICODE] lone surrogate (\ud800) in POST /api/kudos text => 400 {"error":"invalid_text"}
+BE-T702 PASS    [UNICODE] lone surrogate (\ud800) in POST /api/rounds name => 400 {"error":"invalid_text"}
+BE-T703 PASS    [UNICODE] lone surrogate (\ud800) in POST /api/questions text => 400 {"error":"invalid_text"}
+BE-T704 PASS    [UNICODE] lone surrogate (\ud800) in POST /api/rounds/:id/actions topic => 400 {"error":"invalid_text"}
+BE-T705 PASS    [UNICODE] lone surrogate (\ud800) in POST /api/hr/issues title => 400 {"error":"invalid_text"}
+BE-T706 PASS    [UNICODE] lone surrogate (\ud800) in POST /api/hr/notes text => 400 {"error":"invalid_text"}
+BE-T707 PASS    [UNICODE] lone surrogate (\ud800) in POST /api/login email => 400 {"error":"invalid_text"}
+BE-T708 PASS    [UNICODE] failed (500) submission leaves no Participation row and the user can still answer => invalid comment answered 400, no 500 to recover from
+BE-T709 FAIL    [UNICODE] NUL character inside a comment is stored and returned intact => 201; stored length 7; equal: false
+BE-T710 PASS    [UNICODE] length limits count UTF-16 units, not characters: kudos text of 300 emoji (300 characters) => 201 {"kudos":{"id":"cmwdvfw9n00jzpk7c8tpiq0tf","fromName":"Adam Vzorový","toName":"B
+BE-T711 PASS    [UNICODE] length limits count UTF-16 units: kudos text of 10 emoji (10 characters) without the emoji field => 400 (10-character text accepted as >= 20: false)
+BE-T712 PASS    [UNICODE] own question of 5 emoji (5 characters) => 400 (5-character text accepted as >= 10: false)
+BE-T713 FAIL    [URL] malformed percent-encoding in path: /api/rounds/%E0%A4%A => 500 Internal Server Error (content-type text/plain)
+BE-T714 FAIL    [URL] malformed percent-encoding in path: /api/rounds/%/results => 500 Internal Server Error (content-type text/plain)
+BE-T715 FAIL    [URL] malformed percent-encoding in path: /api/teams/%ZZ/summary => 500 Internal Server Error (content-type text/plain)
+BE-T716 FAIL    [URL] malformed percent-encoding in path: /api/actions/%E0%A4%A => 500 Internal Server Error (content-type text/plain)
+BE-T717 FAIL    [URL] malformed percent-encoding in path: /api/hr/issues/%C0%AF => 500 Internal Server Error (content-type text/plain)
+BE-T718 FAIL    [URL] malformed percent-encoding without a session => 500 Internal Server Error
+BE-T719 PASS    [URL] static files and project files are not served => statuses 404,404,404,404,404,404
+BE-T720 PASS    [RACE] submission racing with close (30 rounds): can a response be stored AFTER the round was already closed and its results read? => 30 iterations: submit=201 & close=200 in 0; response stored after results of the closed round were already read: 0
+BE-T721 PASS    [RACE] 60 parallel writes by 12 users (kudos + actions + issues) => {"201":60}
+BE-T722 PASS    [RACE] the same round created twice in parallel with an identical body (double click) => statuses 201,201; drafts named 'Dvojklik': 2
+BE-T723 PASS    [LOAD] 100 parallel failed logins: latency of an authenticated request during the burst => baseline 11.6 ms; during burst 26793.2 ms; burst statuses {401}; slowest login 26932.1 ms
+BE-T724 PASS    [HOME] manager Beta without an open/draft round and last round closed 14 days ago gets the 'start a round' task => 200 <!DOCTYPE html><html lang="sk" class="h-full"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><l…(+48 chars)
+BE-T725 PASS    [HOME] a stale draft whose deadline has passed (cannot be opened, edited or deleted) suppresses the 'start a round' task => open of the stale draft: 409 {"error":"deadline_passed"}; task shown: true
+BE-T726 PASS    [ROUND-LIFE] an expired draft can never leave the DRAFT state through the API => open/close/DELETE/PATCH → 409,409,405,405; draft stays in every manager/HR list forever
+BE-T727 FAIL    [HOME] home shows at most 3 tasks => manager Alfa task links: 4; HR task links: 3
+BE-T728 PASS    [RESULTS] 5-question round with 5 responses: results => status=ok averages=1,2,3,4,5
+BE-T729 PASS    [RESULTS] 3-question round with 5 responses: results => status=ok averages=1,2,3
+BE-T730 PASS    [THRESHOLD-PAGE] page /rounds/:id/results as mA: round with 4 responses => HTTP 200; comment of the 4-response round present: false
+BE-T731 PASS    [THRESHOLD-PAGE] page /rounds/:id/results as hr: round with 4 responses => HTTP 200; comment of the 4-response round present: false
+BE-T732 PASS    [THRESHOLD-PAGE] page /rounds/:id/report as mA: round with 4 responses => HTTP 200; comment of the 4-response round present: false
+BE-T733 PASS    [THRESHOLD-PAGE] page /team/:id as a1: round with 4 responses => HTTP 200; comment of the 4-response round present: false
+BE-T734 PASS    [THRESHOLD-PAGE] page /team/:id as mA: round with 4 responses => HTTP 200; comment of the 4-response round present: false
+BE-T735 PASS    [THRESHOLD-PAGE] page /team/:id/trend as mA: round with 4 responses => HTTP 200; comment of the 4-response round present: false
+BE-T736 PASS    [NFR-01-PAGE] page /team/:id as a1: comments of a 6-response round => HTTP 200; comment text present: false
+BE-T737 PASS    [NFR-01-PAGE] page /rounds/:id/report as mA: comments of a 6-response round => HTTP 200; comment text present: false
+BE-T738 PASS    [NFR-01-PAGE] page /team/:id/trend as hr: comments of a 6-response round => HTTP 200; comment text present: false
+BE-T739 PASS    [NFR-01-PAGE] page / as a1: comments of a 6-response round => HTTP 200; comment text present: false
+BE-T740 PASS    [NFR-01-PAGE] page /hr/overview as hr: comments of a 6-response round => HTTP 200; comment text present: false
+BE-T741 PASS    [NFR-01-PAGE] page /hr/heatmap as hr: comments of a 6-response round => HTTP 200; comment text present: false
+BE-T742 PASS    [NFR-01-PAGE] results page of the manager shows comments but no Response ids / respondent names next to them => HTTP 200; comment shown: true
+BE-T743 PASS    [NFR-04] fill page shows the confidentiality sentence and never the word 'anonym' => HTTP 200; sentence present: true; 'anonym' present: false
+BE-T744 PASS    [NFR-04] no page of any role contains 'anonym' => none
+BE-T745 PASS    [AUTHZ-PAGE] kudos form page lists every user as a recipient but exposes no e-mail or role => HTTP 200; e-mails present: false
+BE-T746 PASS    [SESSION] pages accept a session whose cookie was already 'logged out' (token replay on pages) => HTTP 307 (page rendered with the logged-out token: false)
+
+TOTAL 746  PASS 735  FAIL 11  BLOCKED 0
+┌──────────────────────────────────────────────────────────────────────────┬──────────┬──────┬──────┬─────────┐
+│ (index)                                                                  │ executed │ PASS │ FAIL │ BLOCKED │
+├──────────────────────────────────────────────────────────────────────────┼──────────┼──────┼──────┼─────────┤
+│ S1 Authentication & session                                              │ 81       │ 81   │ 0    │ 0       │
+│ S2 Authorization matrix (role x endpoint)                                │ 170      │ 170  │ 0    │ 0       │
+│ S3 Rounds: creation, validation, lifecycle                               │ 81       │ 81   │ 0    │ 0       │
+│ S4 Responses & confidentiality storage                                   │ 76       │ 76   │ 0    │ 0       │
+│ S5 Results, threshold 4 vs 5, suggestions, summary, trend, heatmap       │ 44       │ 44   │ 0    │ 0       │
+│ S6 Actions and kudos                                                     │ 90       │ 89   │ 1    │ 0       │
+│ S7 Question library, own questions, HR issues/notes/overview, home tasks │ 93       │ 92   │ 1    │ 0       │
+│ S8 HTTP methods, headers, injection, error handling                      │ 65       │ 64   │ 1    │ 0       │
+│ S9 Deep probes: invalid unicode, races, pages, load                      │ 46       │ 38   │ 8    │ 0       │
+└──────────────────────────────────────────────────────────────────────────┴──────────┴──────┴──────┴─────────┘

@@ -1,0 +1,46 @@
+[
+ {
+  "area": "C-Forms",
+  "desc": "Session ends while the kudos form is open",
+  "pre": "Adam on /kudos/new with a valid kudos typed; session cookie removed (as after expiry or logout in another tab)",
+  "steps": "Click „Poslať kudos“",
+  "expected": "The user is told that they have to log in again (or is taken to /login); the message must not suggest that trying again will help",
+  "req": "MVP-01",
+  "status": "FAIL",
+  "actual": "API answered 401; still on /kudos/new; message: \"Niečo sa nepodarilo. Skús to znova.\"",
+  "evidence": "shots/kudos-session-expired-360.png"
+ },
+ {
+  "area": "C-Forms",
+  "desc": "Session ends while the questionnaire is being filled in",
+  "pre": "Adam on the comment step of an open round; session cookie removed",
+  "steps": "Click „Odoslať“",
+  "expected": "The user learns that the session ended and how to continue without losing the answers; not „Skús to znova“",
+  "req": "MVP-09",
+  "status": "FAIL",
+  "actual": "API answered 401; still on the questionnaire: true; message: \"Niečo sa nepodarilo. Skús to znova.\"",
+  "evidence": "shots/fill-session-expired-360.png"
+ },
+ {
+  "area": "C-Forms",
+  "desc": "Session ends, then the user clicks a menu link",
+  "pre": "Manager on /rounds; session cookie removed",
+  "steps": "Click „Môj tím“",
+  "expected": "Redirect to /login",
+  "req": "MVP-01, MVP-03",
+  "status": "PASS",
+  "actual": "landed on /login; Feedback portál Prihlásenie E-mail Heslo Prihlásiť sa Demo n",
+  "evidence": ""
+ },
+ {
+  "area": "C-Forms",
+  "desc": "Logout while the server does not answer",
+  "pre": "Manager; POST /api/logout aborted",
+  "steps": "Click „Odhlásiť sa“",
+  "expected": "The user is not told they are logged out while the session is still valid",
+  "req": "MVP-01",
+  "status": "PASS",
+  "actual": "after the failed logout the page shows /; the session is still valid: true; error shown: false",
+  "evidence": ""
+ }
+]

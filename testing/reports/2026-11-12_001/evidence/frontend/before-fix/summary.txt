@@ -1,0 +1,88 @@
+| Area | Executed | Passed | Failed | Blocked |
+| --- | --- | --- | --- | --- |
+| A-Navigation | 131 | 125 | 6 | 0 |
+| B-Components | 42 | 41 | 1 | 0 |
+| C-Forms | 91 | 79 | 12 | 0 |
+| D-Animations | 15 | 7 | 1 | 7 |
+| E-Responsive | 140 | 127 | 13 | 0 |
+| F-Visual | 14 | 2 | 12 | 0 |
+| G-Accessibility | 81 | 67 | 14 | 0 |
+| P-Print | 7 | 7 | 0 | 0 |
+| T-Text | 54 | 41 | 13 | 0 |
+| **Total** | **575** | **496** | **72** | **7** |
+
+Script errors: 0
+
+Failed tests:
+FE-T016 [FE-004] A-Navigation – Unauthenticated unknown route /does-not-exist
+FE-T102 [FE-004] A-Navigation – 404: unknown route as employee
+FE-T105 [FE-004] A-Navigation – 404: unknown team id as hr
+FE-T106 [FE-004] A-Navigation – 404: unknown HR sub-route as hr
+FE-T119 [FE-010] A-Navigation – Active menu item on /rounds/:id/fill as employee
+FE-T126 [FE-022] A-Navigation – Slow navigation shows that something is loading
+FE-T252 [FE-013] E-Responsive – Tap targets at 360 px: main menu links
+FE-T253 [FE-013] E-Responsive – Tap targets at 360 px: logout button
+FE-T254 [FE-013] E-Responsive – Tap targets at 360 px: login inputs and submit
+FE-T255 [FE-013] E-Responsive – Tap targets at 360 px: home task button
+FE-T259 [FE-013] E-Responsive – Tap targets at 360 px: kudos form: selects, emoji buttons, submit
+FE-T261 [FE-013] E-Responsive – Tap targets at 360 px: tabs (sub navigation)
+FE-T262 [FE-013] E-Responsive – Tap targets at 360 px: round list: Výsledky, Uzavrieť, Vytvoriť kolo
+FE-T263 [FE-013] E-Responsive – Tap targets at 360 px: results: Report na tlač, Použiť ako krok, Pridať krok
+FE-T264 [FE-013] E-Responsive – Tap targets at 360 px: results: summary toggles (Rozdelenie odpovedí, Komentáre)
+FE-T265 [FE-013] E-Responsive – Tap targets at 360 px: new round: question check rows
+FE-T266 [FE-013] E-Responsive – Tap targets at 360 px: issues: filter selects and button, status selects, Pridať podnet
+FE-T267 [N-01 (informational)] E-Responsive – Main menu of hr at 360 px stays on one row and inside the header
+FE-T268 [N-01 (informational)] E-Responsive – Main menu of hr at 320 px stays on one row and inside the header
+FE-T297 [N-04 (informational)] C-Forms – Comment step: typing past the limit gives the user a signal
+FE-T298 [FE-014] C-Forms – Comment step: emoji and the counter
+FE-T312 [FE-006] G-Accessibility – Keyboard only: complete the questionnaire without a mouse
+FE-T313 [FE-001] C-Forms – Manager home offers a way to fill in the open round of the own team
+FE-T323 [FE-002] F-Visual – Results: a long comment without spaces stays inside its card at 1280 px
+FE-T324 [FE-002] F-Visual – Results: a long comment without spaces stays inside its card at 360 px
+FE-T330 [N-02 (informational)] C-Forms – New round: the preselection notice after the user replaced the whole selection
+FE-T338 [FE-008] C-Forms – Own question: Enter adds the question and does not submit the round
+FE-T340 [FE-008] C-Forms – Own question added while the round is already full (5)
+FE-T345 [FE-009] B-Components – Draft: printable report of a draft
+FE-T349 [FE-002] F-Visual – Round with a 120-character name without spaces: list at 360 px
+FE-T351 [FE-007] C-Forms – New round as HR: switching the team switches the preselection and shows it
+FE-T361 [FE-017] C-Forms – Action form: missing deadline only
+FE-T364 [N-03 (informational)] C-Forms – Action: success is confirmed to the user
+FE-T369 [FE-002] F-Visual – Results: an action with a long word stays inside its card at 1280 px
+FE-T370 [FE-002] F-Visual – Results: an action with a long word stays inside its card at 360 px
+FE-T371 [FE-002] F-Visual – Team page („Povedali ste, urobili sme“): the same long action at 360 px
+FE-T390 [FE-002] F-Visual – Team feed: kudos with a 300-character word at 360 px
+FE-T392 [FE-002] F-Visual – „Moje kudos“: a kudos with a 300-character word at 360 px
+FE-T408 [FE-002] C-Forms – Issue from a round with a 120-character title without spaces
+FE-T414 [FE-002] F-Visual – Notes: a 200-character word at 360 px
+FE-T418 [FE-015] G-Accessibility – Every screen has its own descriptive <title>
+FE-T419 [FE-016] G-Accessibility – Landmarks: header, main and labelled navigation
+FE-T423 [FE-016] G-Accessibility – Heading structure on fill-question
+FE-T431 [FE-016] G-Accessibility – Heading structure on rounds
+FE-T439 [FE-016] G-Accessibility – Heading structure on hr-rounds
+FE-T452 [FE-017] G-Accessibility – Validation errors are tied to their fields (kudos form)
+FE-T453 [FE-017] G-Accessibility – Required fields are announced as required
+FE-T475 [FE-018] G-Accessibility – Colour contrast of text on hr-heatmap
+FE-T478 [FE-018] G-Accessibility – Colour contrast of placeholder text
+FE-T479 [FE-018] G-Accessibility – Non-text contrast: borders of inputs and of the scale buttons
+FE-T489 [FE-006] G-Accessibility – The new question is announced when the step changes
+FE-T491 [FE-016] G-Accessibility – Emoji in kudos have a text alternative
+FE-T493 [FE-011] G-Accessibility – Horizontally scrolling tables can be scrolled from the keyboard
+FE-T495 [FE-019] D-Animations – Reduced motion: the progress bar of the questionnaire does not animate
+FE-T507 [FE-004] T-Text – No leftover English in the visible text of employee
+FE-T510 [FE-005] T-Text – Home sentence for a round closed 3 days ago (manager of Tím Beta)
+FE-T513 [FE-021] T-Text – Consistent terms: the menu item „Prieskumy“ and the page it opens
+FE-T517 [FE-020] F-Visual – Heatmap legend ranges do not overlap
+FE-T519 [FE-012] F-Visual – Trend chart: axis text stays readable at 360 px
+FE-T520 [FE-012] F-Visual – Trend chart: axis text stays readable at 320 px
+FE-T534 [FE-005] T-Text – Plural form: home.roundAwaitingAction 2 days
+FE-T535 [FE-005] T-Text – Plural form: home.roundAwaitingAction 4 days
+FE-T543 [FE-005] T-Text – Plural form: home.roundsAwaitingAction 2 rounds, 2 days
+FE-T560 [FE-005] T-Text – Plural form: hrOverview.headlineWaiting 2 of 8, 2 days
+FE-T561 [FE-005] T-Text – Plural form: hrOverview.headlineWaiting 5 of 8, 5 days
+FE-T562 [FE-005] T-Text – Plural form: hrOverview.headlineWaiting 1 of 1
+FE-T563 [FE-005] T-Text – Plural form: hrOverview.headlineAllDone 1
+FE-T564 [FE-005] T-Text – Plural form: hrOverview.headlineAllDone 2
+FE-T566 [FE-005] T-Text – Plural form: hrOverview.teamLine 1 of 1
+FE-T569 [FE-005] T-Text – Plural form: hrOverview.awaitingSince 0 (closed today)
+FE-T572 [FE-003] C-Forms – Session ends while the kudos form is open
+FE-T573 [FE-003] C-Forms – Session ends while the questionnaire is being filled in

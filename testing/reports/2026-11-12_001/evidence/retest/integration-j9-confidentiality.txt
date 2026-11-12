@@ -1,0 +1,25 @@
+PASS  [J9] Response table has no user column, no time column, and no hidden rowid  => columns=id,roundId,teamId,v1,v2,v3,v4,v5,comment; rowid=no such column; WITHOUT ROWID=true
+PASS  [J9] Participation table holds only round and user  => columns=roundId,userId; rowid=no such column
+PASS  [J9] No other table, trigger or index links a response to a person or a time  => tables=Action,Issue,Kudos,MeetingNote,Participation,Question,Response,Round,RoundQuestion,Team,User; triggers=0; tables referencing a response=0; Response indexes=Response_roundId_idx
+PASS  [J9] Response ids are random UUIDs (version 4), not sequential  => 40 of 40 ids are UUID v4, e.g. 0f907a3a-2f65-41b7-b855-2547b47d4018
+PASS  [J9] Order of Response rows in the database does not reveal the order of submission  => rounds where storage order = submission order (or reverse): 0 of 6; pooled rank correlation ρ=0.23 (n=36, Σd²=162)
+PASS  [J9] Order of Participation rows does not reveal the order of submission either  => distinct storage orders across rounds=1 (501234); submission orders were 103245, 013254, 401352, 103254, 234015, 523014
+PASS  [J9] Every round has as many participations as responses (who and what are written together)  => 7 rounds checked; mismatches=0
+PASS  [J9] The reply to a submission carries no response id  => body={"ok":true}
+PASS  [J9] No API response available to the manager contains user ids, e-mails, names or response ids  => scanned 29393 bytes: user ids=0, e-mails=0, names=0, response ids=0
+PASS  [J9] No API response available to HR contains user ids, e-mails or response ids of respondents  => scanned 20239 bytes: user ids=0, e-mails=0, names=0, response ids=0
+PASS  [J9] Pages of the manager (results, report, team page, trend, round list, home) carry no respondent identity, also not in the embedded page data  => scanned 198249 bytes: user ids=0, e-mails=0, names=0, response ids=0, raw answer rows=false
+PASS  [J9] There is no endpoint that lists who has answered  => /api/rounds/:id/participations=404/404; /api/rounds/:id/participation=404/404; /api/rounds/:id/responses=405/405; /api/participations=404/404; /api/responses=404/404; /api/users=404/404; /api/teams/:t
+PASS  [J9] Round list of the manager says only whether the manager answered, never who else did  => keys=awaitingAction,closesAt,id,name,participation,questionCount,status,submitted,teamId,teamName
+PASS  [J9] Comments come back in a different order on every request and not in submission order  => distinct orders in 25 requests=25; first-submitted comment shown first 3×
+PASS  [J9] The results page also shuffles comments on every load  => distinct orders in 6 loads=6: 241653, 642351, 246531, 124356, 615342, 623145
+PASS  [J9] Timing channel: what the manager can observe while a round is open  => counter seen after each submission=1,2,3,4,5,6 — a manager who watches the counter and knows who is at the keyboard learns WHO answered WHEN, but no content is available until the round is closed
+PASS  [J9] Aggregates cannot be queried for a subset of responses  => identical aggregates for 5 parameter variants=true,true,true,true,true
+PASS  [J9] Differencing with the manager's own answer: threshold of 5 reached by 4 employees + the manager  => status=ok; sums of the 4 employees derived by the manager=10,10,10,10 (true sums=10,10,10,10); average of 4 people per question=2.5,2.5,2.5,2.5
+PASS  [J9] Unanimous answers: what a manager learns when everyone gives the same value  => distribution=0,0,5,0,0 — informational only
+PASS  [J9] An employee cannot read back any stored answer, not even the own one  => scanned 6558 bytes; contains 'answers'/'comment'/'v1'=false
+PASS  [J9] SQLite side files next to the QA database  => files=qa-e2e.db; journal_mode=delete
+BLOCKED  [J9] Server log does not contain the body of a response (NFR-01)  => Not executable from this agent: the server on :3303 was started by the coordinator and its console output is not available to me. Not verified at runtime.
+
+J9 done: 22 checks, 0 failed
+exit 0

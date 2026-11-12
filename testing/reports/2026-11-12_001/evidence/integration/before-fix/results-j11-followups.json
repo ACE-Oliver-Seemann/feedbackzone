@@ -1,0 +1,134 @@
+[
+ {
+  "suite": "j11-followups",
+  "j": "J10",
+  "d": "Seed: 2 teams of 6 (1 manager + 5 employees) and 1 HR user",
+  "pre": "seed only",
+  "steps": "count users per team and role",
+  "exp": "13 users; each team 1 MANAGER + 5 EMPLOYEE; HR without a team (MVP-02)",
+  "actual": "users=13, teams=2, HR=1",
+  "status": "PASS",
+  "evidence": ""
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J10",
+  "d": "Seed: question library of IT-03",
+  "pre": "seed only",
+  "steps": "count questions, topics, starters, fixed",
+  "exp": "38 questions = 37 rotating in 8 topics + 1 fixed; 12 starters; scales only AGREEMENT/QUALITY/OVERTIME/FREQUENCY",
+  "actual": "questions=38, fixed=1, topics=8, starters=12, scales=QUALITY,AGREEMENT,OVERTIME,FREQUENCY",
+  "status": "PASS",
+  "evidence": ""
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J5",
+  "d": "Passwords are stored only as bcrypt hashes",
+  "pre": "seed only",
+  "steps": "read User.passwordHash of all users",
+  "exp": "every value starts with $2 and is 60 characters; the plain password does not occur (NFR-05)",
+  "actual": "checked 13 hashes",
+  "status": "PASS",
+  "evidence": ""
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J10",
+  "d": "Only invented test accounts exist",
+  "pre": "seed only",
+  "steps": "read all e-mail addresses",
+  "exp": "all in the reserved domain example.test (NFR-06)",
+  "actual": "domains=example.test",
+  "status": "PASS",
+  "evidence": ""
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J5",
+  "d": "No registration, password reset or user administration screens exist",
+  "pre": "-",
+  "steps": "GET /register, /signup, /forgot-password, /reset-password, /admin, /users, /api/register, /api/users",
+  "exp": "404 (or redirect to /login for unknown pages) — MVP-02",
+  "actual": "/register=404; /signup=404; /forgot-password=404; /reset-password=404; /admin=404; /users=404; /api/register=404; /api/users=404",
+  "status": "PASS",
+  "evidence": ""
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J6",
+  "d": "Team page lists closed rounds newest first when one round was closed by hand before its deadline",
+  "pre": "round X: deadline in 10 days, closed by hand at 2026-11-12T16:28:07.194Z; round Y: closed by its deadline at 2026-11-12T16:28:08.217Z (later)",
+  "steps": "Adam opens 'Môj tím'; read the order of the round cards and their 'Uzavreté' dates",
+  "exp": "Y (closed last) above X; each card dated with the day it was really closed (MVP-14 'najnovšie hore')",
+  "actual": "order=QA kolo X (uzavreté ručne skôr) | QA kolo Y (uzavreté neskôr); labels=Uzavreté 22. 11. 2026 · Odpovedalo 5 z 6 | Uzavreté 12. 11. 2026 · Odpovedalo 5 z 6; DB closedAt X=2026-11-12T16:28:07.194Z, Y=2026-11-12T16:28:08.217Z",
+  "status": "FAIL",
+  "evidence": "screens/j11-01-team-order.png"
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J6",
+  "d": "Trend page and team page agree on which round is the newest",
+  "pre": "as above",
+  "steps": "manager opens 'Vývoj tímu' (newest first) and the team page",
+  "exp": "the same round is first on both",
+  "actual": "trend first='QA kolo Y (uzavreté neskôr)'; team page first='QA kolo X (uzavreté ručne skôr)'",
+  "status": "FAIL",
+  "evidence": "screens/j11-02-trend-vs-team.png"
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J1",
+  "d": "Thank-you screen shows the actions of the round that was closed last",
+  "pre": "as above; open round Z",
+  "steps": "Adam fills round Z and submits",
+  "exp": "'Čo sa urobilo po kole „QA kolo Y (uzavreté neskôr)“' with 'QA krok kola Y' (MVP-09: 'kroky posledného uzavretého kola')",
+  "actual": "Čo sa urobilo po kole „QA kolo X (uzavreté ručne skôr)“ QA krok kola X Plánované QA Termín 13. 11. 2026 Späť na moje prieskumy",
+  "status": "FAIL",
+  "evidence": "screens/j11-03-thanks-last-closed.png"
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J4",
+  "d": "Issues list with an unknown status in the URL",
+  "pre": "seed issues: 1 Otvorené, 1 Rieši sa; one more set to Hotové",
+  "steps": "create and finish an issue; open /hr/issues?status=NEZNAMY",
+  "exp": "the visible filter and the list agree (either default 'Nevybavené' with unfinished issues only, or 'Všetko' with all)",
+  "actual": "filter shows 'Nevybavené'; list has 3 issues, includes the finished one=true",
+  "status": "FAIL",
+  "evidence": "screens/j11-04-filter-unknown-status.png"
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J4",
+  "d": "Issue form opened with an unknown round id in the URL",
+  "pre": "-",
+  "steps": "open /hr/issues?round=neexistuje#new",
+  "exp": "page renders (200) without a prefill notice and without an error",
+  "actual": "HTTP 200; prefill notice=false",
+  "status": "PASS",
+  "evidence": ""
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J4",
+  "d": "Issues filter keeps working together with the 'from round' link",
+  "pre": "closed round X",
+  "steps": "open /hr/issues?round=<X>&status=DONE",
+  "exp": "form open with the round notice; list shows only finished issues",
+  "actual": "notice=1; list=[\"QA hotový podnet\"]",
+  "status": "PASS",
+  "evidence": ""
+ },
+ {
+  "suite": "j11-followups",
+  "j": "J9",
+  "d": "Result and summary APIs do not send caching headers that would allow storing confidential data",
+  "pre": "closed round X",
+  "steps": "read Cache-Control of GET /api/rounds/:id/results and /api/teams/:id/summary",
+  "exp": "no-store (informational: without a header browsers do not cache XHR responses by default, shared proxies might)",
+  "actual": "results: null; summary: null",
+  "status": "FAIL",
+  "evidence": ""
+ }
+]

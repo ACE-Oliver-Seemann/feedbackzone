@@ -1,0 +1,36 @@
+PASS  [J5] Wrong password shows one generic message and does not log in  => msg='Nesprávny e-mail alebo heslo.', cookies=
+PASS  [J5] Unknown e-mail gives exactly the same message and status as a wrong password  => msg='Nesprávny e-mail alebo heslo.'; unknown e-mail → 401 {"error":"invalid_credentials"}; wrong password → 401 {"error":"invalid_credentials"}
+PASS  [J5] Empty form is not submitted  => login requests=0
+PASS  [J5] E-mail is accepted regardless of case and surrounding spaces  => HTTP 200, user=Adam Vzorový
+PASS  [J5] Password is case sensitive  => HTTP 401
+PASS  [J5] Session cookie attributes  => fz_session=<token>; Path=/; Expires=Fri, 13 Nov 2026 02:10:37 GMT; Max-Age=28800; Secure; HttpOnly; SameSite=lax
+PASS  [J5] Login response does not expose the password hash or e-mail list  => user keys=id,name,role,teamId; home=/
+PASS  [J5] Login as Zamestnanec: lands on '/', header shows the name and role, menu matches the role  => header='Feedback portál Adam Vzorový Zamestnanec Odhlásiť sa Domov Môj tím Kudos', menu=Domov,Môj tím,Kudos, current=Domov
+PASS  [J5] Login as Manažér: lands on '/', header shows the name and role, menu matches the role  => header='Feedback portál Alena Testová Manažér Odhlásiť sa Domov Prieskumy Môj tím Kudos', menu=Domov,Prieskumy,Môj tím,Kudos, current=Domov
+PASS  [J5] Login as HR: lands on '/', header shows the name and role, menu matches the role  => header='Feedback portál Hana Personálna HR Odhlásiť sa Domov Prieskumy Prehľady Podnety Kudos', menu=Domov,Prieskumy,Prehľady,Podnety,Kudos, current=Domov
+PASS  [J5] The session cookie is not readable from page scripts  => document.cookie=''
+PASS  [J5] Session survives a page refresh and a new tab  => after reload path=/kudos/me; second tab path=/team/:id, shows Adam=true
+PASS  [J5] A logged-in user who opens /login again  => path after opening /login=/; session cookie still present=true
+PASS  [J5] Every page redirects an anonymous visitor to /login  => /→/login; /rounds→/login; /rounds/new→/login; /rounds/:id/fill→/login; /rounds/:id/results→/login; /rounds/:id/report→/login; /team/:team→/login; /team/:team/trend→/login; /kudos/new→/login; /kudos/me
+PASS  [J5] Every API endpoint refuses an anonymous request  => statuses=401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401,401
+PASS  [J5] Logout ends the session in the browser  => cookie present=false; '/' → /login
+PASS  [J5] Back button after logout does not show the previous user's pages  => after back #1: /login leak=false; after back #2: /login leak=false
+PASS  [J5] Pages are served with headers that forbid caching  => '/' → private, no-cache, no-store, max-age=0, must-revalidate; '/kudos/me' → private, no-cache, no-store, max-age=0, must-revalidate; '/api/kudos/me' → null
+PASS  [J5] The old session token is useless after logout  => GET /api/me → 401 {"error":"unauthorized"}; GET /api/kudos/me → 401
+PASS  [J5] Two tabs: logout in one tab, then navigation in the other  => tab B path=/login
+PASS  [J5] Two tabs: logout in one tab, then a form submit in the other (kudos)  => path=/kudos/new; message=["Prihlásenie vypršalo. Prihlás sa znova v novej karte a potom to tu skús ešte raz. Čo máš vyplnené, zostane.",""]; text kept='QA kudos písané pred odhlásení…'; kudos rows=0
+PASS  [J5] Session expires while a member is filling in a round (cookie removed before the final submit)  => path=/rounds/cmwdv5j410015pk04rw741iuo/fill; message after 1st try=["Prihlásenie vypršalo. Prihlás sa znova v novej karte a potom to tu skús ešte raz. Čo máš vyplnené, zostane.",""]; after retry=["Pri
+PASS  [J5] After the session expired mid-form, the member can log in again and fill the round (answers must be re-entered)  => responses=1
+PASS  [J5] Tampered session cookie (signature changed) is refused in the browser  => path=/login
+PASS  [J5] Forged payload: another user's id with one's own signature is refused  => statuses=401,401,401,401,401,401,401,401,401,401
+FAIL  [J5] Switching accounts in the same browser: the second login replaces the first identity in every tab  => tab A header still shows Emil=true; after submit tab A says thank-you=true; participation Emil=0, Dana=1
+PASS  [J5] HR cannot fill in a round  => page 403, POST 403, GET 403
+PASS  [J5] HR opening the manager's list /rounds is taken to the HR list  => /hr/rounds
+PASS  [J5] Manager cannot open any HR page  => /hr/rounds=403; /hr/overview=403; /hr/heatmap=403; /hr/issues=403; /hr/notes=403; 'Späť na úvod' works
+PASS  [J5] Manager cannot create, open or close a round of another team  => create 403, open 403, close 403, fill page 403
+PASS  [J5] Unknown ids: manager gets 403 (cannot probe), HR gets 404, unknown route gets 404  => manager 403/403; HR 404/404; route 404
+PASS  [J5] Menu links are not the protection: employee calls manager/HR APIs directly  => statuses=403,403,403,403,403,403,403,403,403
+PASS  [J5] GET /api/me returns the logged-in user, role and team and nothing else  => EMPLOYEE:true:false | MANAGER:true:false | HR:true:false
+
+J5 done: 33 checks, 1 failed
+exit 0
