@@ -39,7 +39,7 @@ export function ActionList({
       {actions.map((action) => (
         <InsetRow key={action.id}>
           <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
-            <h3 className="min-w-0 pt-0.5 font-semibold tracking-[-0.005em] text-ink">
+            <h3 className="min-w-0 pt-0.5 font-semibold tracking-[-0.005em] break-words text-ink">
               {action.topic}
             </h3>
             {editable ? (

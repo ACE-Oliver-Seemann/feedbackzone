@@ -2,6 +2,7 @@ import { parseLocalDate } from "@/lib/dates";
 import { db } from "@/lib/db";
 import { assertCanViewTeam, assertCanWriteActions, requireRole } from "@/lib/authz";
 import { conflict, forbidden, validationError } from "@/lib/errors";
+import { charCount, visibleLength } from "@/lib/text-length";
 import type { SessionUser } from "@/lib/session";
 import { closeExpiredRounds } from "@/server/rounds";
 import { loadRoundForResults } from "@/server/results";
@@ -69,12 +70,12 @@ export async function createAction(
   const fields: Record<string, string> = {};
 
   const topic = typeof input.topic === "string" ? input.topic.trim() : "";
-  if (!topic) fields.topic = "required";
-  else if (topic.length > MAX_TOPIC_LENGTH) fields.topic = "too_long";
+  if (visibleLength(topic) === 0) fields.topic = "required";
+  else if (charCount(topic) > MAX_TOPIC_LENGTH) fields.topic = "too_long";
 
   const description = typeof input.description === "string" ? input.description.trim() : "";
-  if (!description) fields.description = "required";
-  else if (description.length > MAX_DESCRIPTION_LENGTH) fields.description = "too_long";
+  if (visibleLength(description) === 0) fields.description = "required";
+  else if (charCount(description) > MAX_DESCRIPTION_LENGTH) fields.description = "too_long";
 
   const dueDate = parseLocalDate(input.dueDate);
   if (!dueDate) fields.dueDate = "invalid";

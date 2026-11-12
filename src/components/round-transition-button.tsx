@@ -7,6 +7,36 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useToast } from "@/components/ui/toast";
 import { t } from "@/lib/texts.sk";
 
+/**
+ * After a successful transition router.refresh() re-renders the row with the
+ * new status, which unmounts this button (and the focus with it). Once that
+ * happens, focus moves to the next sensible control in the same row: the new
+ * transition button ("Uzavrieť"), else the first action ("Výsledky"), else the
+ * round name. Nothing moves if the user has already focused something else.
+ * Hooks: data-round-row / -actions / -heading in round-list.tsx (FE-002).
+ */
+function focusRowAfterRefresh(trigger: HTMLElement | null) {
+  const row = trigger?.closest<HTMLElement>("[data-round-row]");
+  if (!trigger || !row) return;
+  const observer = new MutationObserver(() => {
+    if (trigger.isConnected) return;
+    stop();
+    const active = document.activeElement;
+    if (active && active !== document.body) return;
+    const target =
+      row.querySelector<HTMLElement>("[data-round-transition] button") ??
+      row.querySelector<HTMLElement>("[data-round-actions] a, [data-round-actions] button") ??
+      row.querySelector<HTMLElement>("[data-round-heading]");
+    target?.focus();
+  });
+  const timer = window.setTimeout(() => stop(), 10_000);
+  function stop() {
+    observer.disconnect();
+    window.clearTimeout(timer);
+  }
+  observer.observe(row, { childList: true, subtree: true });
+}
+
 // "Spustiť" / "Uzavrieť" (MVP-05).
 export function RoundTransitionButton({
   roundId,
@@ -36,6 +66,7 @@ export function RoundTransitionButton({
     try {
       const response = await fetch(`/api/rounds/${roundId}/${action}`, { method: "POST" });
       if (response.ok) {
+        focusRowAfterRefresh(triggerRef.current);
         router.refresh();
         toast.success(action === "open" ? t.toasts.roundOpened : t.toasts.roundClosed);
       } else if (response.status === 409) {
@@ -53,7 +84,7 @@ export function RoundTransitionButton({
   const label = action === "open" ? t.rounds.open : t.rounds.close;
 
   return (
-    <div className="inline-flex max-w-full flex-col items-start gap-1.5">
+    <div data-round-transition="" className="inline-flex max-w-full flex-col items-start gap-1.5">
       <Button
         ref={triggerRef}
         variant={action === "open" ? "primary" : "secondary"}

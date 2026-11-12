@@ -60,7 +60,14 @@ export const t = {
     forbiddenTitle: "Sem nemáš prístup",
     forbiddenText: "Táto stránka nie je dostupná pre tvoju rolu alebo tím.",
     forbiddenCode: "Chyba 403",
+    notFoundTitle: "Stránka neexistuje",
+    notFoundText: "Adresa je nesprávna alebo stránka už nie je dostupná.",
+    notFoundCode: "Chyba 404",
     backHome: "Späť na úvod",
+  },
+  // <title> of each page; the root layout appends " · Feedback portál" (FE-009).
+  meta: {
+    fill: "Vyplnenie prieskumu",
   },
   roundStatus: {
     DRAFT: "Koncept",
@@ -121,7 +128,13 @@ export const t = {
     commentCounter: (length: number) => `${length} / 1000`,
     submit: "Odoslať",
     submitting: "Odosielam…",
-    thanksTitle: "Ďakujeme za odpoveď",
+    // INT-004: 401 on submit. The answers stay in this tab, so logging in again
+    // in a new tab and then sending works.
+    sessionExpiredTitle: "Prihlásenie vypršalo",
+    sessionExpiredText:
+      "Odpovede sa neodoslali. Prihlás sa znova v novej karte, potom sa sem vráť a klikni na „Odoslať“.",
+    sessionExpiredLink: "Prihlásiť sa v novej karte",
+    thanksTitle:"Ďakujeme za odpoveď",
     thanksText: "Tvoja odpoveď je odoslaná. Výsledky uvidí manažér až po uzavretí kola.",
     alreadySubmittedTitle: "Toto kolo už máš vyplnené",
     alreadySubmittedText: "Do každého kola sa dá odpovedať iba raz.",
@@ -175,6 +188,13 @@ export const t = {
     submit: "Pridať krok",
     submitting: "Ukladám…",
     invalid: "Vyplň tému, čo sa urobí a platný termín.",
+    // Per-field messages for the 400 response's `fields` (FE-005).
+    fieldErrors: {
+      topic: "Zadaj tému (najviac 120 znakov).",
+      description: "Napíš, čo sa urobí (najviac 1 000 znakov).",
+      dueDate: "Zadaj platný termín.",
+      status: "Vyber stav.",
+    },
     added: "Krok je pridaný.",
     statusSaved: "Stav je uložený.",
   },
@@ -183,7 +203,6 @@ export const t = {
     roundsEmpty: "Tím zatiaľ nemá žiadne uzavreté kolo.",
     participation: (responded: number, teamSize: number) =>
       `Odpovedalo ${responded} z ${teamSize}`,
-    closed: (date: string) => `Uzavreté ${date}`,
     insufficient: (min: number) =>
       `Nedostatok odpovedí – priemery sa zobrazujú až od ${min} odpovedí.`,
     average: "Priemer",

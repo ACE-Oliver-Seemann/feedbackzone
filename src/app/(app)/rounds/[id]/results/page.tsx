@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ActionForm } from "@/components/action-form";
 import { ActionList } from "@/components/action-list";
 import { StatusBadge } from "@/components/round-list";
@@ -11,6 +12,8 @@ import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listRoundActions } from "@/server/actions";
 import { getRoundResults, type QuestionResult } from "@/server/results";
+
+export const metadata: Metadata = { title: t.results.title };
 
 // Screen "Výsledky kola a kroky" for manager and HR (MVP-10, MVP-11, MVP-13, MVP-15).
 export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/results">) {

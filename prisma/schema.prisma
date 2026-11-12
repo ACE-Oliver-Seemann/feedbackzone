@@ -23,6 +23,8 @@ model User {
   passwordHash String
   role         String // EMPLOYEE | MANAGER | HR
   teamId       String?
+  /// Raised on logout; session tokens carrying an older value stop working (BE-001).
+  sessionVersion Int    @default(0)
   team         Team?   @relation("TeamMembers", fields: [teamId], references: [id])
 
   managedTeam    Team?           @relation("TeamManager")

@@ -71,7 +71,13 @@ const CASES: Case[] = [
   },
   {
     name: "POST /api/logout",
-    call: (as) => invoke(logout, "/api/logout", as, { method: "POST" }),
+    // Logout really ends the session (BE-001): reset the version afterwards so
+    // the following rows still run with a valid session for this actor.
+    call: async (as) => {
+      const response = await invoke(logout, "/api/logout", as, { method: "POST" });
+      if (as) await db.user.update({ where: { id: as.id }, data: { sessionVersion: 0 } });
+      return response;
+    },
     expected: status([401, 200, 200, 200, 200, 200]),
   },
   {

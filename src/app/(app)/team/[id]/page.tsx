@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ActionList } from "@/components/action-list";
 import { KudosList } from "@/components/kudos-list";
 import { IconCalendar, IconChart, IconUsers } from "@/components/ui/icons";
@@ -8,6 +9,8 @@ import { MIN_GROUP_SIZE } from "@/config/privacy";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { getTeamSummary, type TeamRoundSummary } from "@/server/teams";
+
+export const metadata: Metadata = { title: t.team.title };
 
 // Screen "Stránka tímu" for team members and HR (MVP-14, MVP-17).
 export default async function TeamPage({ params }: PageProps<"/team/[id]">) {
@@ -81,13 +84,13 @@ function TimelineRound({
         aria-hidden="true"
       />
 
-      <h2 className="text-lg leading-snug font-semibold tracking-[-0.01em] text-ink">
+      <h2 className="text-lg leading-snug font-semibold tracking-[-0.01em] break-words text-ink">
         {round.name}
       </h2>
       <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
         <span className="inline-flex items-center gap-1.5">
           <IconCalendar size={15} />
-          {t.team.closed(formatDate(round.closesAt))}
+          {t.rounds.deadline(formatDate(round.closesAt))}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <IconUsers size={15} />

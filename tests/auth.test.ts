@@ -1,3 +1,4 @@
+import { NextRequest } from "next/server";
 import { beforeAll, describe, expect, it } from "vitest";
 import { POST as login } from "@/app/api/login/route";
 import { POST as logout } from "@/app/api/logout/route";
@@ -104,5 +105,30 @@ describe("authenticated endpoints [MVP-03]", () => {
     const cookie = response.headers.get("set-cookie") ?? "";
     expect(cookie).toContain(`${SESSION_COOKIE}=;`);
     expect(cookie).toMatch(/max-age=0/i);
+  });
+
+  it("logout invalidates the token on the server, so a copied cookie stops working [BE-001]", async () => {
+    const employee = fx.b.employees[0];
+    const response = await loginAs(employee.email, PASSWORD);
+    const token = /fz_session=([^;]+)/.exec(response.headers.get("set-cookie") ?? "")?.[1];
+    expect(token).toBeTruthy();
+    const withCookie = (path: string, method = "GET") =>
+      new NextRequest(`http://localhost${path}`, {
+        method,
+        headers: { cookie: `${SESSION_COOKIE}=${token}` },
+      });
+
+    expect((await me(withCookie("/api/me"), undefined)).status).toBe(200);
+    expect((await logout(withCookie("/api/logout", "POST"), undefined)).status).toBe(200);
+    // Replaying the copied cookie after logout is rejected.
+    expect((await me(withCookie("/api/me"), undefined)).status).toBe(401);
+
+    // Logging in again issues a new, working session.
+    const again = await loginAs(employee.email, PASSWORD);
+    const newToken = /fz_session=([^;]+)/.exec(again.headers.get("set-cookie") ?? "")?.[1];
+    const fresh = new NextRequest("http://localhost/api/me", {
+      headers: { cookie: `${SESSION_COOKIE}=${newToken}` },
+    });
+    expect((await me(fresh, undefined)).status).toBe(200);
   });
 });

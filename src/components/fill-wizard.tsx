@@ -41,6 +41,8 @@ export function FillWizard({
   const [comment, setComment] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // INT-004: the session ended while filling in; the answers are still here.
+  const [sessionExpired, setSessionExpired] = useState(false);
   // Encouraging line on the thank-you screen, picked when the server accepts the answers.
   const [cheer, setCheer] = useState(0);
 
@@ -66,6 +68,7 @@ export function FillWizard({
   async function submit() {
     setPending(true);
     setError(null);
+    setSessionExpired(false);
     try {
       const response = await fetch(`/api/rounds/${roundId}/responses`, {
         method: "POST",
@@ -80,6 +83,8 @@ export function FillWizard({
       } else if (response.status === 409) {
         const { error: code } = await response.json();
         setStep(code === "already_submitted" ? "already" : "closed");
+      } else if (response.status === 401) {
+        setSessionExpired(true);
       } else {
         setError(t.errors.generic);
       }
@@ -221,6 +226,20 @@ export function FillWizard({
           {error && (
             <Notice tone="error" role="alert" className="mt-4">
               {error}
+            </Notice>
+          )}
+          {sessionExpired && (
+            <Notice tone="error" role="alert" title={t.fill.sessionExpiredTitle} className="mt-4">
+              <p>{t.fill.sessionExpiredText}</p>
+              {/* A new tab keeps this one, and the answers in it, intact. */}
+              <a
+                href="/login"
+                target="_blank"
+                rel="noopener"
+                className="mt-1 inline-block rounded font-semibold underline underline-offset-2 hover:text-red-950"
+              >
+                {t.fill.sessionExpiredLink}
+              </a>
             </Notice>
           )}
           <StepButtons>

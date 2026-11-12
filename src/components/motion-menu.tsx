@@ -1,11 +1,19 @@
 "use client";
 
-import { useId, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { IconSparkle } from "@/components/ui/icons";
 import { type MotionPreference, useMotionPreference, useSystemReducedMotion } from "@/lib/motion";
 import { t } from "@/lib/texts.sk";
 
 const OPTIONS: MotionPreference[] = ["system", "on", "reduced"];
+
+/** Puts the (position: fixed) panel right under the button. */
+function place(button: HTMLElement | null, panel: HTMLElement | null) {
+  if (!button || !panel) return;
+  const rect = button.getBoundingClientRect();
+  panel.style.top = `${Math.round(rect.bottom + 8)}px`;
+  panel.style.right = `${Math.max(16, Math.round(window.innerWidth - rect.right))}px`;
+}
 
 /**
  * Header button with the animation setting. A native popover gives Esc,
@@ -30,14 +38,15 @@ export function MotionMenu() {
           ? t.motion.hintSystemReduced
           : t.motion.hintSystemFull;
 
-  function place() {
-    const button = buttonRef.current;
-    const panel = panelRef.current;
-    if (!button || !panel) return;
-    const rect = button.getBoundingClientRect();
-    panel.style.top = `${Math.round(rect.bottom + 8)}px`;
-    panel.style.right = `${Math.max(16, Math.round(window.innerWidth - rect.right))}px`;
-  }
+  // The button moves when the window is resized; an open panel follows it (FE-011).
+  useEffect(() => {
+    const onResize = () => {
+      const panel = panelRef.current;
+      if (panel?.matches(":popover-open")) place(buttonRef.current, panel);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   return (
     <>
@@ -56,7 +65,7 @@ export function MotionMenu() {
         id={panelId}
         popover="auto"
         onBeforeToggle={(event) => {
-          if (event.newState === "open") place();
+          if (event.newState === "open") place(buttonRef.current, panelRef.current);
         }}
         className="ui-popover fixed inset-auto m-0 w-[min(18rem,calc(100vw-2rem))] rounded-xl bg-surface p-4 text-ink shadow-[var(--shadow-raised)] ring-1 ring-line"
       >

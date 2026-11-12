@@ -20,7 +20,10 @@ export function StatusBadge({ status }: { status: RoundStatus }) {
   return <UiBadge tone={STATUS_TONE[status]}>{t.roundStatus[status]}</UiBadge>;
 }
 
-/** Employee view: open rounds of own team with the "Odoslané" state (MVP-06). */
+/**
+ * Employee view: open rounds of own team with the "Odoslané" state (MVP-06).
+ * Sits right under the page h1, so the round names are h2 (FE-010).
+ */
 export function MySurveyList({ rounds }: { rounds: RoundListItem[] }) {
   if (rounds.length === 0) {
     return <EmptyState icon={<IconInbox size={22} />} title={t.rounds.mySurveysEmpty} />;
@@ -45,7 +48,7 @@ export function MySurveyList({ rounds }: { rounds: RoundListItem[] }) {
             />
           )}
           <div className="pointer-events-none relative min-w-0">
-            <h3 className="text-[1.0625rem] font-semibold tracking-[-0.01em] text-ink">{round.name}</h3>
+            <h2 className="text-[1.0625rem] font-semibold tracking-[-0.01em] text-ink">{round.name}</h2>
             <p className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
               <span className="inline-flex items-center gap-1.5">
                 <IconCalendar size={15} className="shrink-0" />
@@ -88,9 +91,12 @@ const COLUMNS =
 export function ManagedRoundList({
   rounds,
   showTeam,
+  headingLevel = 3,
 }: {
   rounds: RoundListItem[];
   showTeam?: boolean;
+  /** 2 when the list sits directly under the page h1 (FE-010); 3 inside a Section. */
+  headingLevel?: 2 | 3;
 }) {
   if (rounds.length === 0) {
     return <EmptyState icon={<IconInbox size={22} />} title={t.rounds.empty} />;
@@ -112,14 +118,28 @@ export function ManagedRoundList({
       </div>
       <ul className="divide-y divide-line">
         {rounds.map((round) => (
-          <ManagedRoundRow key={round.id} round={round} showTeam={showTeam} />
+          <ManagedRoundRow
+            key={round.id}
+            round={round}
+            showTeam={showTeam}
+            headingLevel={headingLevel}
+          />
         ))}
       </ul>
     </div>
   );
 }
 
-function ManagedRoundRow({ round, showTeam }: { round: RoundListItem; showTeam?: boolean }) {
+function ManagedRoundRow({
+  round,
+  showTeam,
+  headingLevel,
+}: {
+  round: RoundListItem;
+  showTeam?: boolean;
+  headingLevel: 2 | 3;
+}) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const participation = round.status !== "DRAFT" ? round.participation : undefined;
   const share =
     participation && participation.teamSize > 0
@@ -127,10 +147,18 @@ function ManagedRoundRow({ round, showTeam }: { round: RoundListItem; showTeam?:
       : 0;
 
   return (
-    <li className={cx("grid gap-3 px-4 py-4 sm:px-5", COLUMNS)}>
+    // data-round-* hooks: RoundTransitionButton moves focus within the row after a
+    // status change replaces the button that had focus (FE-002).
+    <li data-round-row={round.id} className={cx("grid gap-3 px-4 py-4 sm:px-5", COLUMNS)}>
       {/* Name and team */}
       <div className="min-w-0">
-        <h3 className="font-semibold tracking-[-0.01em] text-ink">{round.name}</h3>
+        <Heading
+          data-round-heading=""
+          tabIndex={-1}
+          className="rounded font-semibold tracking-[-0.01em] text-ink"
+        >
+          {round.name}
+        </Heading>
         {showTeam && (
           <Link
             href={`/team/${round.teamId}`}
@@ -176,7 +204,7 @@ function ManagedRoundRow({ round, showTeam }: { round: RoundListItem; showTeam?:
       </div>
 
       {/* Actions */}
-      <div className="flex flex-wrap items-start gap-2 lg:justify-end">
+      <div data-round-actions="" className="flex flex-wrap items-start gap-2 lg:justify-end">
         {round.status !== "DRAFT" && (
           <ButtonLink
             href={`/rounds/${round.id}/results`}

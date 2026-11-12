@@ -71,6 +71,12 @@ describe("send kudos [MVP-16]", () => {
     ["text of 19 characters", () => ({ text: "x".repeat(19) })],
     ["text of 501 characters", () => ({ text: "x".repeat(501) })],
     ["text padded with spaces to 20", () => ({ text: `${"x".repeat(10)}${" ".repeat(10)}` })],
+    // BE-002: 10 emoji are 10 characters, not 20.
+    ["10 emoji (20 UTF-16 code units)", () => ({ text: "🎉".repeat(10) })],
+    // BE-003: invisible characters do not count.
+    ["text of only zero-width characters", () => ({ text: "​".repeat(30) })],
+    ["10 letters padded with zero-width spaces", () => ({ text: `${"x".repeat(10)}${"​".repeat(15)}` })],
+    ["501 emoji", () => ({ text: "🎉".repeat(501) })],
     ["an unknown value", () => ({ value: "LUCK" })],
     ["an unknown visibility", () => ({ visibility: "PUBLIC" })],
   ])("rejects %s", async (_label, override) => {
@@ -81,6 +87,11 @@ describe("send kudos [MVP-16]", () => {
   it("accepts text of exactly 20 and 500 characters", async () => {
     expect((await send(fx.a.employees[0], { text: "x".repeat(20) })).status).toBe(201);
     expect((await send(fx.a.employees[0], { text: "x".repeat(500) })).status).toBe(201);
+  });
+
+  it("counts characters, not UTF-16 code units: 260 emoji fit into 500 [BE-002]", async () => {
+    expect((await send(fx.a.employees[0], { text: "🎉".repeat(260) })).status).toBe(201);
+    expect((await send(fx.a.employees[0], { text: "🎉".repeat(500) })).status).toBe(201);
   });
 });
 

@@ -2,6 +2,7 @@ import { parseLocalDate } from "@/lib/dates";
 import { db } from "@/lib/db";
 import { assertCanManageRounds, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
+import { charCount, visibleLength } from "@/lib/text-length";
 import type { SessionUser } from "@/lib/session";
 
 export type RoundStatus = "DRAFT" | "OPEN" | "CLOSED";
@@ -97,8 +98,8 @@ export async function createRound(
   const fields: Record<string, string> = {};
 
   const name = typeof input.name === "string" ? input.name.trim() : "";
-  if (!name) fields.name = "required";
-  else if (name.length > MAX_NAME_LENGTH) fields.name = "too_long";
+  if (visibleLength(name) === 0) fields.name = "required";
+  else if (charCount(name) > MAX_NAME_LENGTH) fields.name = "too_long";
 
   // A manager may omit the team; it defaults to their own.
   const teamId =

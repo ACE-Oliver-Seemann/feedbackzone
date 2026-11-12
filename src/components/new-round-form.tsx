@@ -12,8 +12,9 @@ import { useToast } from "@/components/ui/toast";
 import { FORWARD } from "@/lib/page-motion";
 import { t } from "@/lib/texts.sk";
 
-// Mirrors MIN_QUESTIONS / MAX_QUESTIONS in src/server/rounds.ts. The server
-// validates again; this only keeps the form from sending an obvious mistake.
+// Mirrors MIN_QUESTIONS / MAX_QUESTIONS in src/server/rounds.ts. Used for the
+// selection counter; the server validates all fields (incl. the question count)
+// and reports them together, so every error shows at once (FE-006).
 const MIN_QUESTIONS = 3;
 const MAX_QUESTIONS = 5;
 
@@ -61,10 +62,6 @@ export function NewRoundForm({
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!countValid) {
-      setFieldErrors({ questionIds: true });
-      return;
-    }
     const form = new FormData(event.currentTarget);
     setPending(true);
     setError(null);
@@ -92,9 +89,10 @@ export function NewRoundForm({
       }
       if (response.status === 400) {
         const { fields } = await response.json();
-        setFieldErrors(
-          Object.fromEntries(Object.keys(fields ?? {}).map((field) => [field, true])),
-        );
+        setFieldErrors({
+          ...Object.fromEntries(Object.keys(fields ?? {}).map((field) => [field, true])),
+          ...(countValid ? {} : { questionIds: true }),
+        });
       } else {
         setError(t.errors.generic);
       }

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/login-form";
 import { BrandMark } from "@/components/ui/brand-mark";
@@ -5,6 +6,8 @@ import { IconInfo } from "@/components/ui/icons";
 import { getPageUser } from "@/lib/page-auth";
 import { homePathFor } from "@/lib/session";
 import { t } from "@/lib/texts.sk";
+
+export const metadata: Metadata = { title: t.login.title };
 
 // Screen "Prihlásenie" (MVP-01). Outside the app shell: on large screens a
 // quiet brand pane next to the form, on small screens only the form.

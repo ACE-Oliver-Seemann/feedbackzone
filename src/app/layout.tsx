@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
-import { MOTION_INIT_SCRIPT } from "@/lib/motion-script";
+import { MotionInitScript } from "@/components/motion-init-script";
 import { t } from "@/lib/texts.sk";
 import "./globals.css";
 
@@ -12,7 +12,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: t.app.name,
+  // Pages export their own title; the template appends the app name (FE-009).
+  title: { template: `%s · ${t.app.name}`, default: t.app.name },
   description: t.app.testDataNotice,
 };
 
@@ -28,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // src/lib/motion.ts), hence suppressHydrationWarning on <html>.
     <html lang="sk" className={`h-full ${outfit.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: MOTION_INIT_SCRIPT }} />
+        <MotionInitScript />
       </head>
       <body className="min-h-full font-sans antialiased">{children}</body>
     </html>

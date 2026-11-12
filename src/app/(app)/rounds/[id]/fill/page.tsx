@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ActionList } from "@/components/action-list";
 import { FillBackLink, FillNotice, FillWizard } from "@/components/fill-wizard";
 import { Page } from "@/components/ui/page";
@@ -6,6 +7,8 @@ import { pageData, requirePageUser } from "@/lib/page-auth";
 import { t } from "@/lib/texts.sk";
 import { listLatestClosedRoundActions } from "@/server/actions";
 import { getRoundForFill } from "@/server/responses";
+
+export const metadata: Metadata = { title: t.meta.fill };
 
 // Screen "Vypĺňanie kola" for employee and manager (MVP-07 to MVP-09).
 export default async function FillPage({ params }: PageProps<"/rounds/[id]/fill">) {

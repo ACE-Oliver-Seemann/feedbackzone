@@ -5,8 +5,8 @@ import { authenticate } from "@/server/auth";
 
 // POST /api/login — the only endpoint available without a session (MVP-01).
 export const POST = route(async (request) => {
-  const user = await authenticate(await readJsonObject(request));
+  const { sessionVersion, ...user } = await authenticate(await readJsonObject(request));
   const response = NextResponse.json({ user, home: homePathFor(user.role) });
-  setSessionCookie(response, user.id);
+  setSessionCookie(response, user.id, sessionVersion);
   return response;
 });

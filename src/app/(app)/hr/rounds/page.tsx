@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ManagedRoundList } from "@/components/round-list";
 import { ButtonLink } from "@/components/ui/button";
 import { IconPlus } from "@/components/ui/icons";
@@ -6,6 +7,8 @@ import { pageData, requirePageUser } from "@/lib/page-auth";
 import { FORWARD } from "@/lib/page-motion";
 import { t } from "@/lib/texts.sk";
 import { listRounds } from "@/server/rounds";
+
+export const metadata: Metadata = { title: t.rounds.allRoundsTitle };
 
 // Screen "Prehľad kôl" for HR (MVP-12, MVP-15).
 export default async function HrRoundsPage() {
@@ -47,7 +50,7 @@ export default async function HrRoundsPage() {
         </dl>
       )}
 
-      <ManagedRoundList rounds={rounds} showTeam />
+      <ManagedRoundList rounds={rounds} showTeam headingLevel={2} />
     </Page>
   );
 }

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { ManagedRoundList, MySurveyList } from "@/components/round-list";
 import { ButtonLink } from "@/components/ui/button";
@@ -8,6 +9,8 @@ import { pageData, requirePageUser } from "@/lib/page-auth";
 import { FORWARD } from "@/lib/page-motion";
 import { t } from "@/lib/texts.sk";
 import { listRounds } from "@/server/rounds";
+
+export const metadata: Metadata = { title: t.rounds.mySurveysTitle };
 
 // Screen "Moje prieskumy" for employee and manager (MVP-06).
 // The manager also sees all rounds of their team here (MVP-05, MVP-15).

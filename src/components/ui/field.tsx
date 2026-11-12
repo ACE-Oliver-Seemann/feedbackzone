@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { cloneElement, isValidElement, useId, type ComponentProps, type ReactElement } from "react";
 import { cx } from "./cx";
 import { IconChevronDown } from "./icons";
 
@@ -14,7 +14,9 @@ export const controlClass = cx(
 
 /**
  * Label + control + hint + error. The control is passed as children, so the
- * <label> wraps it and no id wiring is needed.
+ * <label> wraps it and gives it its name. Hint and error are linked to the
+ * control with aria-describedby, and an error also sets aria-invalid unless
+ * the control sets it itself (FE-007).
  */
 export function Field({
   label,
@@ -32,28 +34,42 @@ export function Field({
   className?: string;
   children: React.ReactNode;
 }) {
+  const id = useId();
+  const hintId = hint ? `${id}-hint` : undefined;
+  const errorId = error ? `${id}-error` : undefined;
+
+  let control = children;
+  if (isValidElement(children)) {
+    const props = (children as ReactElement<Record<string, unknown>>).props;
+    const describedBy = [props["aria-describedby"], hintId, errorId].filter(Boolean).join(" ");
+    control = cloneElement(children as ReactElement<Record<string, unknown>>, {
+      "aria-describedby": describedBy || undefined,
+      "aria-invalid": props["aria-invalid"] ?? (error ? true : undefined),
+    });
+  }
+
   // Only the label text and the control sit inside <label>, so hint, counter
   // and error do not become part of the control's accessible name.
   return (
     <div className={cx("block", className)}>
       <label className="block">
         <span className="mb-1.5 block text-sm font-medium text-ink">{label}</span>
-        {children}
+        {control}
       </label>
       {(hint || aside) && (
         <span className="mt-1.5 flex justify-between gap-3 text-xs text-muted">
-          <span>{hint}</span>
+          <span id={hintId}>{hint}</span>
           {aside && <span className="tabular-nums">{aside}</span>}
         </span>
       )}
-      {error && <FieldError>{error}</FieldError>}
+      {error && <FieldError id={errorId}>{error}</FieldError>}
     </div>
   );
 }
 
-export function FieldError({ children }: { children: React.ReactNode }) {
+export function FieldError({ id, children }: { id?: string; children: React.ReactNode }) {
   return (
-    <span role="alert" className="mt-1.5 block animate-rise text-sm text-red-700">
+    <span id={id} role="alert" className="mt-1.5 block animate-rise text-sm text-red-700">
       {children}
     </span>
   );

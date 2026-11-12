@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { assertCanFillRound, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
+import { charCount, visibleLength } from "@/lib/text-length";
 import type { SessionUser } from "@/lib/session";
 import { closeExpiredRounds, type RoundStatus } from "@/server/rounds";
 
@@ -94,8 +95,9 @@ export async function submitResponse(
   let comment: string | null = null;
   if (input.comment !== undefined && input.comment !== null) {
     if (typeof input.comment !== "string") fields.comment = "invalid";
-    else if (input.comment.trim().length > MAX_COMMENT_LENGTH) fields.comment = "too_long";
-    else comment = input.comment.trim() || null;
+    else if (charCount(input.comment.trim()) > MAX_COMMENT_LENGTH) fields.comment = "too_long";
+    // A comment of only invisible characters counts as no comment.
+    else comment = visibleLength(input.comment) > 0 ? input.comment.trim() : null;
   }
 
   if (Object.keys(fields).length > 0) throw validationError(fields);

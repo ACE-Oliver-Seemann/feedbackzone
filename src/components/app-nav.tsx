@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useLayoutEffect, useRef } from "react";
 import { cx } from "@/components/ui/cx";
@@ -20,6 +20,25 @@ function directionFor(target: number, active: number): string[] | undefined {
   if (active < 0 || target > active) return FORWARD;
   if (target < active) return BACK;
   return undefined;
+}
+
+/**
+ * Pending hint on the clicked nav link while a slow navigation loads (FE-008).
+ * Always rendered with a fixed size, only the opacity changes (no layout
+ * shift); the short delay keeps it from flashing on fast navigations. It is an
+ * opacity pulse, so it stays acceptable under reduced motion.
+ */
+function NavPendingHint() {
+  const { pending } = useLinkStatus();
+  return (
+    <span
+      aria-hidden="true"
+      className={cx(
+        "pointer-events-none absolute inset-x-3 bottom-1 h-0.5 rounded-full bg-brand-600 transition-opacity duration-150",
+        pending ? "animate-pulse opacity-100 delay-150" : "opacity-0",
+      )}
+    />
+  );
 }
 
 /**
@@ -117,6 +136,7 @@ export function AppNav({ items }: { items: NavItem[] }) {
                   )}
                 >
                   {item.label}
+                  <NavPendingHint />
                 </Link>
               </li>
             );

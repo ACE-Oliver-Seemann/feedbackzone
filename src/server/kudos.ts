@@ -8,6 +8,7 @@ import {
 } from "@/config/kudos";
 import { db } from "@/lib/db";
 import { validationError } from "@/lib/errors";
+import { charCount, visibleLength } from "@/lib/text-length";
 import type { SessionUser } from "@/lib/session";
 
 // Kudos are signed: the sender is always stored and shown (MVP-16).
@@ -67,8 +68,8 @@ export async function sendKudos(
   else if (toUserId === user.id) fields.toUserId = "self";
 
   const text = typeof input.text === "string" ? input.text.trim() : "";
-  if (text.length < KUDOS_MIN_LENGTH) fields.text = "too_short";
-  else if (text.length > KUDOS_MAX_LENGTH) fields.text = "too_long";
+  if (visibleLength(text) < KUDOS_MIN_LENGTH) fields.text = "too_short";
+  else if (charCount(text) > KUDOS_MAX_LENGTH) fields.text = "too_long";
 
   if (!includes(KUDOS_VALUES, input.value)) fields.value = "invalid";
   if (!includes(KUDOS_VISIBILITIES, input.visibility)) fields.visibility = "invalid";

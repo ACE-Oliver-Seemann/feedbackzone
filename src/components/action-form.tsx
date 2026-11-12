@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/toast";
 import { t } from "@/lib/texts.sk";
 
 const STATUSES = ["PLANNED", "IN_PROGRESS", "DONE"] as const;
+type FieldName = keyof typeof t.actions.fieldErrors;
 
 // Form "Pridať krok" on the results screen (MVP-13).
 export function ActionForm({ roundId }: { roundId: string }) {
@@ -18,6 +19,7 @@ export function ActionForm({ roundId }: { roundId: string }) {
   const toast = useToast();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, true>>>({});
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -25,6 +27,7 @@ export function ActionForm({ roundId }: { roundId: string }) {
     const form = new FormData(formElement);
     setPending(true);
     setError(null);
+    setFieldErrors({});
     try {
       const response = await fetch(`/api/rounds/${roundId}/actions`, {
         method: "POST",
@@ -41,8 +44,19 @@ export function ActionForm({ roundId }: { roundId: string }) {
         router.refresh();
         // The new step appears in the list above; the toast confirms it.
         toast.success(t.toasts.actionAdded);
+      } else if (response.status === 400) {
+        // The API names the invalid fields (FE-005); without them, the summary message.
+        const body = await response.json().catch(() => ({}));
+        const invalid = Object.keys(body?.fields ?? {}).filter(
+          (field): field is FieldName => field in t.actions.fieldErrors,
+        );
+        if (invalid.length > 0) {
+          setFieldErrors(Object.fromEntries(invalid.map((field) => [field, true])));
+        } else {
+          setError(t.actions.invalid);
+        }
       } else {
-        setError(response.status === 400 ? t.actions.invalid : t.errors.generic);
+        setError(t.errors.generic);
       }
     } catch {
       setError(t.errors.generic);
@@ -50,23 +64,25 @@ export function ActionForm({ roundId }: { roundId: string }) {
     setPending(false);
   }
 
+  const errorText = (field: FieldName) => fieldErrors[field] && t.actions.fieldErrors[field];
+
   return (
     <Panel className="mt-4 p-5 sm:p-6">
       <form onSubmit={onSubmit} noValidate aria-labelledby="action-form-title" className="space-y-5">
         <h3 id="action-form-title" className="text-base font-semibold tracking-[-0.01em] text-ink">
           {t.actions.addTitle}
         </h3>
-        <Field label={t.actions.topic}>
+        <Field label={t.actions.topic} error={errorText("topic")}>
           <Input name="topic" type="text" maxLength={120} placeholder={t.actions.topicPlaceholder} />
         </Field>
-        <Field label={t.actions.description}>
+        <Field label={t.actions.description} error={errorText("description")}>
           <Textarea name="description" rows={3} maxLength={1000} />
         </Field>
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label={t.actions.dueDate}>
+          <Field label={t.actions.dueDate} error={errorText("dueDate")}>
             <Input name="dueDate" type="date" />
           </Field>
-          <Field label={t.actions.status}>
+          <Field label={t.actions.status} error={errorText("status")}>
             <Select name="status" defaultValue="PLANNED">
               {STATUSES.map((status) => (
                 <option key={status} value={status}>
