@@ -126,6 +126,8 @@ async function main() {
 
   // Children first, because of foreign keys. User.teamId and Team.managerId
   // reference each other, so the link from users is cut before deleting.
+  await db.issue.deleteMany();
+  await db.meetingNote.deleteMany();
   await db.kudos.deleteMany();
   await db.action.deleteMany();
   await db.response.deleteMany();
@@ -232,6 +234,41 @@ async function main() {
       }),
     ]);
   }
+
+  // Demo for IT-10: one note from a meeting and two issues. Invented content.
+  const hr = await db.user.findFirstOrThrow({ where: { role: "HR" } });
+  const note = await db.meetingNote.create({
+    data: {
+      title: "Stretnutie s Tímom Beta",
+      meetingDate: new Date(Date.now() - 2 * day),
+      text: "V zasadačke na 3. poschodí je už druhý týždeň teplo, klimatizácia nechladí.\nTím by privítal menej prekrývajúcich sa porád v utorok.",
+      createdById: hr.id,
+    },
+  });
+  await db.issue.create({
+    data: {
+      title: "Nefunguje klimatizácia v zasadačke na 3. poschodí",
+      description: "Podľa tímu nechladí už druhý týždeň.",
+      source: "MEETING",
+      ownerGroup: "FACILITY",
+      teamId: beta.id,
+      noteId: note.id,
+      dueDate: new Date(Date.now() + 7 * day),
+      createdById: hr.id,
+    },
+  });
+  await db.issue.create({
+    data: {
+      title: "Príliš veľa porád v jednom dni",
+      description: "Téma z posledného kola aj zo stretnutia.",
+      source: "SURVEY",
+      ownerGroup: "TEAM_MANAGER",
+      status: "IN_PROGRESS",
+      roundId: round.id,
+      teamId: beta.id,
+      createdById: hr.id,
+    },
+  });
 
   const counts = {
     users: await db.user.count(),

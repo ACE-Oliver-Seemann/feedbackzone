@@ -3,6 +3,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { PATCH as patchAction } from "@/app/api/actions/[id]/route";
 import { GET as getMyKudos } from "@/app/api/kudos/me/route";
 import { POST as postKudos } from "@/app/api/kudos/route";
+import { PATCH as patchIssue } from "@/app/api/hr/issues/[id]/route";
+import { GET as getIssues, POST as postIssue } from "@/app/api/hr/issues/route";
+import { GET as getNotes, POST as postNote } from "@/app/api/hr/notes/route";
 import { GET as getHrOverview } from "@/app/api/hr/overview/route";
 import { POST as logout } from "@/app/api/logout/route";
 import { GET as getMe } from "@/app/api/me/route";
@@ -212,6 +215,48 @@ const CASES: Case[] = [
     name: "GET /api/hr/overview",
     call: (as) => invoke(getHrOverview, "/api/hr/overview", as),
     expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/hr/issues",
+    call: (as) => invoke(getIssues, "/api/hr/issues", as),
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "POST /api/hr/issues",
+    call: (as) =>
+      invoke(postIssue, "/api/hr/issues", as, {
+        method: "POST",
+        body: { title: "Testovací podnet", source: "OTHER", ownerGroup: "FACILITY" },
+      }),
+    expected: status([401, 403, 403, 403, 403, 201]),
+  },
+  {
+    name: "PATCH /api/hr/issues/:id",
+    call: async (as) => {
+      const issue = await db.issue.create({
+        data: { title: "Podnet", source: "OTHER", ownerGroup: "OTHER", createdById: fx.hr.id },
+      });
+      return invoke(patchIssue, `/api/hr/issues/${issue.id}`, as, {
+        method: "PATCH",
+        id: issue.id,
+        body: { status: "DONE" },
+      });
+    },
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/hr/notes",
+    call: (as) => invoke(getNotes, "/api/hr/notes", as),
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "POST /api/hr/notes",
+    call: (as) =>
+      invoke(postNote, "/api/hr/notes", as, {
+        method: "POST",
+        body: { title: "Stretnutie", meetingDate: dateInDays(-1), text: "Testovacia poznámka." },
+      }),
+    expected: status([401, 403, 403, 403, 403, 201]),
   },
   {
     name: "GET /api/kudos/me",

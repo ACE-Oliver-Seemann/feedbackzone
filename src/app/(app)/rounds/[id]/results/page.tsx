@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ActionForm, SuggestionText } from "@/components/action-form";
 import { ActionList } from "@/components/action-list";
 import { Badge, StatusBadge } from "@/components/round-list";
@@ -42,6 +43,15 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
       <p className="mt-1 text-sm text-slate-600">
         {round.teamName} · {t.rounds.deadline(formatDate(round.closesAt))}
       </p>
+
+      {user.role === "HR" && isClosed && (
+        <Link
+          href={`/hr/issues?round=${round.id}#new`}
+          className="mt-3 inline-block rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+        >
+          {t.issues.createFromRound}
+        </Link>
+      )}
 
       {round.status !== "DRAFT" && (
         <p className="mt-4 rounded-lg border border-slate-200 bg-white p-4 font-medium">
