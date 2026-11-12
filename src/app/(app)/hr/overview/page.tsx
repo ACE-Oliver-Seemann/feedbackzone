@@ -9,6 +9,8 @@ import {
 } from "@/server/hr-overview";
 
 // Screen "Plnenie reakcie" for HR (IT-05).
+export const metadata = { title: t.hrOverview.title };
+
 export default async function HrOverviewPage() {
   const user = await requirePageUser("HR");
   const overview = await pageData(() => getReactionOverview(user));

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 // Mirror src/config/kudos.ts; the server validates again.
 const VALUES = ["COLLABORATION", "QUALITY", "HELPING", "INNOVATION", "CUSTOMER"] as const;
@@ -53,7 +53,7 @@ export function KudosForm({ recipients }: { recipients: Recipient[] }) {
           Object.fromEntries(Object.keys(fields ?? {}).map((field) => [field, true])),
         );
       } else {
-        setError(t.errors.generic);
+        setError(errorForStatus(response.status));
       }
     } catch {
       setError(t.errors.generic);
@@ -62,14 +62,14 @@ export function KudosForm({ recipients }: { recipients: Recipient[] }) {
   }
 
   const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
+    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
   const fieldError = (field: FieldName) =>
     fieldErrors[field] && (
       <span role="alert" className="mt-1 block text-sm font-normal text-red-700">
         {t.kudos.fieldErrors[field]}
       </span>
     );
-  const length = text.trim().length;
+  const length = [...text.trim()].length;
 
   return (
     <form onSubmit={onSubmit} noValidate className="mt-6 space-y-5">
@@ -183,7 +183,7 @@ export function KudosForm({ recipients }: { recipients: Recipient[] }) {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
+        className="w-full rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
       >
         {pending ? t.kudos.submitting : t.kudos.submit}
       </button>

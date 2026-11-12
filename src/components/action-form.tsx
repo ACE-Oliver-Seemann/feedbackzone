@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 const STATUSES = ["PLANNED", "IN_PROGRESS", "DONE"] as const;
 
@@ -62,7 +62,7 @@ export function ActionForm({
         setDescription("");
         router.refresh();
       } else {
-        setError(response.status === 400 ? t.actions.invalid : t.errors.generic);
+        setError(response.status === 400 ? t.actions.invalid : errorForStatus(response.status));
       }
     } catch {
       setError(t.errors.generic);
@@ -71,7 +71,7 @@ export function ActionForm({
   }
 
   const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
+    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
 
   return (
     <>
@@ -86,7 +86,7 @@ export function ActionForm({
               <button
                 type="button"
                 onClick={() => applySuggestion(suggestion)}
-                className="mt-3 rounded-md border border-teal-700 bg-white px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+                className="mt-3 rounded-md border border-teal-700 bg-white px-3 py-3 text-sm font-medium text-teal-800 hover:bg-teal-50"
               >
                 {t.suggestions.use}
               </button>
@@ -149,7 +149,7 @@ export function ActionForm({
         <button
           type="submit"
           disabled={pending}
-          className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
+          className="w-full rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
         >
           {pending ? t.actions.submitting : t.actions.submit}
         </button>

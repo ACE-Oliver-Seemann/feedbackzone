@@ -86,6 +86,16 @@ Testovacie účty sú v `prisma/seed.ts` (doména `example.test`, spoločné hes
 - `src/lib/texts.sk.ts` – všetky texty UI (NFR-07, NFR-04).
 - `tests/` – testy volajú priamo handlery endpointov; `tests/helpers.ts` má fixtures.
 
+### Testovanie podľa TESTING_RULES.md
+- Pravidlá sú v `TESTING_RULES.md`. Správy z relácií sú v `testing/reports/<dátum>_<poradie>/`, skripty v `testing/scripts/`.
+- Agenti testujú proti produkčnému zostaveniu (`next start`) na vlastných portoch a vlastných databázach
+  `prisma/qa-*.db` (`DATABASE_URL="file:./qa-x.db"`), nikdy proti `prisma/dev.db`.
+- Na Windows treba pred `prisma generate` alebo migráciou zastaviť všetky bežiace servery (zamknutý súbor enginu).
+- Regresné testy opravených chýb sú v `tests/qa-fixes.test.ts`; ID chýb sú v `BUG_REGISTER.md` danej relácie.
+- Odhlásenie ukončí všetky relácie používateľa na serveri (`User.sessionsValidAfter`). Test, ktorý sa odhlási,
+  sa musí znova prihlásiť.
+- Text od používateľa prechádza cez `cleanText` a dĺžka sa počíta cez `charLength` (`src/lib/text.ts`).
+
 ### Pozor pri zmene schémy (NFR-01)
 `prisma/migrations/*_init/migration.sql` je ručne upravená: tabuľky `Response` a `Participation` sú `WITHOUT ROWID`
 (inak by skrytý `rowid` prezradil poradie vkladania a odpovede by sa dali spárovať s účasťou) a `Response` má `CHECK`

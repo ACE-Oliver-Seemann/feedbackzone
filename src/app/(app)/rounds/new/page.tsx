@@ -13,6 +13,8 @@ function isoWeek(date: Date): number {
 }
 
 // Screen "Nové kolo" for manager and HR (MVP-04).
+export const metadata = { title: t.newRound.title };
+
 export default async function NewRoundPage() {
   const user = await requirePageUser("MANAGER", "HR");
   const [questions, teams] = await pageData(() =>

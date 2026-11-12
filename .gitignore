@@ -43,3 +43,7 @@ next-env.d.ts
 # local databases
 /prisma/*.db
 /prisma/*.db-journal
+
+# QA evidence: screenshots and PDFs are large; logs, JSON and reports are kept
+/testing/reports/**/*.png
+/testing/reports/**/*.pdf

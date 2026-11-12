@@ -4,7 +4,6 @@ import { db } from "@/lib/db";
 import { assertCanViewResults, requireRole } from "@/lib/authz";
 import { forbidden, notFound } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
-import { computeQuestionResults } from "@/server/results";
 import { closeExpiredRounds } from "@/server/rounds";
 
 // IT-08: results over time and across teams. Everything here is built from
@@ -51,26 +50,28 @@ type RoundRow = {
 const closedTime = (round: RoundRow) => round.closedAt ?? round.closesAt;
 
 /**
- * Scores of one round, or null below the threshold. A score is 1–5 where
- * higher is always better: averages on reversed scales are flipped (6 − x).
+ * Unrounded scores of one round, or null below the threshold. A score is 1–5
+ * where higher is always better: averages on reversed scales are flipped (6 − x).
  */
 function scoreRound(round: RoundRow): { fixed: number | null; topics: Map<string, number> } | null {
   if (round.responses.length < MIN_GROUP_SIZE) return null;
-  const results = computeQuestionResults(round.questions, round.responses);
 
   const fixedScores: number[] = [];
   const byTopic = new Map<string, number[]>();
-  round.questions.forEach((item, index) => {
-    const average = results[index].average;
+  round.questions.forEach((item) => {
+    // Exact mean of the answers; rounding happens once, when a number is shown (QA E2E-009).
+    const key = `v${item.position}` as "v1" | "v2" | "v3" | "v4" | "v5";
+    const values = round.responses.map((response) => response[key]).filter((v) => v !== null);
+    if (values.length === 0) return;
+    const average = values.reduce((total, value) => total + value, 0) / values.length;
     const score = SCALES[toScaleKey(item.question.scale)].higherIsBetter ? average : 6 - average;
     if (item.question.fixed) fixedScores.push(score);
     else byTopic.set(item.question.topic, [...(byTopic.get(item.question.topic) ?? []), score]);
   });
 
-  const fixed = mean(fixedScores);
   return {
-    fixed: fixed === null ? null : round2(fixed),
-    topics: new Map([...byTopic].map(([topic, scores]) => [topic, round2(mean(scores)!)])),
+    fixed: mean(fixedScores),
+    topics: new Map([...byTopic].map(([topic, scores]) => [topic, mean(scores)!])),
   };
 }
 
@@ -119,7 +120,12 @@ export async function getTeamTrend(user: SessionUser, teamId: string): Promise<T
     const scores = scoreRound(round);
     if (!scores) return { ...base, status: "insufficient_responses" };
     for (const topic of scores.topics.keys()) topics.add(topic);
-    return { ...base, status: "ok", fixed: scores.fixed, topics: Object.fromEntries(scores.topics) };
+    return {
+      ...base,
+      status: "ok",
+      fixed: scores.fixed === null ? null : round2(scores.fixed),
+      topics: Object.fromEntries([...scores.topics].map(([topic, score]) => [topic, round2(score)])),
+    };
   });
 
   return { team, topics: [...topics].sort((a, b) => a.localeCompare(b, "sk")), points };

@@ -7,6 +7,8 @@ import { listRounds } from "@/server/rounds";
 
 // Screen "Prieskumy" for a manager: all rounds of their team (MVP-05, MVP-15).
 // Moved here from the home page, which now shows what needs doing (IT-11, IT-12).
+export const metadata = { title: t.nav.rounds };
+
 export default async function TeamRoundsPage() {
   const user = await requirePageUser("MANAGER", "HR");
   if (user.role === "HR") redirect("/hr/rounds");
@@ -18,7 +20,7 @@ export default async function TeamRoundsPage() {
         <h1 className="text-xl font-semibold">{t.rounds.teamRoundsTitle}</h1>
         <Link
           href="/rounds/new"
-          className="rounded-md bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800"
+          className="rounded-md bg-teal-700 px-3 py-3 text-sm font-medium text-white hover:bg-teal-800"
         >
           {t.rounds.createFirst}
         </Link>

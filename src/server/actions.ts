@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { assertCanViewTeam, assertCanWriteActions, requireRole } from "@/lib/authz";
 import { conflict, forbidden, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
+import { charLength, cleanText } from "@/lib/text";
 import { closeExpiredRounds } from "@/server/rounds";
 import { loadRoundForResults } from "@/server/results";
 
@@ -68,13 +69,13 @@ export async function createAction(
 
   const fields: Record<string, string> = {};
 
-  const topic = typeof input.topic === "string" ? input.topic.trim() : "";
+  const topic = cleanText(input.topic);
   if (!topic) fields.topic = "required";
-  else if (topic.length > MAX_TOPIC_LENGTH) fields.topic = "too_long";
+  else if (charLength(topic) > MAX_TOPIC_LENGTH) fields.topic = "too_long";
 
-  const description = typeof input.description === "string" ? input.description.trim() : "";
+  const description = cleanText(input.description);
   if (!description) fields.description = "required";
-  else if (description.length > MAX_DESCRIPTION_LENGTH) fields.description = "too_long";
+  else if (charLength(description) > MAX_DESCRIPTION_LENGTH) fields.description = "too_long";
 
   const dueDate = parseLocalDate(input.dueDate);
   if (!dueDate) fields.dueDate = "invalid";
@@ -136,14 +137,22 @@ export async function listLatestClosedRoundActions(
 ): Promise<{ roundName: string; actions: ActionItem[] } | null> {
   assertCanViewTeam(user, teamId);
   await closeExpiredRounds();
-  const round = await db.round.findFirst({
+  const rounds = await db.round.findMany({
     where: { teamId, status: "CLOSED" },
-    orderBy: [{ closesAt: "desc" }, { id: "asc" }],
     select: {
+      id: true,
       name: true,
+      closesAt: true,
+      closedAt: true,
       actions: { orderBy: [{ dueDate: "asc" }, { id: "asc" }], select: ACTION_SELECT },
     },
   });
+  // The round closed last, not the one with the latest deadline (QA E2E-002).
+  const closedTime = (item: { closedAt: Date | null; closesAt: Date }) =>
+    (item.closedAt ?? item.closesAt).getTime();
+  const round = rounds.sort(
+    (a, b) => closedTime(b) - closedTime(a) || a.id.localeCompare(b.id),
+  )[0];
   if (!round) return null;
   return { roundName: round.name, actions: round.actions.map(toItem) };
 }

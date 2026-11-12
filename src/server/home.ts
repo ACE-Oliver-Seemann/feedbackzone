@@ -100,7 +100,13 @@ async function managerTasks(user: SessionUser, now: number): Promise<HomeTask[]>
   tasks.push(...(await surveysToFill(user)));
 
   // 4. Nothing running and nothing prepared for a while.
-  const active = await db.round.count({ where: { teamId, status: { in: ["OPEN", "DRAFT"] } } });
+  // A draft past its deadline can no longer be opened, so it does not count (QA BE-010).
+  const active = await db.round.count({
+    where: {
+      teamId,
+      OR: [{ status: "OPEN" }, { status: "DRAFT", closesAt: { gte: new Date(now) } }],
+    },
+  });
   if (active === 0) {
     const closed = await db.round.findMany({
       where: { teamId, status: "CLOSED" },

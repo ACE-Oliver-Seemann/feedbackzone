@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 // Form "Nová poznámka zo stretnutia" for HR (IT-10). Typed text only.
 export function NoteForm() {
@@ -30,7 +30,7 @@ export function NoteForm() {
         formElement.reset();
         router.refresh();
       } else {
-        setError(response.status === 400 ? t.notes.invalid : t.errors.generic);
+        setError(response.status === 400 ? t.notes.invalid : errorForStatus(response.status));
       }
     } catch {
       setError(t.errors.generic);
@@ -39,7 +39,7 @@ export function NoteForm() {
   }
 
   const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
+    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
 
   return (
     <form
@@ -76,7 +76,7 @@ export function NoteForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
+        className="w-full rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
       >
         {pending ? t.notes.submitting : t.notes.submit}
       </button>

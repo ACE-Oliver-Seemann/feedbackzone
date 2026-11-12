@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 const OWNER_GROUPS = ["FACILITY", "IT_SUPPORT", "HR", "MANAGEMENT", "TEAM_MANAGER", "OTHER"] as const;
 const STATUSES = ["OPEN", "IN_PROGRESS", "DONE"] as const;
@@ -22,30 +22,30 @@ export function IssueControls({
   const router = useRouter();
   const [current, setCurrent] = useState({ status, ownerGroup });
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function change(patch: { status?: Status; ownerGroup?: OwnerGroup }) {
     const previous = current;
     setCurrent({ ...current, ...patch });
     setPending(true);
-    setError(false);
+    setError(null);
     try {
       const response = await fetch(`/api/hr/issues/${issueId}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(patch),
       });
-      if (!response.ok) throw new Error("failed");
+      if (!response.ok) throw new Error(String(response.status));
       router.refresh();
-    } catch {
+    } catch (caught) {
       setCurrent(previous);
-      setError(true);
+      setError(errorForStatus(caught instanceof Error ? Number(caught.message) : 0));
     }
     setPending(false);
   }
 
   const selectClass =
-    "rounded-md border border-slate-300 bg-white px-2 py-1 text-sm disabled:opacity-60";
+    "rounded-md border border-slate-300 bg-white px-2 py-3 text-sm disabled:opacity-60";
 
   return (
     <span className="flex flex-wrap items-center gap-2">
@@ -77,7 +77,7 @@ export function IssueControls({
       </select>
       {error && (
         <span role="alert" className="text-xs text-red-700">
-          {t.errors.generic}
+          {error}
         </span>
       )}
     </span>

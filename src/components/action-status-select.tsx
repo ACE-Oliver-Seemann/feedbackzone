@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 // Mirrors ACTION_STATUSES in src/server/actions.ts; the server validates.
 const STATUSES = ["PLANNED", "IN_PROGRESS", "DONE"] as const;
@@ -12,24 +12,24 @@ export function ActionStatusSelect({ actionId, status }: { actionId: string; sta
   const router = useRouter();
   const [value, setValue] = useState<Status>(status);
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function change(next: Status) {
     const previous = value;
     setValue(next);
     setPending(true);
-    setError(false);
+    setError(null);
     try {
       const response = await fetch(`/api/actions/${actionId}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ status: next }),
       });
-      if (!response.ok) throw new Error("failed");
+      if (!response.ok) throw new Error(String(response.status));
       router.refresh();
-    } catch {
+    } catch (caught) {
       setValue(previous);
-      setError(true);
+      setError(errorForStatus(caught instanceof Error ? Number(caught.message) : 0));
     }
     setPending(false);
   }
@@ -41,7 +41,7 @@ export function ActionStatusSelect({ actionId, status }: { actionId: string; sta
         value={value}
         disabled={pending}
         onChange={(event) => change(event.target.value as Status)}
-        className="rounded-md border border-slate-300 bg-white px-2 py-1 text-sm disabled:opacity-60"
+        className="rounded-md border border-slate-300 bg-white px-2 py-3 text-sm disabled:opacity-60"
       >
         {STATUSES.map((item) => (
           <option key={item} value={item}>
@@ -51,7 +51,7 @@ export function ActionStatusSelect({ actionId, status }: { actionId: string; sta
       </select>
       {error && (
         <span role="alert" className="text-xs text-red-700">
-          {t.errors.generic}
+          {error}
         </span>
       )}
     </span>

@@ -6,18 +6,26 @@ import { SubNav } from "@/components/sub-nav";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listManageableTeams } from "@/server/catalog";
-import { ACTIVE_FILTER, getIssuePrefill, listIssues } from "@/server/hr-issues";
+import { ACTIVE_FILTER, ALL_FILTER, getIssuePrefill, listIssues } from "@/server/hr-issues";
 
 const first = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
 // Screen "Podnety" for HR (IT-10): list with filters and the form for a new issue.
+export const metadata = { title: t.issues.pageTitle };
+
 export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issues">) {
   const user = await requirePageUser("HR");
   const query = await searchParams;
-  const group = first(query.group) ?? "";
+  // A hand-typed filter that does not exist falls back to the default view.
+  const requestedGroup = first(query.group) ?? "";
+  const group = (OWNER_GROUPS as readonly string[]).includes(requestedGroup) ? requestedGroup : "";
   // IT-13: show what is still to be done; finished issues are one click away.
-  const status = first(query.status) ?? ACTIVE_FILTER;
+  const requestedStatus = first(query.status) ?? ACTIVE_FILTER;
+  const status =
+    requestedStatus === ALL_FILTER || (ISSUE_STATUSES as readonly string[]).includes(requestedStatus)
+      ? requestedStatus
+      : ACTIVE_FILTER;
 
   const [issues, teams, prefill] = await pageData(() =>
     Promise.all([
@@ -27,7 +35,7 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
     ]),
   );
 
-  const selectClass = "rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm";
+  const selectClass = "rounded-md border border-slate-300 bg-white px-2 py-3 text-sm";
 
   return (
     <section className="max-w-3xl">
@@ -59,7 +67,7 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
           {t.issues.status}
           <select name="status" defaultValue={status} className={`${selectClass} mt-1 block`}>
             <option value={ACTIVE_FILTER}>{t.issues.filterActive}</option>
-            <option value="ALL">{t.issues.filterAll}</option>
+            <option value={ALL_FILTER}>{t.issues.filterAll}</option>
             {ISSUE_STATUSES.map((item) => (
               <option key={item} value={item}>
                 {t.issueStatuses[item]}
@@ -69,7 +77,7 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
         </label>
         <button
           type="submit"
-          className="rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+          className="rounded-md border border-teal-700 px-3 py-3 text-sm font-medium text-teal-800 hover:bg-teal-50"
         >
           {t.issues.filter}
         </button>
@@ -129,7 +137,7 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
 
       {/* Open straight away when HR came here to raise an issue from a round or a note. */}
       <details className="mt-8" open={Boolean(prefill.round || prefill.note) || undefined}>
-        <summary className="inline-block cursor-pointer rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800">
+        <summary className="inline-block cursor-pointer rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800">
           {t.issues.submit}
         </summary>
         <h2 className="mt-4 text-lg font-semibold">{t.issues.newTitle}</h2>

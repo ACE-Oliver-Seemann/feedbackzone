@@ -70,7 +70,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
               y={y(tick)}
               textAnchor="end"
               dominantBaseline="middle"
-              className="fill-slate-500 text-[12px]"
+              className="fill-slate-500 text-[14px]"
             >
               {tick}
             </text>
@@ -121,7 +121,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
               x={x(index)}
               y={HEIGHT - PAD.bottom + 18}
               textAnchor={index === 0 && points.length > 1 ? "start" : index === points.length - 1 && points.length > 1 ? "end" : "middle"}
-              className="fill-slate-500 text-[12px]"
+              className="fill-slate-500 text-[14px]"
             >
               {formatDate(point.date)}
             </text>
@@ -134,7 +134,7 @@ export function TrendChart({ points, title }: { points: TrendChartPoint[]; title
             x={x(lastMeasured.index)}
             y={y(lastMeasured.value) - 12}
             textAnchor={lastMeasured.index === points.length - 1 && points.length > 1 ? "end" : "middle"}
-            className="fill-slate-900 text-[14px] font-semibold"
+            className="fill-slate-900 text-[15px] font-semibold"
           >
             {number(lastMeasured.value)}
           </text>

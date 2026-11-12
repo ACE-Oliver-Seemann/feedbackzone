@@ -3,7 +3,7 @@ import { t } from "@/lib/texts.sk";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: t.app.name,
+  title: { default: t.app.name, template: `%s – ${t.app.name}` },
   description: t.app.testDataNotice,
 };
 

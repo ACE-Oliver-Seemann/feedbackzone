@@ -5,6 +5,8 @@ import { t } from "@/lib/texts.sk";
 import { listKudosRecipients } from "@/server/kudos";
 
 // Screen "Poslať kudos" for everyone (MVP-16).
+export const metadata = { title: t.kudos.newTitle };
+
 export default async function NewKudosPage() {
   const user = await requirePageUser();
   const recipients = await pageData(() => listKudosRecipients(user));

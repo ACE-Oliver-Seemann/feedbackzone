@@ -7,6 +7,8 @@ import { listRounds } from "@/server/rounds";
 
 // Home page of every role: what needs doing now (IT-11), and for team members
 // the list of their open surveys (MVP-06).
+export const metadata = { title: t.nav.home };
+
 export default async function HomePage() {
   const user = await requirePageUser();
   const [tasks, rounds] = await pageData(() =>
@@ -24,8 +26,9 @@ export default async function HomePage() {
       {user.role !== "HR" && openRounds.length > 0 && (
         <section className="mt-10">
           <h2 className="text-lg font-semibold">{t.rounds.mySurveysTitle}</h2>
-          {/* The button to fill in is in the task above; here is only the state. */}
-          <MySurveyList rounds={openRounds} showFillLink={false} />
+          {/* Keeps its own "Vyplniť" button: the tasks above are capped at three,
+              so a survey may not be among them (QA FE-001). */}
+          <MySurveyList rounds={openRounds} />
         </section>
       )}
     </>

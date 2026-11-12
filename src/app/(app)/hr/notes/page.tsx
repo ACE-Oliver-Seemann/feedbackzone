@@ -6,6 +6,8 @@ import { formatDate, t } from "@/lib/texts.sk";
 import { listNotes } from "@/server/hr-issues";
 
 // Screen "Poznámky zo stretnutí" for HR (IT-10).
+export const metadata = { title: t.notes.pageTitle };
+
 export default async function HrNotesPage() {
   const user = await requirePageUser("HR");
   const notes = await pageData(() => listNotes(user));
@@ -50,7 +52,7 @@ export default async function HrNotesPage() {
               )}
               <Link
                 href={`/hr/issues?note=${note.id}#new`}
-                className="mt-3 inline-block rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+                className="mt-3 inline-block rounded-md border border-teal-700 px-3 py-3 text-sm font-medium text-teal-800 hover:bg-teal-50"
               >
                 {t.notes.createIssue}
               </Link>

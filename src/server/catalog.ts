@@ -1,8 +1,10 @@
+import { Prisma } from "@prisma/client";
 import { toScaleKey, type ScaleKey } from "@/config/scales";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/authz";
 import { forbidden, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
+import { charLength, cleanText } from "@/lib/text";
 
 export type QuestionItem = {
   id: string;
@@ -62,9 +64,9 @@ export async function createTeamQuestion(
   requireRole(user, "MANAGER");
   if (!user.teamId) throw forbidden();
 
-  const text = typeof input.text === "string" ? input.text.trim().replace(/\s+/g, " ") : "";
-  if (text.length < CUSTOM_QUESTION_MIN_LENGTH) throw validationError({ text: "too_short" });
-  if (text.length > CUSTOM_QUESTION_MAX_LENGTH) throw validationError({ text: "too_long" });
+  const text = cleanText(input.text).replace(/\s+/g, " ");
+  if (charLength(text) < CUSTOM_QUESTION_MIN_LENGTH) throw validationError({ text: "too_short" });
+  if (charLength(text) > CUSTOM_QUESTION_MAX_LENGTH) throw validationError({ text: "too_long" });
 
   // The same wording must not exist twice for the team, nor shadow the shared library.
   const candidates = await db.question.findMany({
@@ -76,11 +78,19 @@ export async function createTeamQuestion(
     throw validationError({ text: "duplicate" });
   }
 
-  const question = await db.question.create({
-    data: { text, topic: CUSTOM_QUESTION_TOPIC, scale: "AGREEMENT", teamId: user.teamId },
-    select: QUESTION_SELECT,
-  });
-  return { ...question, scale: toScaleKey(question.scale) };
+  try {
+    const question = await db.question.create({
+      data: { text, topic: CUSTOM_QUESTION_TOPIC, scale: "AGREEMENT", teamId: user.teamId },
+      select: QUESTION_SELECT,
+    });
+    return { ...question, scale: toScaleKey(question.scale) };
+  } catch (error) {
+    // Two identical requests at the same moment: the unique index stops the second.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      throw validationError({ text: "duplicate" });
+    }
+    throw error;
+  }
 }
 
 /** Teams the user may create a round for: own team for a manager, all for HR. */

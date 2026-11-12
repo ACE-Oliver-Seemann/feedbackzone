@@ -7,6 +7,8 @@ import { listLatestClosedRoundActions } from "@/server/actions";
 import { getRoundForFill } from "@/server/responses";
 
 // Screen "Vypĺňanie kola" for employee and manager (MVP-07 to MVP-09).
+export const metadata = { title: t.fill.pageTitle };
+
 export default async function FillPage({ params }: PageProps<"/rounds/[id]/fill">) {
   const user = await requirePageUser("EMPLOYEE", "MANAGER");
   const { id } = await params;

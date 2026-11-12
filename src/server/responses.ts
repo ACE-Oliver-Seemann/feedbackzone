@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { assertCanFillRound, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
+import { charLength, cleanText } from "@/lib/text";
 import { closeExpiredRounds, type RoundStatus } from "@/server/rounds";
 
 export const MAX_COMMENT_LENGTH = 1000;
@@ -96,17 +97,26 @@ export async function submitResponse(
   let comment: string | null = null;
   if (input.comment !== undefined && input.comment !== null) {
     if (typeof input.comment !== "string") fields.comment = "invalid";
-    else if (input.comment.trim().length > MAX_COMMENT_LENGTH) fields.comment = "too_long";
-    else comment = input.comment.trim() || null;
+    else if (charLength(cleanText(input.comment)) > MAX_COMMENT_LENGTH) fields.comment = "too_long";
+    else comment = cleanText(input.comment) || null;
   }
 
   if (Object.keys(fields).length > 0) throw validationError(fields);
   const values = answers as number[];
 
   try {
-    await db.$transaction([
-      db.participation.create({ data: { roundId: round.id, userId: user.id } }),
-      db.response.create({
+    await db.$transaction(async (tx) => {
+      // A real write on the round takes the database write lock first, so the
+      // check "still open and before the deadline" and the two inserts cannot
+      // be separated by someone closing the round (QA BE-002).
+      const stillOpen = await tx.round.updateMany({
+        where: { id: round.id, status: "OPEN", closesAt: { gte: new Date() } },
+        data: { status: "OPEN" },
+      });
+      if (stillOpen.count === 0) throw conflict("round_closed");
+
+      await tx.participation.create({ data: { roundId: round.id, userId: user.id } });
+      await tx.response.create({
         data: {
           roundId: round.id,
           teamId: round.teamId,
@@ -117,8 +127,8 @@ export async function submitResponse(
           v5: values[4] ?? null,
           comment,
         },
-      }),
-    ]);
+      });
+    });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       throw conflict("already_submitted");

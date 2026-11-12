@@ -139,8 +139,10 @@ describe("HR issues [IT-10]", () => {
     expect((await list("?group=FACILITY")).map((item) => item.title)).toEqual(["Klíma"]);
     expect((await list("?status=DONE")).map((item) => item.title)).toEqual(["Pomalé notebooky"]);
     expect(await list("?group=IT_SUPPORT&status=OPEN")).toEqual([]);
-    // An unknown filter value is ignored rather than trusted.
-    expect(await list("?group=BOGUS")).toHaveLength(2);
+    // An unknown filter value is an error, not "show everything" (QA BE-009).
+    expect(
+      (await getIssues(request("/api/hr/issues?group=BOGUS", { as: fx.hr }), undefined)).status,
+    ).toBe(400);
   });
 });
 

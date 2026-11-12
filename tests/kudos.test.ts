@@ -56,7 +56,9 @@ describe("send kudos [MVP-16]", () => {
     expect((await send(fx.hr)).status).toBe(201);
     expect((await send(fx.a.manager)).status).toBe(201);
     expect((await send(fx.b.employees[0])).status).toBe(201);
-    expect((await send(fx.a.employees[0], { toUserId: fx.hr.id })).status).toBe(201);
+    expect(
+      (await send(fx.a.employees[0], { toUserId: fx.hr.id, visibility: "PRIVATE" })).status,
+    ).toBe(201);
   });
 
   it("requires a session", async () => {

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 // Mirror src/config/owner-groups.ts; the server validates again.
 const OWNER_GROUPS = ["FACILITY", "IT_SUPPORT", "HR", "MANAGEMENT", "TEAM_MANAGER", "OTHER"] as const;
@@ -50,7 +50,7 @@ export function IssueForm({ teams, prefill }: { teams: Team[]; prefill: Prefill 
         setSaved(true);
         router.refresh();
       } else {
-        setError(response.status === 400 ? t.issues.invalid : t.errors.generic);
+        setError(response.status === 400 ? t.issues.invalid : errorForStatus(response.status));
       }
     } catch {
       setError(t.errors.generic);
@@ -59,7 +59,7 @@ export function IssueForm({ teams, prefill }: { teams: Team[]; prefill: Prefill 
   }
 
   const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
+    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
 
   return (
     <form
@@ -150,7 +150,7 @@ export function IssueForm({ teams, prefill }: { teams: Team[]; prefill: Prefill 
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
+        className="w-full rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
       >
         {pending ? t.issues.submitting : t.issues.submit}
       </button>

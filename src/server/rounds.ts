@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { assertCanManageRounds, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
+import { charLength, cleanText } from "@/lib/text";
 
 export type RoundStatus = "DRAFT" | "OPEN" | "CLOSED";
 
@@ -104,9 +105,9 @@ export async function createRound(
 
   const fields: Record<string, string> = {};
 
-  const name = typeof input.name === "string" ? input.name.trim() : "";
+  const name = cleanText(input.name);
   if (!name) fields.name = "required";
-  else if (name.length > MAX_NAME_LENGTH) fields.name = "too_long";
+  else if (charLength(name) > MAX_NAME_LENGTH) fields.name = "too_long";
 
   // A manager may omit the team; it defaults to their own.
   const teamId =

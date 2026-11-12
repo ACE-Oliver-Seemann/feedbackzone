@@ -5,6 +5,8 @@ import { homePathFor } from "@/lib/session";
 import { t } from "@/lib/texts.sk";
 
 // Screen "Prihlásenie" (MVP-01).
+export const metadata = { title: t.login.title };
+
 export default async function LoginPage() {
   const user = await getPageUser();
   if (user) redirect(homePathFor(user.role));

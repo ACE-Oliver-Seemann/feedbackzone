@@ -11,7 +11,7 @@ export type NavItem = {
 };
 
 /** Main menu with the current area marked, so it is always clear where you are (IT-12). */
-export function NavLinks({ items }: { items: NavItem[] }) {
+export function NavLinks({ items, label }: { items: NavItem[]; label: string }) {
   const pathname = usePathname();
   const isActive = (item: NavItem) =>
     item.match.some((prefix) =>
@@ -19,7 +19,7 @@ export function NavLinks({ items }: { items: NavItem[] }) {
     );
 
   return (
-    <nav className="mx-auto flex max-w-4xl flex-wrap gap-x-1 px-2 pb-2">
+    <nav aria-label={label} className="mx-auto flex max-w-4xl flex-wrap gap-x-1 px-2 pb-2">
       {items.map((item) => {
         const active = isActive(item);
         return (
@@ -27,7 +27,7 @@ export function NavLinks({ items }: { items: NavItem[] }) {
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`rounded-md px-2 py-1.5 text-sm font-medium ${
+            className={`rounded-md px-3 py-3 text-sm font-medium ${
               active
                 ? "bg-teal-50 text-teal-900"
                 : "text-slate-700 hover:bg-slate-100 hover:text-teal-800"

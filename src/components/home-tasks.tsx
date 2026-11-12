@@ -60,7 +60,7 @@ export function HomeTasks({ tasks, emptyText }: { tasks: HomeTask[]; emptyText: 
             <p className="min-w-0 flex-1 basis-48 font-medium">{text}</p>
             <Link
               href={task.href}
-              className="rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
+              className="rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800"
             >
               {action}
             </Link>

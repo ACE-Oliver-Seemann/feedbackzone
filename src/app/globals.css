@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
 body {
+  /* A long word or a pasted link wraps instead of widening the page (QA FE-002). */
+  overflow-wrap: anywhere;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* Placeholder text readable against white: 4.8 : 1 (QA FE-018). */
+::placeholder {
+  color: #64748b;
+  opacity: 1;
 }

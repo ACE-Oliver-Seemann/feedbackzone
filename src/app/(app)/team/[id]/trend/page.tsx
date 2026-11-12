@@ -9,6 +9,8 @@ const number = (value: number) =>
   value.toLocaleString("sk-SK", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 
 // Screen "Vývoj tímu" for the team's manager and HR (IT-08).
+export const metadata = { title: t.trend.title };
+
 export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/trend">) {
   const user = await requirePageUser("MANAGER", "HR");
   const { id } = await params;
@@ -60,7 +62,14 @@ export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/tr
 
           <h2 className="mt-8 text-lg font-semibold">{t.trend.tableTitle}</h2>
           <p className="mt-1 text-sm text-slate-600">{t.trend.tableHint}</p>
-          <div className="mt-3 overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <p className="mt-1 text-xs text-slate-600">{t.trend.scrollHint}</p>
+          <div
+            // Focusable, so that the table can be scrolled with the keyboard (QA FE-011).
+            tabIndex={0}
+            role="region"
+            aria-label={t.trend.tableTitle}
+            className="mt-2 overflow-x-auto rounded-lg border border-slate-200 bg-white"
+          >
             <table className="w-full min-w-max text-sm">
               <thead>
                 <tr className="border-b border-slate-200 text-left text-slate-600">

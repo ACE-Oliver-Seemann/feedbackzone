@@ -26,7 +26,8 @@ function navFor(role: Role, teamId: string | null): NavItem[] {
   if (role === "MANAGER") {
     return [home, { href: "/rounds", label: t.nav.rounds, match: ["/rounds"] }, ...team, kudos];
   }
-  return [home, ...team, kudos];
+  // An employee reaches the questionnaire from the home page, so it stays marked there.
+  return [{ ...home, match: ["/", "/rounds"] }, ...team, kudos];
 }
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
@@ -46,7 +47,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             <LogoutButton />
           </div>
         </div>
-        <NavLinks items={items} />
+        <NavLinks items={items} label={t.nav.mainLabel} />
       </header>
       <main className="mx-auto max-w-4xl px-4 py-6">{children}</main>
     </div>

@@ -23,7 +23,7 @@ export function SubNav({
             key={item.href}
             href={item.href}
             aria-current={active ? "page" : undefined}
-            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium ${
+            className={`-mb-px border-b-2 px-3 py-3 text-sm font-medium ${
               active
                 ? "border-teal-700 text-teal-900"
                 : "border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900"

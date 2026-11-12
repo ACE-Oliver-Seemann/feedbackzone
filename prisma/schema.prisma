@@ -17,13 +17,16 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(cuid())
-  name         String
-  email        String  @unique
-  passwordHash String
-  role         String // EMPLOYEE | MANAGER | HR
-  teamId       String?
-  team         Team?   @relation("TeamMembers", fields: [teamId], references: [id])
+  id                 String    @id @default(cuid())
+  name               String
+  email              String    @unique
+  passwordHash       String
+  role               String // EMPLOYEE | MANAGER | HR
+  // Set at logout: session tokens issued before this moment are no longer
+  // accepted, so a copied cookie stops working (MVP-01, QA BE-001).
+  sessionsValidAfter DateTime?
+  teamId             String?
+  team               Team?     @relation("TeamMembers", fields: [teamId], references: [id])
 
   managedTeam    Team?           @relation("TeamManager")
   participations Participation[]
@@ -63,6 +66,10 @@ model Question {
   fixed   Boolean @default(false)
 
   rounds RoundQuestion[]
+
+  // One wording per team (QA BE-005). SQLite treats NULL team ids as distinct,
+  // so this does not constrain the shared library.
+  @@unique([teamId, text])
 }
 
 model Round {

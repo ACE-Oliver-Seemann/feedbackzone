@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 // "Spustiť" / "Uzavrieť" (MVP-05).
 export function RoundTransitionButton({
@@ -28,7 +28,7 @@ export function RoundTransitionButton({
         const { error: code } = await response.json();
         setError(code === "deadline_passed" ? t.rounds.deadlinePassed : t.rounds.invalidState);
       } else {
-        setError(t.errors.generic);
+        setError(errorForStatus(response.status));
       }
     } catch {
       setError(t.errors.generic);
@@ -44,8 +44,8 @@ export function RoundTransitionButton({
         disabled={pending}
         className={
           action === "open"
-            ? "rounded-md bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60"
-            : "rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-100 disabled:opacity-60"
+            ? "rounded-md bg-teal-700 px-3 py-3 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60"
+            : "rounded-md border border-slate-300 bg-white px-3 py-3 text-sm font-medium text-slate-800 hover:bg-slate-100 disabled:opacity-60"
         }
       >
         {action === "open" ? t.rounds.open : t.rounds.close}

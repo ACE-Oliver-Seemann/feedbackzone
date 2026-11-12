@@ -11,6 +11,7 @@ import { db } from "@/lib/db";
 import { requireRole } from "@/lib/authz";
 import { notFound, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
+import { charLength, cleanText } from "@/lib/text";
 
 // IT-10: HR's list of issues ("podnety") and notes from offline meetings.
 // Everything here is for HR only.
@@ -22,6 +23,8 @@ import type { SessionUser } from "@/lib/session";
 
 /** Filter value for "everything that is not done yet" (IT-13). */
 export const ACTIVE_FILTER = "ACTIVE";
+/** Filter value for "no restriction on status". */
+export const ALL_FILTER = "ALL";
 
 const MAX_TITLE = 120;
 const MAX_DESCRIPTION = 2000;
@@ -93,12 +96,29 @@ const oneOf = <T extends string>(list: readonly T[], value: unknown): value is T
 const optionalId = (value: unknown): string | null =>
   typeof value === "string" && value.trim() ? value.trim() : null;
 
+/** Absent, null and "" mean "not given"; anything else must be a string. */
+const isOptionalString = (value: unknown) =>
+  value === undefined || value === null || typeof value === "string";
+
 /** GET /api/hr/issues — optionally filtered by owner group and status. */
 export async function listIssues(
   user: SessionUser,
   filter: { ownerGroup?: string | null; status?: string | null } = {},
 ): Promise<IssueItem[]> {
   requireRole(user, "HR");
+  // An unknown filter is a mistake to report, not a reason to show everything (QA BE-009).
+  const fields: Record<string, string> = {};
+  if (filter.ownerGroup && !oneOf(OWNER_GROUPS, filter.ownerGroup)) fields.group = "invalid";
+  if (
+    filter.status &&
+    filter.status !== ACTIVE_FILTER &&
+    filter.status !== ALL_FILTER &&
+    !oneOf(ISSUE_STATUSES, filter.status)
+  ) {
+    fields.status = "invalid";
+  }
+  if (Object.keys(fields).length > 0) throw validationError(fields);
+
   const issues = await db.issue.findMany({
     where: {
       ...(oneOf(OWNER_GROUPS, filter.ownerGroup) ? { ownerGroup: filter.ownerGroup } : {}),
@@ -122,12 +142,18 @@ export async function createIssue(
   requireRole(user, "HR");
   const fields: Record<string, string> = {};
 
-  const title = typeof input.title === "string" ? input.title.trim() : "";
-  if (title.length < 3) fields.title = "too_short";
-  else if (title.length > MAX_TITLE) fields.title = "too_long";
+  const title = cleanText(input.title);
+  if (charLength(title) < 3) fields.title = "too_short";
+  else if (charLength(title) > MAX_TITLE) fields.title = "too_long";
 
-  const description = typeof input.description === "string" ? input.description.trim() : "";
-  if (description.length > MAX_DESCRIPTION) fields.description = "too_long";
+  const description = cleanText(input.description);
+  if (charLength(description) > MAX_DESCRIPTION) fields.description = "too_long";
+
+  // A wrongly typed optional field is rejected instead of being dropped (QA BE-008).
+  if (!isOptionalString(input.description)) fields.description = "invalid";
+  for (const key of ["roundId", "teamId", "noteId"] as const) {
+    if (!isOptionalString(input[key])) fields[key] = "invalid";
+  }
 
   if (!oneOf(ISSUE_SOURCES, input.source)) fields.source = "invalid";
   if (!oneOf(OWNER_GROUPS, input.ownerGroup)) fields.ownerGroup = "invalid";
@@ -245,13 +271,13 @@ export async function createNote(
   requireRole(user, "HR");
   const fields: Record<string, string> = {};
 
-  const title = typeof input.title === "string" ? input.title.trim() : "";
-  if (title.length < 3) fields.title = "too_short";
-  else if (title.length > MAX_TITLE) fields.title = "too_long";
+  const title = cleanText(input.title);
+  if (charLength(title) < 3) fields.title = "too_short";
+  else if (charLength(title) > MAX_TITLE) fields.title = "too_long";
 
-  const text = typeof input.text === "string" ? input.text.trim() : "";
+  const text = cleanText(input.text);
   if (!text) fields.text = "required";
-  else if (text.length > MAX_NOTE_TEXT) fields.text = "too_long";
+  else if (charLength(text) > MAX_NOTE_TEXT) fields.text = "too_long";
 
   const meetingDate = parseLocalDate(input.meetingDate);
   if (!meetingDate) fields.meetingDate = "invalid";

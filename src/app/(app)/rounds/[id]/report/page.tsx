@@ -20,6 +20,8 @@ const number = (value: number) =>
  * application and its access rules, and free text is the part most likely to
  * give its author away.
  */
+export const metadata = { title: t.report.title };
+
 export default async function RoundReportPage({ params }: PageProps<"/rounds/[id]/report">) {
   const user = await requirePageUser("MANAGER", "HR");
   const { id } = await params;
@@ -47,12 +49,16 @@ export default async function RoundReportPage({ params }: PageProps<"/rounds/[id
         <p className="mt-1 text-sm text-slate-700">
           {round.teamName}, {t.rounds.deadline(formatDate(round.closesAt)).toLowerCase()}
         </p>
-        <p className="mt-1 text-sm font-medium">
-          {t.results.participation(participation.responded, participation.teamSize)}
-        </p>
+        {round.status !== "DRAFT" && (
+          <p className="mt-1 text-sm font-medium">
+            {t.results.participation(participation.responded, participation.teamSize)}
+          </p>
+        )}
       </header>
 
-      {results.status === "not_closed" && <p className="mt-4">{t.results.notClosed}</p>}
+      {results.status === "not_closed" && (
+        <p className="mt-4">{round.status === "DRAFT" ? t.results.draft : t.results.notClosed}</p>
+      )}
 
       {results.status === "insufficient_responses" && (
         <section className="mt-4">

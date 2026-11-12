@@ -20,6 +20,8 @@ const number = (value: number) =>
   value.toLocaleString("sk-SK", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
 
 // Screen "Porovnanie tímov" for HR (IT-08).
+export const metadata = { title: t.heatmap.title };
+
 export default async function HrHeatmapPage() {
   const user = await requirePageUser("HR");
   const heatmap = await pageData(() => getHeatmap(user));
@@ -42,7 +44,13 @@ export default async function HrHeatmapPage() {
         <p className="mt-4 text-slate-600">{t.heatmap.empty}</p>
       ) : (
         <>
-          <div className="mt-4 overflow-x-auto rounded-lg border border-slate-200 bg-white">
+          <p className="mt-3 text-xs text-slate-600">{t.trend.scrollHint}</p>
+          <div
+            tabIndex={0}
+            role="region"
+            aria-label={t.heatmap.title}
+            className="mt-2 overflow-x-auto rounded-lg border border-slate-200 bg-white"
+          >
             <table className="w-full min-w-max border-separate border-spacing-0.5 text-sm">
               <thead>
                 <tr className="text-left text-slate-600">
@@ -72,7 +80,7 @@ export default async function HrHeatmapPage() {
                       return score === undefined ? (
                         <td
                           key={topic}
-                          className="px-3 py-2 text-right text-slate-400"
+                          className="px-3 py-2 text-right text-slate-600"
                           title={t.heatmap.noData}
                         >
                           –
@@ -98,9 +106,10 @@ export default async function HrHeatmapPage() {
             {[...STEPS].reverse().map((step, index, all) => (
               <span key={step.className} className="inline-flex items-center gap-1.5">
                 <span className={`inline-block h-3 w-5 rounded-sm ${step.className}`} />
-                {index === all.length - 1
-                  ? t.heatmap.legendFrom(number(step.from))
-                  : t.heatmap.legendRange(number(step.from || 1), number(all[index + 1].from))}
+                {/* "pod 3,0", "od 3,0", "od 3,5"…: every score falls into exactly one step. */}
+                {index === 0
+                  ? t.heatmap.legendBelow(number(all[1].from))
+                  : t.heatmap.legendFrom(number(step.from))}
               </span>
             ))}
             <span>{t.heatmap.legendNoData}</span>

@@ -8,6 +8,8 @@ import { formatDate, t } from "@/lib/texts.sk";
 import { getTeamSummary } from "@/server/teams";
 
 // Screen "Stránka tímu" for team members and HR (MVP-14, MVP-17).
+export const metadata = { title: t.team.title };
+
 export default async function TeamPage({ params }: PageProps<"/team/[id]">) {
   const user = await requirePageUser();
   const { id } = await params;
@@ -38,7 +40,7 @@ export default async function TeamPage({ params }: PageProps<"/team/[id]">) {
             <li key={round.id} className="rounded-lg border border-slate-200 bg-slate-100/60 p-4">
               <h2 className="text-lg font-semibold">{round.name}</h2>
               <p className="mt-1 text-sm text-slate-600">
-                {t.team.closed(formatDate(round.closesAt))} ·{" "}
+                {t.team.closed(formatDate(round.closedAt))} ·{" "}
                 {t.team.participation(round.participation.responded, round.participation.teamSize)}
               </p>
 

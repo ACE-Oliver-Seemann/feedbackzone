@@ -33,13 +33,21 @@ function sign(payload: string): string {
 
 export function createSessionToken(userId: string, now = Date.now()): string {
   const payload = Buffer.from(
-    JSON.stringify({ uid: userId, exp: Math.floor(now / 1000) + SESSION_TTL_SECONDS }),
+    JSON.stringify({ uid: userId, iat: now, exp: Math.floor(now / 1000) + SESSION_TTL_SECONDS }),
   ).toString("base64url");
   return `${payload}.${sign(payload)}`;
 }
 
 /** Returns the user id, or null when the token is missing, forged or expired. */
 export function verifySessionToken(token: string | undefined, now = Date.now()): string | null {
+  return readSessionToken(token, now)?.userId ?? null;
+}
+
+/** The verified content of a token: whose it is and when it was issued (ms). */
+export function readSessionToken(
+  token: string | undefined,
+  now = Date.now(),
+): { userId: string; issuedAt: number } | null {
   if (!token) return null;
   const [payload, signature, ...rest] = token.split(".");
   if (!payload || !signature || rest.length > 0) return null;
@@ -52,21 +60,24 @@ export function verifySessionToken(token: string | undefined, now = Date.now()):
     const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
     if (typeof data.uid !== "string" || typeof data.exp !== "number") return null;
     if (data.exp * 1000 <= now) return null;
-    return data.uid;
+    // Tokens from before logout tracking carry no issue time; treat them as oldest.
+    return { userId: data.uid, issuedAt: typeof data.iat === "number" ? data.iat : 0 };
   } catch {
     return null;
   }
 }
 
 export async function loadSessionUser(token: string | undefined): Promise<SessionUser | null> {
-  const userId = verifySessionToken(token);
-  if (!userId) return null;
+  const session = readSessionToken(token);
+  if (!session) return null;
   const user = await db.user.findUnique({
-    where: { id: userId },
-    select: { id: true, name: true, role: true, teamId: true },
+    where: { id: session.userId },
+    select: { id: true, name: true, role: true, teamId: true, sessionsValidAfter: true },
   });
   if (!user) return null;
-  return { ...user, role: user.role as Role };
+  // Logged out since this token was issued (QA BE-001).
+  if (user.sessionsValidAfter && session.issuedAt < user.sessionsValidAfter.getTime()) return null;
+  return { id: user.id, name: user.name, role: user.role as Role, teamId: user.teamId };
 }
 
 /** For route handlers: the logged-in user, or 401. */

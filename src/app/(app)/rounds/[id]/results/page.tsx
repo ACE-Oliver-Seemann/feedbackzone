@@ -11,6 +11,8 @@ import { getRoundResults, summarizeResults, type QuestionResult } from "@/server
 import { getRoundSuggestions } from "@/server/suggestions";
 
 // Screen "Výsledky kola a kroky" for manager and HR (MVP-10, MVP-11, MVP-13, MVP-15).
+export const metadata = { title: t.results.title };
+
 export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/results">) {
   const user = await requirePageUser("MANAGER", "HR");
   const { id } = await params;
@@ -51,7 +53,7 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
       {isClosed && (
         <Link
           href={`/rounds/${round.id}/report`}
-          className="mr-2 mt-3 inline-block rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+          className="mr-2 mt-3 inline-block rounded-md border border-teal-700 px-3 py-3 text-sm font-medium text-teal-800 hover:bg-teal-50"
         >
           {t.report.open}
         </Link>
@@ -59,7 +61,7 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
       {user.role === "HR" && isClosed && (
         <Link
           href={`/hr/issues?round=${round.id}#new`}
-          className="mt-3 inline-block rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+          className="mt-3 inline-block rounded-md border border-teal-700 px-3 py-3 text-sm font-medium text-teal-800 hover:bg-teal-50"
         >
           {t.issues.createFromRound}
         </Link>
@@ -198,7 +200,7 @@ function QuestionCard({ question }: { question: QuestionResult }) {
         </p>
       </div>
       <details className="mt-2">
-        <summary className="cursor-pointer text-sm font-medium text-teal-800">
+        <summary className="inline-block cursor-pointer py-2 text-sm font-medium text-teal-800">
           {t.results.showDistribution}
         </summary>
       <ul className="mt-3 space-y-1">

@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SCALES, type ScaleKey } from "@/config/scales";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 const MAX_COMMENT_LENGTH = 1000; // mirrors src/server/responses.ts
 const SCALE = [1, 2, 3, 4, 5] as const;
@@ -36,6 +36,19 @@ export function FillWizard({
   const [error, setError] = useState<string | null>(null);
 
   const total = questions.length;
+
+  // After each step the focus moves to the new content, so that keyboard and
+  // screen-reader users continue from the new question, not from a button
+  // that no longer exists (QA FE-006). Not on the first render.
+  const stepRef = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    stepRef.current?.focus();
+  }, [step, index]);
   const primary =
     "rounded-md bg-teal-700 px-5 py-3 text-base font-medium text-white hover:bg-teal-800 disabled:opacity-50";
   const secondary =
@@ -75,7 +88,7 @@ export function FillWizard({
         const { error: code } = await response.json();
         setStep(code === "already_submitted" ? "already" : "closed");
       } else {
-        setError(t.errors.generic);
+        setError(errorForStatus(response.status));
       }
     } catch {
       setError(t.errors.generic);
@@ -115,7 +128,7 @@ export function FillWizard({
   }
 
   return (
-    <div>
+    <div ref={stepRef} tabIndex={-1} className="outline-none">
       <p className="text-sm font-medium text-teal-800">{roundName}</p>
 
       {step === "intro" && (
@@ -138,7 +151,7 @@ export function FillWizard({
           </p>
           <div className="mt-2 h-1.5 rounded-full bg-slate-200" aria-hidden="true">
             <div
-              className="h-1.5 rounded-full bg-teal-600 transition-all"
+              className="h-1.5 rounded-full bg-teal-600 transition-all motion-reduce:transition-none"
               style={{ width: `${((index + 1) / total) * 100}%` }}
             />
           </div>
@@ -182,11 +195,11 @@ export function FillWizard({
               maxLength={MAX_COMMENT_LENGTH}
               value={comment}
               onChange={(event) => setComment(event.target.value)}
-              className="block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600"
+              className="block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600"
             />
           </label>
           <p className="mt-1 text-right text-xs text-slate-500">
-            {t.fill.commentCounter(comment.length)}
+            {t.fill.commentCounter([...comment].length)}
           </p>
           {error && (
             <p role="alert" className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">

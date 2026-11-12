@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type FormEvent } from "react";
-import { t } from "@/lib/texts.sk";
+import { errorForStatus, t } from "@/lib/texts.sk";
 
 // Mirrors MIN_QUESTIONS / MAX_QUESTIONS in src/server/rounds.ts and the custom
 // question limits in src/server/catalog.ts. The server validates again; this
@@ -10,6 +10,8 @@ import { t } from "@/lib/texts.sk";
 const MIN_QUESTIONS = 3;
 const MAX_QUESTIONS = 5;
 const CUSTOM_MAX_LENGTH = 200;
+/** Topic of a team's own questions; mirrors CUSTOM_QUESTION_TOPIC in src/server/catalog.ts. */
+const CUSTOM_TOPIC = "Vlastné otázky tímu";
 
 type Question = {
   id: string;
@@ -53,15 +55,9 @@ export function NewRoundForm({
   const [allQuestions, setAllQuestions] = useState(questions);
   const [teamId, setTeamId] = useState(teams[0]?.id ?? "");
   const [selected, setSelected] = useState<string[]>(() => defaults[teams[0]?.id ?? ""] ?? []);
-  // Topics that hold a preselected question start expanded; the rest are collapsed.
-  const [openTopics] = useState(
-    () =>
-      new Set(
-        questions
-          .filter((question) => (defaults[teams[0]?.id ?? ""] ?? []).includes(question.id))
-          .map((question) => question.topic),
-      ),
-  );
+  // Bumped when an own question is added, to re-open its topic (QA FE-008).
+  const [customAdded, setCustomAdded] = useState(0);
+  const [customNotice, setCustomNotice] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, true>>>({});
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -84,6 +80,18 @@ export function NewRoundForm({
     return [...groups.entries()];
   }, [visible]);
 
+  // Topics holding a preselected question of the CHOSEN team start expanded;
+  // the rest are collapsed (QA FE-007: they used to follow the first team only).
+  const openTopics = useMemo(
+    () =>
+      new Set(
+        allQuestions
+          .filter((question) => (defaults[teamId] ?? []).includes(question.id))
+          .map((question) => question.topic),
+      ),
+    [allQuestions, defaults, teamId],
+  );
+
   const total = fixedQuestions.length + selected.length;
   const countValid = total >= MIN_QUESTIONS && total <= MAX_QUESTIONS;
 
@@ -102,6 +110,7 @@ export function NewRoundForm({
   async function addCustomQuestion() {
     setCustomPending(true);
     setCustomError(null);
+    setCustomNotice(false);
     try {
       const response = await fetch("/api/questions", {
         method: "POST",
@@ -118,6 +127,9 @@ export function NewRoundForm({
             : current,
         );
         setCustomText("");
+        setCustomAdded((count) => count + 1);
+        // Saved for good, but not in this round: say so instead of staying silent.
+        setCustomNotice(total >= MAX_QUESTIONS);
       } else if (response.status === 400) {
         const { fields } = await response.json();
         const code = fields?.text as string | undefined;
@@ -163,7 +175,7 @@ export function NewRoundForm({
           Object.fromEntries(Object.keys(fields ?? {}).map((field) => [field, true])),
         );
       } else {
-        setError(t.errors.generic);
+        setError(errorForStatus(response.status));
       }
     } catch {
       setError(t.errors.generic);
@@ -172,7 +184,7 @@ export function NewRoundForm({
   }
 
   const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
+    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
   const fieldError = (field: FieldName) =>
     fieldErrors[field] && (
       <span role="alert" className="mt-1 block text-sm font-normal text-red-700">
@@ -247,8 +259,12 @@ export function NewRoundForm({
         <div className="mt-3 space-y-4">
           {topics.map(([topic, items]) => (
             <details
-              key={topic}
-              open={openTopics.has(topic) || undefined}
+              // Remounted on a team change or a new own question, so the
+              // initial open state is computed again.
+              key={`${teamId}-${topic}-${topic === CUSTOM_TOPIC ? customAdded : 0}`}
+              open={
+                openTopics.has(topic) || (topic === CUSTOM_TOPIC && customAdded > 0) || undefined
+              }
               className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2"
             >
               <summary className="cursor-pointer text-sm font-semibold text-slate-800">
@@ -268,7 +284,7 @@ export function NewRoundForm({
                   return (
                     <li key={question.id}>
                       <label
-                        className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-2 text-sm ${
+                        className={`flex cursor-pointer items-start gap-3 rounded-md border px-3 py-3 text-sm ${
                           checked ? "border-teal-600 bg-teal-50" : "border-slate-200 bg-white"
                         } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
                       >
@@ -327,6 +343,11 @@ export function NewRoundForm({
               ))}
             </ul>
             <p className="mt-2 text-xs text-slate-600">{t.newRound.custom.permanent}</p>
+            {customNotice && (
+              <p role="status" className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-950">
+                {t.newRound.custom.addedNotSelected}
+              </p>
+            )}
             {customError && (
               <p role="alert" className="mt-2 text-sm text-red-700">
                 {t.newRound.custom.errors[customError]}
@@ -336,7 +357,7 @@ export function NewRoundForm({
               type="button"
               onClick={addCustomQuestion}
               disabled={customPending || !customText.trim()}
-              className="mt-3 rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
+              className="mt-3 rounded-md border border-teal-700 px-3 py-3 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50"
             >
               {customPending ? t.newRound.custom.adding : t.newRound.custom.add}
             </button>
@@ -361,7 +382,7 @@ export function NewRoundForm({
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
+        className="w-full rounded-md bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
       >
         {pending ? t.newRound.submitting : t.newRound.submit}
       </button>

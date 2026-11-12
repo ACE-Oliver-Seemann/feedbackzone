@@ -11,6 +11,7 @@ import {
 import { db } from "@/lib/db";
 import { validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
+import { charLength, cleanText } from "@/lib/text";
 
 // Kudos are signed: the sender is always stored and shown (MVP-16).
 
@@ -80,12 +81,12 @@ export async function sendKudos(
     else fields.emoji = "invalid";
   }
 
-  const text = typeof input.text === "string" ? input.text.trim() : "";
+  const text = cleanText(input.text);
   if (input.text !== undefined && input.text !== null && typeof input.text !== "string") {
     fields.text = "invalid";
-  } else if (text.length > KUDOS_MAX_LENGTH) {
+  } else if (charLength(text) > KUDOS_MAX_LENGTH) {
     fields.text = "too_long";
-  } else if (emoji === null && !fields.emoji && text.length < KUDOS_MIN_LENGTH) {
+  } else if (emoji === null && !fields.emoji && charLength(text) < KUDOS_MIN_LENGTH) {
     // Without an emoji the MVP-16 minimum applies.
     fields.text = "too_short";
   }
@@ -95,8 +96,16 @@ export async function sendKudos(
 
   if (Object.keys(fields).length > 0) throw validationError(fields);
 
-  const recipient = await db.user.findUnique({ where: { id: toUserId }, select: { id: true } });
+  const recipient = await db.user.findUnique({
+    where: { id: toUserId },
+    select: { id: true, teamId: true },
+  });
   if (!recipient) throw validationError({ toUserId: "unknown" });
+  // "Public in the team" is shown on the recipient's team page. A recipient
+  // without a team (HR) has none, so it would be visible nowhere (QA E2E-007).
+  if (input.visibility === "TEAM" && recipient.teamId === null) {
+    throw validationError({ visibility: "no_team" });
+  }
 
   const kudos = await db.kudos.create({
     data: {
