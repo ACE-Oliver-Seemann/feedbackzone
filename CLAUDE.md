@@ -64,6 +64,7 @@ v `node_modules/next/dist/docs/` (pozri `AGENTS.md`).
 | `npm run build` | Produkčný build |
 | `npm run db:migrate` | `prisma migrate dev` po zmene schémy |
 | `npm run db:seed` | Iba seed (zmaže a naplní `prisma/dev.db`) |
+| `npm run db:demo` | Seed + ukážkové dáta: uzavreté kolá s odpoveďami, krokmi a kudos, aby bolo vidno výsledky, grafy a prehľady HR. **Zmaže dáta.** Akceptačný scenár a testy potrebujú čistý seed, nie demo dáta. |
 
 Testovacie účty sú v `prisma/seed.ts` (doména `example.test`, spoločné heslo `Heslo123`).
 

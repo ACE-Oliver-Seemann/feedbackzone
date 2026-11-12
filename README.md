@@ -43,6 +43,7 @@ Seed pripraví aj jedno uzavreté kolo Tímu Beta so 4 odpoveďami (pod prahom d
 | `npm run lint` | ESLint |
 | `npm run db:migrate` | Nová migrácia po zmene `prisma/schema.prisma` |
 | `npm run db:seed` | Zmaže a naplní testovacie dáta |
+| `npm run db:demo` | To isté a navyše ukážkové uzavreté kolá s odpoveďami, krokmi a kudos |
 
 ## Stav
 
