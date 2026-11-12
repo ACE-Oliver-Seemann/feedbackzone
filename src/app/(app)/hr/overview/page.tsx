@@ -1,7 +1,12 @@
 import Link from "next/link";
+import { SubNav } from "@/components/sub-nav";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { t } from "@/lib/texts.sk";
-import { getReactionOverview, type ReactionSummary } from "@/server/hr-overview";
+import {
+  getReactionOverview,
+  type ReactionOverview,
+  type ReactionSummary,
+} from "@/server/hr-overview";
 
 // Screen "Plnenie reakcie" for HR (IT-05).
 export default async function HrOverviewPage() {
@@ -10,8 +15,21 @@ export default async function HrOverviewPage() {
 
   return (
     <section className="max-w-3xl">
+      <SubNav
+        label={t.nav.hrInsights}
+        current="/hr/overview"
+        items={[
+          { href: "/hr/overview", label: t.nav.hrOverview },
+          { href: "/hr/heatmap", label: t.nav.hrHeatmap },
+        ]}
+      />
       <h1 className="text-xl font-semibold">{t.hrOverview.title}</h1>
       <p className="mt-1 text-sm text-slate-600">{t.hrOverview.intro}</p>
+      {overview.total.closedRounds > 0 && (
+        <p className="mt-3 rounded-lg border border-teal-200 bg-teal-50 p-4 font-medium text-teal-950">
+          {headline(overview)}
+        </p>
+      )}
 
       {overview.total.closedRounds === 0 ? (
         <p className="mt-4 text-slate-600">{t.hrOverview.empty}</p>
@@ -30,7 +48,15 @@ export default async function HrOverviewPage() {
                     {team.teamName}
                   </Link>
                 </h2>
-                <SummaryFigures summary={team} />
+                <p className="mt-1 text-sm">
+                  {t.hrOverview.teamLine(team.roundsWithAction, team.closedRounds)}
+                </p>
+                <details className="mt-1">
+                  <summary className="cursor-pointer text-sm font-medium text-teal-800">
+                    {t.hrOverview.details}
+                  </summary>
+                  <SummaryFigures summary={team} />
+                </details>
                 {team.awaitingRounds.length > 0 && (
                   <div className="mt-3 rounded-md bg-amber-50 px-3 py-2">
                     <h3 className="text-sm font-medium text-amber-950">
@@ -55,6 +81,20 @@ export default async function HrOverviewPage() {
         </>
       )}
     </section>
+  );
+}
+
+/** The one sentence HR needs before any table (IT-13). */
+function headline(overview: ReactionOverview): string {
+  const waiting = overview.teams
+    .flatMap((team) => team.awaitingRounds.map((round) => ({ team: team.teamName, ...round })))
+    .sort((a, b) => b.daysWaiting - a.daysWaiting);
+  if (waiting.length === 0) return t.hrOverview.headlineAllDone(overview.total.closedRounds);
+  return t.hrOverview.headlineWaiting(
+    waiting.length,
+    overview.total.closedRounds,
+    waiting[0].team,
+    waiting[0].daysWaiting,
   );
 }
 

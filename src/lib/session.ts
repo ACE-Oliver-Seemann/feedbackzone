@@ -96,7 +96,11 @@ export function clearSessionCookie(response: NextResponse): void {
   });
 }
 
-/** Landing page after login (MVP-01). */
+/**
+ * Landing page after login (MVP-01). Since IT-11 every role starts on the home
+ * page with its tasks; the parameter stays so that a role can differ again.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function homePathFor(role: Role): string {
-  return role === "HR" ? "/hr/rounds" : "/";
+  return "/";
 }

@@ -38,7 +38,13 @@ function RoundMeta({ round, showTeam }: { round: RoundListItem; showTeam?: boole
 }
 
 /** Employee view: open rounds of own team with the "Odoslané" state (MVP-06). */
-export function MySurveyList({ rounds }: { rounds: RoundListItem[] }) {
+export function MySurveyList({
+  rounds,
+  showFillLink = true,
+}: {
+  rounds: RoundListItem[];
+  showFillLink?: boolean;
+}) {
   if (rounds.length === 0) {
     return <p className="mt-3 text-slate-600">{t.rounds.mySurveysEmpty}</p>;
   }
@@ -55,7 +61,7 @@ export function MySurveyList({ rounds }: { rounds: RoundListItem[] }) {
             )}
           </div>
           <RoundMeta round={round} />
-          {!round.submitted && (
+          {showFillLink && !round.submitted && (
             <Link
               href={`/rounds/${round.id}/fill`}
               className="mt-3 inline-block rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"

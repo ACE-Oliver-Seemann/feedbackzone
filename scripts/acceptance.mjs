@@ -129,7 +129,7 @@ const teamB = (await mgrB("/api/me")).json.user.teamId;
 const teamBText = text((await mgrB(`/team/${teamB}`)).text);
 check("5  team B page hides averages below the threshold", teamBText.includes("Nedostatok odpovedí") && !teamBText.includes("Posledný šprint"));
 check("5  HR can open the team page", (await hr(`/team/${teamA}`)).status === 200);
-check("5  menu has team and kudos links", (await alfa[0]("/")).text.includes(`/team/${teamA}`) && text((await alfa[0]("/")).text).includes("Poslať kudos"));
+check("5  menu has team and kudos links", (await alfa[0]("/")).text.includes(`/team/${teamA}`) && text((await alfa[0]("/")).text).includes("Kudos"));
 
 // 6. An employee sends public kudos to a colleague; it shows in the team feed.
 const barboraId = (await alfa[1]("/api/me")).json.user.id;

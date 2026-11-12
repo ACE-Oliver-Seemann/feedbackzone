@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SubNav } from "@/components/sub-nav";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { t } from "@/lib/texts.sk";
 import { getHeatmap } from "@/server/trends";
@@ -26,6 +27,14 @@ export default async function HrHeatmapPage() {
 
   return (
     <section className="max-w-4xl">
+      <SubNav
+        label={t.nav.hrInsights}
+        current="/hr/heatmap"
+        items={[
+          { href: "/hr/overview", label: t.nav.hrOverview },
+          { href: "/hr/heatmap", label: t.nav.hrHeatmap },
+        ]}
+      />
       <h1 className="text-xl font-semibold">{t.heatmap.title}</h1>
       <p className="mt-1 text-sm text-slate-600">{t.heatmap.intro(heatmap.windowDays)}</p>
 

@@ -20,6 +20,9 @@ import type { SessionUser } from "@/lib/session";
 // get into an issue only if HR retypes it — the form tells HR not to copy
 // comments word for word.
 
+/** Filter value for "everything that is not done yet" (IT-13). */
+export const ACTIVE_FILTER = "ACTIVE";
+
 const MAX_TITLE = 120;
 const MAX_DESCRIPTION = 2000;
 const MAX_NOTE_TEXT = 10000;
@@ -99,7 +102,11 @@ export async function listIssues(
   const issues = await db.issue.findMany({
     where: {
       ...(oneOf(OWNER_GROUPS, filter.ownerGroup) ? { ownerGroup: filter.ownerGroup } : {}),
-      ...(oneOf(ISSUE_STATUSES, filter.status) ? { status: filter.status } : {}),
+      ...(filter.status === ACTIVE_FILTER
+        ? { status: { in: ["OPEN", "IN_PROGRESS"] } }
+        : oneOf(ISSUE_STATUSES, filter.status)
+          ? { status: filter.status }
+          : {}),
     },
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     select: ISSUE_SELECT,

@@ -7,7 +7,7 @@ import { SCALES } from "@/config/scales";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listRoundActions } from "@/server/actions";
-import { getRoundResults, type QuestionResult } from "@/server/results";
+import { getRoundResults, summarizeResults, type QuestionResult } from "@/server/results";
 import { getRoundSuggestions } from "@/server/suggestions";
 
 // Screen "Výsledky kola a kroky" for manager and HR (MVP-10, MVP-11, MVP-13, MVP-15).
@@ -23,6 +23,10 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
   );
   // IT-09: only for a closed round above the confidentiality threshold.
   const suggestions = suggested.status === "ok" ? suggested.suggestions : [];
+  // IT-13: the two sentences a manager needs first; everything else is below.
+  const summary = results.status === "ok" ? summarizeResults(results.questions) : null;
+  const average = (value: number) =>
+    value.toLocaleString("sk-SK", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
   const { round, participation } = results;
   const isClosed = round.status === "CLOSED";
   // Only the team's manager writes actions; HR reads them (permission matrix).
@@ -84,6 +88,27 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
 
       {results.status === "ok" && (
         <>
+          {summary && (
+            <div className="mt-4 rounded-lg border border-teal-200 bg-teal-50 p-4">
+              <h2 className="font-semibold text-teal-950">{t.results.summaryTitle}</h2>
+              <p className="mt-1 text-sm">
+                {t.results.strongest(summary.strongest.text, average(summary.strongest.average))}
+              </p>
+              <p className="mt-1 text-sm">
+                {t.results.weakest(summary.weakest.text, average(summary.weakest.average))}
+              </p>
+              {suggestions[0] && (
+                <p className="mt-2 text-sm">
+                  <span className="font-medium">{t.results.suggestedStep}</span>{" "}
+                  {suggestions[0].suggestion}{" "}
+                  <a href="#kroky" className="font-medium text-teal-800 underline">
+                    {t.results.toActions}
+                  </a>
+                </p>
+              )}
+            </div>
+          )}
+
           <section className="mt-8">
             <h2 className="text-lg font-semibold">{t.results.questionsTitle}</h2>
             <ul className="mt-3 space-y-3">
@@ -93,9 +118,12 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
             </ul>
           </section>
 
-          <section className="mt-8">
-            <h2 className="text-lg font-semibold">{t.results.commentsTitle}</h2>
-            <p className="text-sm text-slate-600">{t.results.commentsHint}</p>
+          {/* Collapsed, with the count in the heading so it is not overlooked. */}
+          <details className="mt-8">
+            <summary className="cursor-pointer text-lg font-semibold">
+              {t.results.commentsTitle} ({results.comments.length})
+            </summary>
+            <p className="mt-1 text-sm text-slate-600">{t.results.commentsHint}</p>
             {results.comments.length === 0 ? (
               <p className="mt-3 text-sm text-slate-600">{t.results.commentsEmpty}</p>
             ) : (
@@ -110,11 +138,11 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
                 ))}
               </ul>
             )}
-          </section>
+          </details>
         </>
       )}
 
-      <section className="mt-8">
+      <section id="kroky" className="mt-8 scroll-mt-4">
         <h2 className="text-lg font-semibold">{t.actions.title}</h2>
         {isClosed ? (
           <>
@@ -169,6 +197,10 @@ function QuestionCard({ question }: { question: QuestionResult }) {
           </span>
         </p>
       </div>
+      <details className="mt-2">
+        <summary className="cursor-pointer text-sm font-medium text-teal-800">
+          {t.results.showDistribution}
+        </summary>
       <ul className="mt-3 space-y-1">
         {question.distribution.map((count, index) => (
           <li
@@ -188,6 +220,7 @@ function QuestionCard({ question }: { question: QuestionResult }) {
           </li>
         ))}
       </ul>
+      </details>
     </li>
   );
 }

@@ -13,6 +13,10 @@ export const t = {
     HR: "HR",
   },
   nav: {
+    home: "Domov",
+    rounds: "Prieskumy",
+    hrInsights: "Prehľady",
+    kudos: "Kudos",
     mySurveys: "Moje prieskumy",
     hrRounds: "Prehľad kôl",
     hrOverview: "Plnenie reakcie",
@@ -40,6 +44,43 @@ export const t = {
     forbiddenTitle: "Sem nemáš prístup",
     forbiddenText: "Táto stránka nie je dostupná pre tvoju rolu alebo tím.",
     backHome: "Späť na úvod",
+  },
+  // IT-11: what needs doing now. One sentence per task.
+  home: {
+    title: "Čo treba urobiť teraz",
+    nothing: "Nič nečaká.",
+    empty: {
+      EMPLOYEE: "Momentálne nemáš žiadny prieskum na vyplnenie. Čo sa zmenilo po minulých, nájdeš v časti Môj tím.",
+      MANAGER: "Každé uzavreté kolo má zapísaný krok a žiadny krok nie je po termíne.",
+      HR: "Každé uzavreté kolo má zapísaný krok a žiadny podnet nie je po termíne.",
+    },
+    tasks: {
+      fillSurvey: (round: string, questions: number) =>
+        `Čaká na teba prieskum „${round}“. Má ${questions} ${questions >= 5 ? "otázok" : "otázky"} a zaberie asi 2 minúty.`,
+      roundAwaitingAction: (round: string, days: number) =>
+        `Kolo „${round}“ je uzavreté ${days === 0 ? "od dnes" : days === 1 ? "1 deň" : `${days} dní`} a tím čaká, čo sa s výsledkami stane. Pozri výsledky a zapíš krok.`,
+      actionsOverdue: (count: number) =>
+        `${count === 1 ? "1 krok je" : count >= 2 && count <= 4 ? `${count} kroky sú` : `${count} krokov je`} po termíne. Dokonči ${count === 1 ? "ho" : "ich"} alebo uprav stav.`,
+      startRound: (days: number | null) =>
+        days === null
+          ? "Tím ešte nemal žiadny prieskum. Vytvor prvé kolo."
+          : `Posledné kolo sa skončilo pred ${days} dňami a žiadne ďalšie nebeží. Vytvor nové.`,
+      roundsAwaitingAction: (count: number, team: string, days: number) =>
+        `${count === 1 ? "1 uzavreté kolo čaká" : count >= 2 && count <= 4 ? `${count} uzavreté kolá čakajú` : `${count} uzavretých kôl čaká`} na krok manažéra. Najdlhšie ${team}, ${days === 1 ? "1 deň" : `${days} dní`}.`,
+      issuesOverdue: (count: number) =>
+        `${count === 1 ? "1 podnet je" : count >= 2 && count <= 4 ? `${count} podnety sú` : `${count} podnetov je`} po termíne.`,
+      lowParticipation: (round: string, team: string, responded: number, size: number, days: number) =>
+        `Kolo „${round}“ (${team}) sa uzavrie ${days <= 1 ? "do zajtra" : `o ${days} dni`} a odpovedalo iba ${responded} z ${size}.`,
+    },
+    actions: {
+      fill: "Vyplniť",
+      results: "Výsledky a krok",
+      actions: "Otvoriť kroky",
+      newRound: "Nové kolo",
+      overview: "Ktoré kolá",
+      issues: "Otvoriť podnety",
+      participation: "Pozrieť účasť",
+    },
   },
   roundStatus: {
     DRAFT: "Koncept",
@@ -122,6 +163,12 @@ export const t = {
     questionsTitle: "Otázky",
     average: "Priemer",
     distributionLabel: (value: number, count: number) => `Hodnota ${value}: ${count}×`,
+    summaryTitle: "V skratke",
+    strongest: (question: string, average: string) => `Najlepšie: „${question}“ (${average}).`,
+    weakest: (question: string, average: string) => `Najslabšie: „${question}“ (${average}).`,
+    suggestedStep: "Navrhovaný krok:",
+    toActions: "Prejsť na kroky",
+    showDistribution: "Rozdelenie odpovedí",
     commentsTitle: "Komentáre",
     commentsHint: "V náhodnom poradí, bez mien.",
     commentsEmpty: "Nikto nepridal komentár.",
@@ -193,8 +240,8 @@ export const t = {
   },
   issues: {
     pageTitle: "Podnety",
-    intro:
-      "Zoznam vecí, ktoré treba vyriešiť, a kto ich má na starosti. Vidí ho iba HR. Skupina je zatiaľ len označenie; podnet jej treba odovzdať mimo aplikácie.",
+    intro: "Čo treba vyriešiť a kto to má na starosti. Vidí iba HR; skupine to treba odovzdať mimo aplikácie.",
+    filterActive: "Nevybavené",
     empty: "Žiadny podnet nezodpovedá výberu.",
     filter: "Filtrovať",
     filterAll: "Všetko",
@@ -223,7 +270,7 @@ export const t = {
   },
   notes: {
     pageTitle: "Poznámky zo stretnutí",
-    intro: "Zápisy z osobných stretnutí. Vidí ich iba HR. Z poznámky sa dá vytvoriť jeden alebo viac podnetov.",
+    intro: "Zápisy z osobných stretnutí, z ktorých sa dajú vytvoriť podnety. Vidí iba HR.",
     newTitle: "Nová poznámka",
     listTitle: "Uložené poznámky",
     empty: "Zatiaľ tu nie je žiadna poznámka.",
@@ -329,8 +376,14 @@ export const t = {
   },
   hrOverview: {
     title: "Plnenie reakcie",
-    intro:
-      "Prieskum má zmysel, iba ak po ňom nasleduje krok. Tu vidno, ako rýchlo a ako často tímy na výsledky reagujú.",
+    intro: "Ako často a ako rýchlo tímy reagujú na výsledky.",
+    headlineWaiting: (waiting: number, closed: number, team: string, days: number) =>
+      `${waiting} z ${closed} uzavretých kôl ${waiting === 1 ? "čaká" : "čakajú"} na krok. Najdlhšie ${team}, ${days === 1 ? "1 deň" : `${days} dní`}.`,
+    headlineAllDone: (closed: number) =>
+      `Všetkých ${closed} uzavretých kôl má zapísaný krok.`,
+    teamLine: (withAction: number, closed: number) =>
+      closed === 0 ? "Zatiaľ žiadne uzavreté kolo." : `Krok má ${withAction} z ${closed} uzavretých kôl.`,
+    details: "Podrobné čísla",
     empty: "Zatiaľ nie je uzavreté žiadne kolo.",
     totalTitle: "Všetky tímy",
     closedRounds: "Uzavreté kolá",
@@ -356,6 +409,11 @@ export const t = {
     closesAt: "Dátum uzávierky",
     questions: "Otázky",
     questionsHint: "Kolo má spolu 3 až 5 otázok. Zobrazia sa v poradí, v akom ich vyberieš.",
+    defaultName: (week: number) => `Pulse – ${week}. týždeň`,
+    preselected:
+      "Predvybrali sme odporúčané otázky, ktoré tím dlhšie nemal. Skontroluj ich a pokojne zmeň; ostatné nájdeš po rozbalení okruhov.",
+    topicCount: (selected: number, total: number) =>
+      selected > 0 ? `(vybrané ${selected} z ${total})` : `(${total})`,
     fixedTitle: "Stála otázka",
     fixedHint: "Je v každom kole ako prvá, aby sa dal sledovať vývoj v čase.",
     starter: "Odporúčaná",

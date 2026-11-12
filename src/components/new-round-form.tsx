@@ -35,17 +35,33 @@ export function NewRoundForm({
   teams,
   redirectTo,
   canAddQuestion,
+  defaults,
+  defaultName,
+  defaultClosesAt,
 }: {
   questions: Question[];
   teams: Team[];
   redirectTo: string;
   /** Only a manager writes own questions, and only for their own team (IT-07). */
   canAddQuestion: boolean;
+  /** Preselected question ids per team (IT-13). */
+  defaults: Record<string, string[]>;
+  defaultName: string;
+  defaultClosesAt: string;
 }) {
   const router = useRouter();
   const [allQuestions, setAllQuestions] = useState(questions);
   const [teamId, setTeamId] = useState(teams[0]?.id ?? "");
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(() => defaults[teams[0]?.id ?? ""] ?? []);
+  // Topics that hold a preselected question start expanded; the rest are collapsed.
+  const [openTopics] = useState(
+    () =>
+      new Set(
+        questions
+          .filter((question) => (defaults[teams[0]?.id ?? ""] ?? []).includes(question.id))
+          .map((question) => question.topic),
+      ),
+  );
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, true>>>({});
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -79,13 +95,8 @@ export function NewRoundForm({
 
   function changeTeam(nextTeamId: string) {
     setTeamId(nextTeamId);
-    // Own questions of another team must not stay ticked.
-    setSelected((current) =>
-      current.filter((id) => {
-        const question = allQuestions.find((item) => item.id === id);
-        return question && (question.teamId === null || question.teamId === nextTeamId);
-      }),
-    );
+    // Each team gets its own preselection; own questions of another team never stay ticked.
+    setSelected(defaults[nextTeamId] ?? []);
   }
 
   async function addCustomQuestion() {
@@ -177,6 +188,7 @@ export function NewRoundForm({
           name="name"
           type="text"
           maxLength={120}
+          defaultValue={defaultName}
           placeholder={t.newRound.namePlaceholder}
           className={inputClass}
         />
@@ -202,16 +214,25 @@ export function NewRoundForm({
         </label>
         <label className="block text-sm font-medium">
           {t.newRound.closesAt}
-          <input name="closesAt" type="date" min={todayLocal()} className={inputClass} />
+          <input
+            name="closesAt"
+            type="date"
+            min={todayLocal()}
+            defaultValue={defaultClosesAt}
+            className={inputClass}
+          />
           {fieldError("closesAt")}
         </label>
       </div>
 
       <fieldset>
         <legend className="text-sm font-medium">{t.newRound.questions}</legend>
-        <p className="mt-1 text-sm text-slate-600">
-          {t.newRound.questionsHint} {t.newRound.starterHint}
-        </p>
+        <p className="mt-1 text-sm text-slate-600">{t.newRound.questionsHint}</p>
+        {selected.length > 0 && (
+          <p className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-950">
+            {t.newRound.preselected}
+          </p>
+        )}
         {fixedQuestions.length > 0 && (
           <div className="mt-3 rounded-md border border-teal-200 bg-teal-50 px-3 py-2 text-sm">
             <p className="font-semibold text-teal-900">{t.newRound.fixedTitle}</p>
@@ -225,11 +246,21 @@ export function NewRoundForm({
         )}
         <div className="mt-3 space-y-4">
           {topics.map(([topic, items]) => (
-            <div key={topic}>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {topic}
-              </p>
-              <ul className="mt-1 space-y-1">
+            <details
+              key={topic}
+              open={openTopics.has(topic) || undefined}
+              className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2"
+            >
+              <summary className="cursor-pointer text-sm font-semibold text-slate-800">
+                {topic}{" "}
+                <span className="font-normal text-slate-600">
+                  {t.newRound.topicCount(
+                    items.filter((question) => selected.includes(question.id)).length,
+                    items.length,
+                  )}
+                </span>
+              </summary>
+              <ul className="mt-2 space-y-1">
                 {items.map((question) => {
                   const position = selected.indexOf(question.id);
                   const checked = position !== -1;
@@ -266,7 +297,7 @@ export function NewRoundForm({
                   );
                 })}
               </ul>
-            </div>
+            </details>
           ))}
         </div>
 

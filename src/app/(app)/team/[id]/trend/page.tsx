@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TrendChart } from "@/components/trend-chart";
+import { SubNav } from "@/components/sub-nav";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { FIXED_TOPIC_LABEL, getTeamTrend } from "@/server/trends";
@@ -19,6 +20,14 @@ export default async function TeamTrendPage({ params }: PageProps<"/team/[id]/tr
 
   return (
     <section className="max-w-3xl">
+      <SubNav
+        label={trend.team.name}
+        current={`/team/${trend.team.id}/trend`}
+        items={[
+          { href: `/team/${trend.team.id}`, label: t.team.title },
+          { href: `/team/${trend.team.id}/trend`, label: t.nav.teamTrend },
+        ]}
+      />
       <p className="text-sm font-medium text-teal-800">{trend.team.name}</p>
       <h1 className="mt-1 text-xl font-semibold">{t.trend.title}</h1>
       <p className="mt-1 text-sm text-slate-600">{t.trend.intro}</p>

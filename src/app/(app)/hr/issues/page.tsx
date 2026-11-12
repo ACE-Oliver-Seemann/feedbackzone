@@ -2,10 +2,11 @@ import Link from "next/link";
 import { IssueControls } from "@/components/issue-controls";
 import { IssueForm } from "@/components/issue-form";
 import { ISSUE_STATUSES, OWNER_GROUPS } from "@/config/owner-groups";
+import { SubNav } from "@/components/sub-nav";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listManageableTeams } from "@/server/catalog";
-import { getIssuePrefill, listIssues } from "@/server/hr-issues";
+import { ACTIVE_FILTER, getIssuePrefill, listIssues } from "@/server/hr-issues";
 
 const first = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
@@ -15,7 +16,8 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
   const user = await requirePageUser("HR");
   const query = await searchParams;
   const group = first(query.group) ?? "";
-  const status = first(query.status) ?? "";
+  // IT-13: show what is still to be done; finished issues are one click away.
+  const status = first(query.status) ?? ACTIVE_FILTER;
 
   const [issues, teams, prefill] = await pageData(() =>
     Promise.all([
@@ -29,6 +31,14 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
 
   return (
     <section className="max-w-3xl">
+      <SubNav
+        label={t.nav.hrIssues}
+        current="/hr/issues"
+        items={[
+          { href: "/hr/issues", label: t.nav.hrIssues },
+          { href: "/hr/notes", label: t.nav.hrNotes },
+        ]}
+      />
       <h1 className="text-xl font-semibold">{t.issues.pageTitle}</h1>
       <p className="mt-1 text-sm text-slate-600">{t.issues.intro}</p>
 
@@ -48,7 +58,8 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
         <label className="text-sm font-medium">
           {t.issues.status}
           <select name="status" defaultValue={status} className={`${selectClass} mt-1 block`}>
-            <option value="">{t.issues.filterAll}</option>
+            <option value={ACTIVE_FILTER}>{t.issues.filterActive}</option>
+            <option value="ALL">{t.issues.filterAll}</option>
             {ISSUE_STATUSES.map((item) => (
               <option key={item} value={item}>
                 {t.issueStatuses[item]}
@@ -116,8 +127,14 @@ export default async function HrIssuesPage({ searchParams }: PageProps<"/hr/issu
         </ul>
       )}
 
-      <h2 className="mt-8 text-lg font-semibold">{t.issues.newTitle}</h2>
-      <IssueForm teams={teams} prefill={prefill} />
+      {/* Open straight away when HR came here to raise an issue from a round or a note. */}
+      <details className="mt-8" open={Boolean(prefill.round || prefill.note) || undefined}>
+        <summary className="inline-block cursor-pointer rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800">
+          {t.issues.submit}
+        </summary>
+        <h2 className="mt-4 text-lg font-semibold">{t.issues.newTitle}</h2>
+        <IssueForm teams={teams} prefill={prefill} />
+      </details>
     </section>
   );
 }

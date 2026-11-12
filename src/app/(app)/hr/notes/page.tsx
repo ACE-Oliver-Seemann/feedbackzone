@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { NoteForm } from "@/components/note-form";
+import { SubNav } from "@/components/sub-nav";
 import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listNotes } from "@/server/hr-issues";
@@ -11,6 +12,14 @@ export default async function HrNotesPage() {
 
   return (
     <section className="max-w-3xl">
+      <SubNav
+        label={t.nav.hrIssues}
+        current="/hr/notes"
+        items={[
+          { href: "/hr/issues", label: t.nav.hrIssues },
+          { href: "/hr/notes", label: t.nav.hrNotes },
+        ]}
+      />
       <h1 className="text-xl font-semibold">{t.notes.pageTitle}</h1>
       <p className="mt-1 text-sm text-slate-600">{t.notes.intro}</p>
 

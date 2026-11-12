@@ -1,37 +1,37 @@
-import Link from "next/link";
 import { LogoutButton } from "@/components/logout-button";
+import { NavLinks, type NavItem } from "@/components/nav-links";
 import { requirePageUser } from "@/lib/page-auth";
 import type { Role } from "@/lib/session";
 import { t } from "@/lib/texts.sk";
 
-// Menu by role (MVP-03). Links are a convenience only; every page and
-// endpoint checks permissions again on the server.
-type NavItem = { href: string; label: string; roles: Role[] };
+// Menu by role (MVP-03): at most five areas (IT-12). Pages inside an area are
+// reached through the tabs on the page. Links are a convenience only; every
+// page and endpoint checks permissions again on the server.
+function navFor(role: Role, teamId: string | null): NavItem[] {
+  const home: NavItem = { href: "/", label: t.nav.home, match: ["/"] };
+  const kudos: NavItem = { href: "/kudos/new", label: t.nav.kudos, match: ["/kudos"] };
+  const team: NavItem[] = teamId
+    ? [{ href: `/team/${teamId}`, label: t.nav.myTeam, match: ["/team"] }]
+    : [];
 
-function navFor(teamId: string | null): NavItem[] {
-  return [
-    { href: "/", label: t.nav.mySurveys, roles: ["EMPLOYEE", "MANAGER"] },
-    { href: "/hr/rounds", label: t.nav.hrRounds, roles: ["HR"] },
-    { href: "/hr/overview", label: t.nav.hrOverview, roles: ["HR"] },
-    { href: "/hr/heatmap", label: t.nav.hrHeatmap, roles: ["HR"] },
-    { href: "/hr/issues", label: t.nav.hrIssues, roles: ["HR"] },
-    { href: "/hr/notes", label: t.nav.hrNotes, roles: ["HR"] },
-    // HR has no team of its own; it reaches team pages from the round overview.
-    ...(teamId
-      ? [{ href: `/team/${teamId}`, label: t.nav.myTeam, roles: ["EMPLOYEE", "MANAGER"] as Role[] }]
-      : []),
-    ...(teamId
-      ? [{ href: `/team/${teamId}/trend`, label: t.nav.teamTrend, roles: ["MANAGER"] as Role[] }]
-      : []),
-    { href: "/rounds/new", label: t.nav.newRound, roles: ["MANAGER", "HR"] },
-    { href: "/kudos/new", label: t.nav.sendKudos, roles: ["EMPLOYEE", "MANAGER", "HR"] },
-    { href: "/kudos/me", label: t.nav.myKudos, roles: ["EMPLOYEE", "MANAGER", "HR"] },
-  ];
+  if (role === "HR") {
+    return [
+      home,
+      { href: "/hr/rounds", label: t.nav.rounds, match: ["/hr/rounds", "/rounds"] },
+      { href: "/hr/overview", label: t.nav.hrInsights, match: ["/hr/overview", "/hr/heatmap", "/team"] },
+      { href: "/hr/issues", label: t.nav.hrIssues, match: ["/hr/issues", "/hr/notes"] },
+      kudos,
+    ];
+  }
+  if (role === "MANAGER") {
+    return [home, { href: "/rounds", label: t.nav.rounds, match: ["/rounds"] }, ...team, kudos];
+  }
+  return [home, ...team, kudos];
 }
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const user = await requirePageUser();
-  const items = navFor(user.teamId).filter((item) => item.roles.includes(user.role));
+  const items = navFor(user.role, user.teamId);
 
   return (
     <div className="min-h-screen">
@@ -46,17 +46,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
             <LogoutButton />
           </div>
         </div>
-        <nav className="mx-auto flex max-w-4xl flex-wrap gap-x-1 px-2 pb-2">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="rounded-md px-2 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-teal-800"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <NavLinks items={items} />
       </header>
       <main className="mx-auto max-w-4xl px-4 py-6">{children}</main>
     </div>

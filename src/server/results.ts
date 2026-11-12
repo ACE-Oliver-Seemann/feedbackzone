@@ -1,6 +1,6 @@
 import { randomInt } from "node:crypto";
 import { MIN_GROUP_SIZE } from "@/config/privacy";
-import { toScaleKey, type ScaleKey } from "@/config/scales";
+import { SCALES, toScaleKey, type ScaleKey } from "@/config/scales";
 import { db } from "@/lib/db";
 import { assertCanViewResults, requireRole } from "@/lib/authz";
 import { forbidden, notFound } from "@/lib/errors";
@@ -140,4 +140,21 @@ export async function getRoundResults(user: SessionUser, roundId: string): Promi
   );
 
   return { ...base, status: "ok", responseCount, questions, comments };
+}
+
+/**
+ * The question the team rated best and the one it rated worst (IT-13).
+ * Compared on favourability, so a reversed scale ("lower is better") is
+ * flipped first. Null when there is nothing to compare.
+ */
+export function summarizeResults(
+  questions: QuestionResult[],
+): { strongest: QuestionResult; weakest: QuestionResult } | null {
+  if (questions.length < 2) return null;
+  const favourability = (question: QuestionResult) =>
+    SCALES[question.scale].higherIsBetter ? question.average : 6 - question.average;
+  const sorted = [...questions].sort(
+    (a, b) => favourability(b) - favourability(a) || a.position - b.position,
+  );
+  return { strongest: sorted[0], weakest: sorted[sorted.length - 1] };
 }

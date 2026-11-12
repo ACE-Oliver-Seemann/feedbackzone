@@ -181,6 +181,53 @@ export async function createRound(
   return round;
 }
 
+/** How many rotating questions are preselected for a new round (IT-13). */
+export const DEFAULT_PICKED_QUESTIONS = 3;
+
+/**
+ * Questions preselected for a new round of a team (IT-13): recommended
+ * (starter) questions, least recently used by the team first, from different
+ * topics. Defaults are followed much more often than not, so they must rotate
+ * — otherwise every round would ask the same three things.
+ */
+export async function suggestRoundQuestions(user: SessionUser, teamId: string): Promise<string[]> {
+  requireRole(user, "MANAGER", "HR");
+  assertCanManageRounds(user, teamId);
+
+  const [starters, used] = await Promise.all([
+    db.question.findMany({
+      where: { starter: true, fixed: false, teamId: null },
+      orderBy: [{ topic: "asc" }, { text: "asc" }],
+      select: { id: true, topic: true },
+    }),
+    db.roundQuestion.findMany({
+      where: { round: { teamId } },
+      select: { questionId: true, round: { select: { closesAt: true } } },
+    }),
+  ]);
+
+  const lastUsed = new Map<string, number>();
+  for (const item of used) {
+    const time = item.round.closesAt.getTime();
+    if ((lastUsed.get(item.questionId) ?? 0) < time) lastUsed.set(item.questionId, time);
+  }
+  // Never used first, then the longest unused. The sort is stable, so ties keep topic order.
+  const candidates = [...starters].sort(
+    (a, b) => (lastUsed.get(a.id) ?? 0) - (lastUsed.get(b.id) ?? 0),
+  );
+
+  const picked: typeof candidates = [];
+  for (const question of candidates) {
+    if (picked.length === DEFAULT_PICKED_QUESTIONS) break;
+    if (!picked.some((item) => item.topic === question.topic)) picked.push(question);
+  }
+  for (const question of candidates) {
+    if (picked.length === DEFAULT_PICKED_QUESTIONS) break;
+    if (!picked.includes(question)) picked.push(question);
+  }
+  return picked.map((question) => question.id);
+}
+
 async function loadManagedRound(user: SessionUser, roundId: string) {
   requireRole(user, "MANAGER", "HR");
   const round = await db.round.findUnique({
