@@ -1,0 +1,41 @@
+PASS  [C] Wrong password: one generic message, no session  => {"path":"/login","alert":"NesprĂˇvny e-mail alebo heslo.","cookie":false}
+PASS  [C] Unknown e-mail gives exactly the same message as a wrong password  => {"path":"/login","alert":"NesprĂˇvny e-mail alebo heslo.","cookie":false}
+PASS  [C] Empty form does not log in  => path=/login; alert=''
+PASS  [C] Injection-like input in the login form is treated as a wrong login  => HTTP 401 {"error":"invalid_credentials"}
+PASS  [C] Login page shows no application menu or data to an anonymous visitor  => nav=0; title='PrihlĂˇsenie Â· Feedback portĂˇl'
+PASS  [C] Correct login as employee lands on '/' with the role shown in the header  => path='/' ; header has name=true, role label=true
+PASS  [C] Correct login as manager lands on '/' with the role shown in the header  => path='/' ; header has name=true, role label=true
+PASS  [C] Correct login as HR lands on '/' with the role shown in the header  => path='/' ; header has name=true, role label=true
+PASS  [C] Session cookie attributes  => fz_session=<token>; Path=/; Expires=Fri, 13 Nov 2026 06:00:28 GMT; Max-Age=28800; Secure; HttpOnly; SameSite=lax
+PASS  [C] Session cookie is not readable by page scripts and /api/me does not expose the password hash  => document.cookie=''; /api/me={"user":{"id":"cmwe3d0p20017pk6kxvszx192","name":"Adam VzorovĂ˝","role":"EMPLOYEE","teamId":"cmwe3d0ot0015pk6k7kd75mth"}}
+PASS  [C] Refresh and a new tab keep the session  => reload â†’ /; second tab â†’ /kudos
+PASS  [C] Opening /login while logged in does not show the form again  => path=/
+PASS  [C] Every page redirects an anonymous visitor to /login without leaking content  => not redirected or leaking: none
+PASS  [C] Every API endpoint refuses an anonymous request  => not 401: none (13 GET, 10 write)
+PASS  [C] Employee: manager and HR pages opened by direct URL show the 403 page  => not 403: none of 13
+PASS  [C] The 403 page keeps the menu, is in Slovak and offers a way back  => nav=2; text='Sem nemĂˇĹˇ prĂ­stup TĂˇto strĂˇnka nie je dostupnĂˇ pre tvoju rolu alebo tĂ­m. SpĂ¤ĹĄ na Ăşvod Chyba 403'; back â†’ /
+PASS  [C] Manager: HR pages and the other team's pages show the 403 page  => not 403: none of 10
+PASS  [C] Manager: own pages open  => failing: none of 8
+PASS  [C] HR: all teams' pages and HR pages open; the fill page does not  => failing: none of 14; fill page 403=true
+PASS  [C] HR opening the manager's list /rounds is sent to the HR list  => path=/hr/rounds, HTTP 200, h1='Prieskumy vĹˇetkĂ˝ch tĂ­mov'
+PASS  [C] Employee API matrix: write and read endpoints of other roles answer 403  => not 403: none of 14; round still OPEN
+PASS  [C] Unknown address shows a Slovak 404 page with a way back, for a logged-in user  => /neexistuje: HTTP 404, menu=0; /rounds/neexistuje/results: HTTP 404, menu=2, text='siĹĄ sa TĂşto strĂˇnku sme nenaĹˇli Adresa neexistuje alebo sa zmenila. SpĂ¤ĹĄ na Ăşvod Chyba 404'
+PASS  [C] Logout ends the session in the browser  => cookie present=false; '/' â†’ /login
+PASS  [C] Browser Back after logout does not bring the private page back  => path=/neexistuje; shows logout button=false
+PASS  [C] The token copied before logout is useless afterwards  => HTTP 401, 401
+PASS  [C] Logout ends the user's sessions in every browser  => second browser â†’ /login
+PASS  [C] Logout of one user does not end other users' sessions  => manager â†’ /, HR â†’ /
+PASS  [C] The same user can log in again right after logging out  => path=/, /api/me=200
+PASS  [C] A failed logout tells the user and keeps them logged in  => message=true, path after failure=/, then â†’ /login
+PASS  [C] Logout while the network is down tells the user  => message=true; /api/me after going online=200
+PASS  [C] Session ends while filling in a round: clear message, answers stay  => message=true, link=1, comment kept=true, responses=0
+PASS  [C] After logging in again in a new tab, the same form submits with the kept answers  => responses=1: 4,3,5,2; comment kept=true
+PASS  [C] Session invalidated on the server (logout elsewhere) while writing a kudos: clear message, text stays  => message=true, text kept=true, kudos=0
+PASS  [C] With an ended session any navigation goes to /login  => path=/login
+PASS  [C] Session ends while the manager writes a step: clear message, form content stays  => message=true, topic kept='TĂ©ma pred vyprĹˇanĂ­m QA', actions=0
+PASS  [C] Session ends before the manager confirms starting a round: understandable message, no change  => informed=true (path=/rounds), success toast=0, db=DRAFT; visible message='PrihlĂˇsenie vyprĹˇalo. PrihlĂˇs sa znova v novej karte a potom to tu skĂşs eĹˇte raz. ÄŚo mĂˇĹˇ vyplnenĂ©, zostane.'
+PASS  [C] Tampered session cookie is refused  => path=/login
+PASS  [C] Forged tokens are refused by the API  => statuses=401,401,401,401,401,401,401,401
+PASS  [C] Deep link: an anonymous visitor who opens a protected address and logs in ends inside the application  => login URL='/login', after login â†’ /
+PASS  [C] Known BUG-036: after switching accounts in the same browser, a tab opened earlier still shows the old name  => stale tab still shows Emil=true (known BUG-036); after reload shows Barbora=true
+PASS  [C] Pages of a logged-in user are not cacheable by shared caches  => '/'=private, no-cache, no-store, max-age=0, must-revalidate; /hr/issues=private, no-cache, no-store, max-age=0, must-revalidate; /api/hr/issues=null (API header missing = known risk R-4)

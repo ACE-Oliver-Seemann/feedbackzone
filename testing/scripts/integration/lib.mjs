@@ -1,6 +1,6 @@
 // Shared helpers for the Level 3 (end-to-end) QA scripts.
 // Runs against the isolated QA server (http://localhost:3303) and prisma/qa-e2e.db only.
-import { chromium } from "playwright-core";
+import { createRequire as _cr } from "node:module";
 import { createRequire } from "node:module";
 import { execSync } from "node:child_process";
 import fs from "node:fs";
@@ -8,15 +8,17 @@ import path from "node:path";
 
 export const BASE = process.env.QA_BASE ?? "http://localhost:3303";
 export const PROJECT = process.env.QA_PROJECT ?? ".";
-export const EVIDENCE = path.join(PROJECT, "testing/reports/2026-11-12_001/evidence/integration");
+export const EVIDENCE = path.join(PROJECT, "testing/reports/2026-11-12_002/evidence/integration");
 export const SCREENS = path.join(EVIDENCE, "screens");
 export const PASSWORD = "Heslo123";
 fs.mkdirSync(SCREENS, { recursive: true });
 
-const require = createRequire(path.join(PROJECT, "package.json"));
+const require = createRequire(path.resolve(PROJECT, "package.json"));
+// playwright-core lives outside the repo; QA_PW points at a folder that has it in node_modules.
+const { chromium } = _cr(path.resolve(process.env.QA_PW ?? PROJECT, "package.json"))("playwright-core");
 const { PrismaClient } = require("@prisma/client");
 export const db = new PrismaClient({
-  datasources: { db: { url: `file:${PROJECT}/prisma/qa-e2e.db` } },
+  datasources: { db: { url: `file:${path.resolve(PROJECT, "prisma/qa-e2e.db").split(path.sep).join("/")}` } },
 });
 
 export const U = {
@@ -149,3 +151,82 @@ export async function fillWizard(page, roundId, answers, comment = "", { stopBef
   if (comment) await page.locator("textarea").fill(comment);
   if (!stopBeforeSubmit) await page.getByRole("button", { name: "Odoslať" }).click();
 }
+
+// ───────────────────────── Session 2026-11-12_002 additions (redesigned markup)
+export const DAY = 864e5;
+/** step(meta, fn): fn returns [ok, actual, evidence?] or "BLOCKED:<reason>". Never throws. */
+export function stepper(R, defaults = {}) {
+  return async (meta, fn) => {
+    try {
+      const out = await fn();
+      if (typeof out === "string" && out.startsWith("BLOCKED")) return R.check({ ...defaults, ...meta }, "BLOCKED", out);
+      const [ok, actual, evidence] = out;
+      return R.check({ ...defaults, ...meta }, ok, actual, evidence ?? "");
+    } catch (error) {
+      return R.check({ ...defaults, ...meta }, false, `SCRIPT/RUNTIME ERROR: ${String(error.message).slice(0, 300)}`);
+    }
+  };
+}
+export const toastRegion = (page) => page.locator('[role="status"][aria-label="Oznámenia"]');
+export const toast = (page, text) => toastRegion(page).getByText(text);
+export const row = (page, name) => page.locator("[data-round-row]").filter({ has: page.getByRole("heading", { name, exact: true }) }).first();
+export const rowById = (page, id) => page.locator(`[data-round-row="${id}"]`);
+/** Clicks a transition button in a round row and answers the confirm dialog. */
+export async function transition(page, rowLocator, label, confirm = true) {
+  await rowLocator.getByRole("button", { name: label }).click();
+  const dialog = page.locator("dialog[open]");
+  await dialog.waitFor({ timeout: 5000 });
+  await dialog.getByRole("button", { name: confirm ? label : "Zrušiť" }).click();
+}
+export async function libraryIds(teamId = null, count = 3) {
+  const fixed = await db.question.findFirst({ where: { fixed: true } });
+  const qs = await db.question.findMany({ where: { fixed: false, teamId: null, starter: true }, orderBy: { id: "asc" } });
+  // different topics
+  const seen = new Set(); const pick = [];
+  for (const q of qs) { if (!seen.has(q.topic)) { seen.add(q.topic); pick.push(q.id); } if (pick.length === count) break; }
+  return { fixedId: fixed.id, ids: pick };
+}
+/** Creates (and optionally opens) a round through the API. Returns the round id. */
+export async function apiRound(call, { teamId, name, days = 7, count = 3, open = true }) {
+  const { ids } = await libraryIds(teamId, count);
+  const r = await call("/api/rounds", "POST", { name, teamId, closesAt: ymd(new Date(Date.now() + days * DAY)), questionIds: ids });
+  if (r.status !== 201) throw new Error(`create round failed: ${r.status} ${r.text}`);
+  const id = r.json.round?.id ?? r.json.id;
+  if (open) {
+    const o = await call(`/api/rounds/${id}/open`, "POST");
+    if (o.status !== 200) throw new Error(`open failed: ${o.status} ${o.text}`);
+  }
+  return id;
+}
+export async function apiRespond(email, roundId, answers, comment) {
+  const call = await api(email);
+  return call(`/api/rounds/${roundId}/responses`, "POST", { answers, ...(comment ? { comment } : {}) });
+}
+/** New wizard walk for the redesigned markup; waits for each transition. */
+export async function wizard(page, roundId, answers, comment = "", { submit = true } = {}) {
+  await page.goto(`${BASE}/rounds/${roundId}/fill`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Začať" }).click();
+  for (let i = 0; i < answers.length; i++) {
+    await page.getByText(`Otázka ${i + 1} z ${answers.length}`).waitFor({ state: "attached", timeout: 8000 });
+    await page.locator("fieldset button[aria-pressed]").nth(answers[i] - 1).click();
+    await page.getByRole("button", { name: "Ďalej" }).click();
+  }
+  await page.locator("textarea").waitFor({ timeout: 8000 });
+  if (comment) await page.locator("textarea").fill(comment);
+  if (submit) {
+    await page.getByRole("button", { name: "Odoslať" }).click();
+    await page.getByRole("heading", { name: "Ďakujeme za odpoveď" }).waitFor({ timeout: 10000 });
+  }
+}
+export const mainOnly = async (page) => (await page.locator("main#main").innerText()).replace(/\s+/g, " ").trim();
+export const pathOf = (page) => new URL(page.url()).pathname;
+export const teams = async () => ({
+  A: await db.team.findFirstOrThrow({ where: { name: "Tím Alfa" } }),
+  B: await db.team.findFirstOrThrow({ where: { name: "Tím Beta" } }),
+});
+export const isoWeek = (date) => {
+  const day = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  day.setUTCDate(day.getUTCDate() + 4 - (day.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(day.getUTCFullYear(), 0, 1));
+  return Math.ceil(((day.getTime() - yearStart.getTime()) / 864e5 + 1) / 7);
+};

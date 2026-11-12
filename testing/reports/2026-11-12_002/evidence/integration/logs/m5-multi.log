@@ -1,0 +1,23 @@
+PASS  [F] Five members press 'OdoslaĹĄ' at the same moment in five browsers  => responses/participations=5/5; stored=1234,2345,3451,4512,5123
+PASS  [F] NFR-01 after simultaneous submissions: stored order gives no hint who sent what  => Response.rowid not available; Participation.rowid not available; table order = UUID order: true
+PASS  [F] The manager's list shows the participation of the moment after a reload  => manager row=true, HR row=true
+PASS  [F] The same member submits from two tabs at the same moment  => responses/participations=1/1; tabs: Toto kolo uĹľ mĂˇĹˇ vyplnenĂ© | ÄŽakujeme za odpoveÄŹ
+PASS  [F] Six parallel API submissions of one member  => statuses=201,409,409,409,409,409; responses/participations=2/2
+PASS  [F] Members submit in the browser while the manager closes the round in another browser  => screens=ÄŽakujeme za odpoveÄŹ | ÄŽakujeme za odpoveÄŹ | ÄŽakujeme za odpoveÄŹ; responses/participations=5/5; submission after close â†’ HTTP 409
+PASS  [F] Race repeated on the API: 10 rounds, 5 submissions against a simultaneous close  => inconsistent rounds=none; rounds where all 5 got in before the close=1/10
+PASS  [F] HR and the manager start the same draft at the same moment  => db=OPEN; HR={"toast":1,"stale":0,"generic":0}; manager={"toast":0,"stale":1,"generic":0}
+PASS  [F] HR and the manager close the same round at the same moment  => db=CLOSED; HR={"toast":1,"stale":0,"generic":0}; manager={"toast":0,"stale":1,"generic":0}
+PASS  [F] Two managers save a round for their own teams at the same moment  => Alfa draft team ok=true, Beta draft team ok=true; cross-visibility=false
+PASS  [F] A step written by the manager is visible to HR and to a team member after their next page load  => HR before reload=false (no live update is expected), HR after reload=true, employee after reload=true
+FAIL  [F] Step status changed in one tab is shown correctly in a second tab of the same manager after that tab refreshes its data  => T1 shows 'PLANNED' for the first step; database has 'DONE'
+FAIL  [F] Issue status changed by one HR session is shown correctly in a second HR session after that session refreshes its data  => session 1 shows 'OPEN' for issue X; database has 'IN_PROGRESS'
+PASS  [F] With rounds open in both teams, each member sees only the own team's round  => Adam sees Alfa=true, Beta=false; Filip sees Beta=true, Alfa=false
+PASS  [F] A member cannot answer the other team's round even with its address  => 403 page=true; API HTTP 403; responses/participations=0/0
+PASS  [F] A manager cannot start, close or write a step on the other team's round  => 403,403,403; Beta round OPEN, Alfa round OPEN
+PASS  [F] Each manager's list and home tasks contain only the own team  => Alfa round names visible to manager Beta: none
+PASS  [F] HR sees the rounds of both teams in one list with the right team on each row  => rows=18, DB rounds=18, wrong team label=0
+PASS  [F] Five identical own questions sent at once are stored once  => statuses=400,201,400,400,400; rows=1
+PASS  [F] Five people send a kudos to the same colleague at once  => statuses=201,201,201,201,201; list items=5; tab='Moje kudos 5'
+PASS  [F] Round closes once when several people load pages at its deadline  => statuses=200,200,200,200,200,200; db=CLOSED; closedAt==closesAt: true
+PASS  [F] Database integrity after all concurrent scenarios  => rounds=18; inconsistent=none
+PASS  [F] No uncaught JavaScript error in any of the parallel sessions  => page errors=0 

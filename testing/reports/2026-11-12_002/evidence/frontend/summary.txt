@@ -1,0 +1,64 @@
+| Section | Executed | Passed | Failed | Blocked |
+| --- | --- | --- | --- | --- |
+| A – Navigation | 156 | 156 | 0 | 0 |
+| B – UI components | 43 | 43 | 0 | 0 |
+| C – Forms and questionnaire | 73 | 69 | 4 | 0 |
+| D – Animations and interactions | 34 | 31 | 3 | 0 |
+| E – Responsive design | 265 | 255 | 10 | 0 |
+| F – Visual and text quality | 49 | 49 | 0 | 0 |
+| G – Accessibility | 96 | 79 | 17 | 0 |
+| **Total** | **716** | **682** | **34** | **0** |
+
+Script errors: 0
+
+Failed tests per defect / note:
+FE2-001: 2 tests (FE2-T473, FE2-T481)
+FE2-002: 1 tests (FE2-T464)
+FE2-003: 1 tests (FE2-T439)
+FE2-004: 5 tests (FE2-T618, FE2-T619, FE2-T621, FE2-T692, FE2-T693)
+FE2-005: 1 tests (FE2-T480)
+FE2-006: 1 tests (FE2-T648)
+FE2-007: 3 tests (FE2-T460, FE2-T713, FE2-T714)
+FE2-008: 3 tests (FE2-T601, FE2-T707, FE2-T708)
+FE2-009: 10 tests (FE2-T193, FE2-T205, FE2-T211, FE2-T213, FE2-T215, FE2-T217, FE2-T226, FE2-T247, FE2-T264, FE2-T702)
+FE2-010: 1 tests (FE2-T586)
+FE2-011: 2 tests (FE2-T711, FE2-T712)
+FE2-012 (known BUG-030): 1 tests (FE2-T647)
+FE2-013 (known BUG-029): 2 tests (FE2-T715, FE2-T716)
+FE2-014 (known BUG-028): 1 tests (FE2-T709)
+
+Failed, blocked and errored tests:
+FE2-T193 [FE2-009] E – Touch targets on /hr/rounds (hr-rounds) as hr, 360px touch device
+FE2-T205 [FE2-009] E – Touch targets on /rounds/:id/report (report) as hr, 360px touch device
+FE2-T211 [FE2-009] E – Touch targets on /hr/overview (overview) as hr, 360px touch device
+FE2-T213 [FE2-009] E – Touch targets on /hr/heatmap (heatmap) as hr, 360px touch device
+FE2-T215 [FE2-009] E – Touch targets on /hr/issues (issues) as hr, 360px touch device
+FE2-T217 [FE2-009] E – Touch targets on /hr/issues?filter=all (issues-all) as hr, 360px touch device
+FE2-T226 [FE2-009] E – Touch targets in the header as hr, 360px touch device
+FE2-T247 [FE2-009] E – Touch targets in the header as mgrA, 360px touch device
+FE2-T264 [FE2-009] E – Touch targets in the header as adam, 360px touch device
+FE2-T439 [FE2-003] D – Question transition is animated in the direction of movement (IT-02)
+FE2-T460 [FE2-007] G – Thank-you screen: focus and announcement
+FE2-T464 [FE2-002] D – Animations last at most 1.5 s: questionnaire confetti (IT-02)
+FE2-T473 [FE2-001] C – New round: empty name — is the error visible where the user is?
+FE2-T480 [FE2-005] G – Sticky save bar does not hide the focused element while tabbing through the form
+FE2-T481 [FE2-001] C – New round: server error 500 shows the generic message, input kept, message visible
+FE2-T586 [FE2-010] G – Structure of /kudos?tab=send (kudos-send) as hr: title, one h1, heading order, landmarks
+FE2-T601 [FE2-008] G – Structure of /hr/overview (403) as mgrA: title, one h1, heading order, landmarks
+FE2-T618 [FE2-004] G – Keyboard walk on /hr/rounds: every stop has a visible focus indicator and is not hidden under the sticky header
+FE2-T619 [FE2-004] G – Keyboard walk on /rounds/:id/results: every stop has a visible focus indicator and is not hidden under the sticky header
+FE2-T621 [FE2-004] G – Keyboard walk on /kudos?tab=send: every stop has a visible focus indicator and is not hidden under the sticky header
+FE2-T647 [FE2-012 (known BUG-030)] G – Non-text contrast of form field borders (BUG-030, known open)
+FE2-T648 [FE2-006] E – Motion menu at 320 px: panel fits the screen, options are large enough to tap
+FE2-T692 [FE2-004] G – Shift+Tab upwards on /hr/rounds at 768px, tablet (header with menu row): focused control is not hidden under the sticky header
+FE2-T693 [FE2-004] G – Shift+Tab upwards on /hr/rounds at 360px, phone: focused control is not hidden under the sticky header
+FE2-T702 [FE2-009] D – Toast: dismiss button works and is big enough for touch
+FE2-T707 [FE2-008] G – 404 page inside the app shell (/team/neexistuje as hr): landmarks and title
+FE2-T708 [FE2-008] G – 403 page inside the app shell (/hr/issues as manager): landmarks, title, no needless scrolling
+FE2-T709 [FE2-014 (known BUG-028)] G – Questionnaire question step has a heading (BUG-028, known partial)
+FE2-T711 [FE2-011] C – Comment field accepts 1 000 characters when emoji are used (BUG-006 residual)
+FE2-T712 [FE2-011] C – Kudos text accepts 500 characters when emoji are used (BUG-006 residual)
+FE2-T713 [FE2-007] G – Kudos: focus after a rejected submit stays on a meaningful element (BUG-016 residual)
+FE2-T714 [FE2-007] G – Login: focus after a rejected login stays on a meaningful element
+FE2-T715 [FE2-013 (known BUG-029)] G – Issue and note forms: error is linked to the invalid field (BUG-029, known open)
+FE2-T716 [FE2-013 (known BUG-029)] G – Required fields are marked as required (BUG-029, known open)

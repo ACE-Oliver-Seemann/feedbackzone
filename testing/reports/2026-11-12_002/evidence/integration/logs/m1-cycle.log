@@ -1,0 +1,78 @@
+PASS  [A] HR logs in through the form and lands on the home page  => path=/, heading=true
+PASS  [G] HR main menu has exactly the five items of IT-12  => Domov,Prieskumy,PrehÄľady,Podnety,Kudos
+PASS  [G] HR home task: closed rounds without an action, recomputed from the database  => UI='1 uzavretĂ© kolo ÄŤakĂˇ na krok manaĹľĂ©ra. NajdlhĹˇie TĂ­m Beta, 3 dni.' expected='1 uzavretĂ© kolo ÄŤakĂˇ na krok manaĹľĂ©ra. NajdlhĹˇie TĂ­m Beta, 3 dni.'
+PASS  [G] New round form is prefilled: name, deadline +7 days, 3 questions + the fixed question (IT-13, IT-04)  => name='Pulse â€“ 46. tĂ˝ĹľdeĹ', closes=2026-11-19 (exp 2026-11-19), ticked=3, counter='OtĂˇzok v kole: 4 (treba 3 aĹľ 5)', notice=true, fixed=true
+PASS  [G] Preselected questions are recommended ones from three different topics, each in an expanded topic  => open topics with a ticked question=3, collapsed with ticked=0, recommended=3
+PASS  [A] Fewer than 3 questions: the form does not save and says why  => path=/rounds/new, message=true, rounds 1â†’1; counter='OtĂˇzok v kole: 2 (treba 3 aĹľ 5)'
+PASS  [A] More than 5 questions cannot be selected in the form  => after 4 ticks: 'OtĂˇzok v kole: 5 (treba 3 aĹľ 5)'; unticked=33, of them disabled=33; after trying a 6th: 'not attempted'
+PASS  [A] HR saves the round for TĂ­m Alfa as a draft with the defaults (two clicks)  => path=/hr/rounds, toast=true, status=DRAFT, questions=4, first fixed=true, startsAt=null
+PASS  [D] List of rounds for HR shows the draft with team, status, deadline and participation equal to the database  => Pulse â€“ 46. tĂ˝ĹľdeĹ TĂ­m Alfa Stav: Koncept UzĂˇvierka 19. 11. 2026 â€“ SpustiĹĄ
+PASS  [A] A draft is invisible to team members (home page and API)  => in list=false; detail HTTP 404 {"error":"not_found"}
+PASS  [A] Start dialog can be cancelled and nothing changes  => db=DRAFT, row shows Koncept=true, toast count=0, dialog open=0
+PASS  [A] HR starts the round through the confirm dialog  => db=OPEN, startsAt set=true, UzavrieĹĄ button=1
+PASS  [A] A running round cannot be started again or edited  => HTTP 409 {"error":"invalid_state"}; row links=TĂ­m Alfa|VĂ˝sledky
+PASS  [G] Manager main menu: Domov, Prieskumy, MĂ´j tĂ­m, Kudos  => Domov,Prieskumy,MĂ´j tĂ­m,Kudos
+PASS  [A] Manager can create a round only for the own team  => options=TĂ­m Beta; POST for Alfa â†’ HTTP 403
+PASS  [G] Own question: too short text is refused  => button disabled=false, message=true, team questions in DB=0
+PASS  [G] Manager adds an own question; it is stored for the team, ticked and visible in an expanded topic  => db teamId ok=true, scale=AGREEMENT, counter='OtĂˇzok v kole: 5 (treba 3 aĹľ 5)', ticked in open topic=true
+PASS  [A] Manager saves the round under a custom name with 5 questions (fixed + 3 + own)  => path=/rounds, toast=true, questions=5, own included=true, fixed first=true
+PASS  [A] Manager starts the own round from /rounds  => db=OPEN
+PASS  [F] Own question of TĂ­m Beta is not offered to the manager of TĂ­m Alfa and cannot be used by them  => in Alfa library=false; POST â†’ HTTP 400 {"error":"validation_error","fields":{"questionIds":"unknown"}}; HR sees it=true
+PASS  [G] Employee main menu: Domov, MĂ´j tĂ­m, Kudos  => Domov,MĂ´j tĂ­m,Kudos
+PASS  [A] Employee home shows the open round as a task and in 'Moje prieskumy'  => task='ÄŚakĂˇ na teba prieskum â€žPulse â€“ 46. tĂ˝ĹľdeĹâ€ś. MĂˇ 4 otĂˇzky a zaberie asi 2 minĂşty.', badge=true
+PASS  [F] Employee of TĂ­m Alfa does not see the round of TĂ­m Beta anywhere  => on page=false; in API list=false; detail HTTP 403
+PASS  [A] Intro screen shows the exact confidentiality text before the first question  => exact text=true, duration=true
+PASS  [A] First question: one question per screen, progress '1 z 4', 'ÄŽalej' disabled until a value is chosen  => fieldsets=1, buttons=5, next disabled=true, legend='Celkovo, akĂ© boli pre mĹa poslednĂ© dva tĂ˝Ĺľdne v prĂˇci?'
+PASS  [A] Back keeps the chosen answer  => q1 pressed='4 â€“ SkĂ´r dobrĂ©', q2 pressed='2 â€“ SkĂ´r nesĂşhlasĂ­m'
+PASS  [A] Comment step: optional comment with a counter, max 1 000 characters  => counter visible=true, maxlength=1000
+PASS  [A] Submit: thank-you screen with a celebration, one response and one participation stored  => responses=1 (4,2,5,3,null), comment stored=true, participations=1, celebration element='canvas'
+PASS  [A] Thank-you screen shows the last closed round's steps section and a way back  => cheer='Super, mĂˇĹˇ to za sebou. Tvoj nĂˇzor pomĂˇha celĂ©mu tĂ­mu.', back link=1, text='Super, mĂˇĹˇ to za sebou. Tvoj nĂˇzor pomĂˇha celĂ©mu tĂ­mu. ÄŽakujeme za odpoveÄŹ Tvoja odpoveÄŹ je odoslanĂˇ. VĂ˝sledky uvidĂ­ 
+PASS  [A] The celebration does not block navigation right after submitting  => navigated in 133 ms; page errors=0
+PASS  [A] Home marks the round as 'OdoslanĂ©' and the task disappears  => nothing=true, badge=true, fill links=0
+PASS  [A] Second attempt through the UI is refused  => heading=true, start buttons=0
+PASS  [A] Second submission through the API is refused with 409 and stores nothing  => HTTP 409 {"error":"already_submitted"}; responses=1, participations=1
+PASS  [A] Second member fills the round on a 360 px phone without horizontal scrolling  => scrollWidth per step=360,360,360,360,360,360,360
+PASS  [A] Member 3 of TĂ­m Alfa fills the round through the wizard  => responses in DB=3
+PASS  [A] Member 4 of TĂ­m Alfa fills the round through the wizard  => responses in DB=4
+PASS  [A] Member 5 of TĂ­m Alfa fills the round through the wizard  => responses in DB=5
+PASS  [D] NFR-01: Response rows carry no user and no time; their order does not reveal who answered  => Response cols=id,roundId,teamId,v1,v2,v3,v4,v5,comment; Participation cols=roundId,userId; WITHOUT ROWID=true; uuid ids=true
+PASS  [A] Open round shows only participation to the manager, in the UI and in the API  => UI participation ok=true; UI has 'Priemer'=false; API keys=round,participation,status; comment leak=false
+PASS  [A] Manager also sees the own-team round to fill in, and fills it as the sixth person  => fill links on home=2; responses=6; participations=6
+PASS  [C] HR cannot fill in a round (page and API)  => 403 page=true; API HTTP 403; responses=6
+PASS  [A] Member of TĂ­m Beta fills a 5-question round incl. the manager's own question  => 5th legend='Rozdelenie Ăşloh v naĹˇom tĂ­me je spravodlivĂ© (QA).'
+PASS  [A] Three more Beta members answer (API), giving exactly 4 responses  => statuses=201,201,201; responses=4
+PASS  [A] Manager closes the round through the confirm dialog  => db=CLOSED, closedAt within 60 s=true
+PASS  [A] Below the threshold the API returns only the state and the count  => manager: {"round":{"id":"cmwe36ebq0063pkf4w48w8k3q","name":"Pulse â€“ prah QA","teamId":"cmwe367al001ipkkoull90wx5","teamName":"TĂ­m Beta","status":"CLOSED","closesAt":"2026-11-19T22:59:59.999Z"},"partic
+PASS  [A] Below the threshold the results page shows 'Nedostatok odpovedĂ­' and nothing else  => forbidden strings present=none
+PASS  [A] Below the threshold: suggestions endpoint, report, team page, trend and comparison give no values  => suggestions HTTP 200 {"status":"insufficient_responses","responseCount":4}; report insufficient=true; team insufficient=true; trend cells='4|Nedostatok odpovedĂ­'; trend API has avg for it=false; heatm
+PASS  [A] A fifth response cannot be added after closing  => closed page=true; API HTTP 409 {"error":"round_closed"}; responses=4
+PASS  [A] Manager Alfa closes round A (6 responses) through the dialog  => db=CLOSED
+PASS  [D] Results page: participation and the average of every question equal the values the members sent  => UI=3,83 / 3,17 / 4,17 / 3,0; expected=3,83 / 3,17 / 4,17 / 3,0
+PASS  [D] Results API equals the database and the UI; no author information anywhere  => questions=4; averages=3.83,3.17,4.17,3; identity strings in body=0; keys=round,participation,status,responseCount,questions,comments
+PASS  [D] Distribution of answers is collapsed and, when opened, equals the database  => open by default=false; UI=Hodnota 1: 0Ă—;Hodnota 2: 1Ă—;Hodnota 3: 1Ă—;Hodnota 4: 2Ă—;Hodnota 5: 2Ă—
+PASS  [D] Comments: collapsed with the count in the heading; the set equals the database; no names  => heading='KomentĂˇre (3)', open by default=false, comments match=true
+PASS  [D] Comments are served in a random order (not the order of submission)  => distinct orders in 12 calls=6
+PASS  [G] Summary box names the best and the weakest question and the first suggested step  => best ok=true, weakest ok=true, first suggestion shown=true; summary='V skratke NajlepĹˇie: â€žKeÄŹ za manaĹľĂ©rom prĂ­dem s problĂ©mom, nieÄŤo sa s nĂ­m zaÄŤne diaĹĄ.â€ś (4,17). NajslabĹˇie: â€žKeÄŹ odvediem dobrĂş prĂˇc
+PASS  [G] Two rule-based suggestions for the two weakest non-fixed questions from different topics, labelled as not AI  => note=true, buttons=2, API suggestions=2, topics=Rast, uznanie a silnĂ© strĂˇnky | JasnosĹĄ a priority, refers to weakest (KeÄŹ odvediem dobrĂş prĂˇcu, niekto si to vâ€¦)=true
+PASS  [A] 'PouĹľiĹĄ ako krok' copies the suggestion into the step form without saving  => topic='Rast, uznanie a silnĂ© strĂˇnky', description='V najbliĹľĹˇom 1:1 sa s kaĹľdĂ˝m porozprĂˇvaj o tom, ÄŤo sa chce vâ€¦', actions in DB=0
+PASS  [A] Step form refuses to save without a due date  => field message=true, generic message=false, toast=0, actions=0
+PASS  [A] Manager writes the step  => db topic ok=true, due=2026-11-26, status=PLANNED, UI select=PLANNED
+PASS  [A] Form is cleared after saving and 'ÄŚakĂˇ na krok' disappears from the list of rounds  => topic after save='', row='Pulse â€“ 46. tĂ˝ĹľdeĹ Stav: UzavretĂ© UzĂˇvierka 19. 11. 2026 ĂšÄŤasĹĄ 6 z 6 VĂ˝sledky'
+PASS  [A] Manager changes the status of the step  => db=IN_PROGRESS, after reload=IN_PROGRESS
+PASS  [A] Employee sees the step and the averages in 'Povedali ste, urobili sme'  => Pulse â€“ 46. tĂ˝ĹľdeĹ UzavretĂ© 12. 11. 2026 Odpovedalo 6 z 6 Celkovo, akĂ© boli pre mĹa poslednĂ© dva tĂ˝Ĺľdne v prĂˇci? Priemer 3,83 Priority nĂˇĹˇho tĂ­mu boli za poslednĂ© dva tĂ˝Ĺľdne stabilnĂ©. Priemer 3,17 KeÄŹ
+PASS  [D] Team summary API equals the team page and never contains comments or respondents  => round keys=id,name,closesAt,closedAt,participation,results,actions; actions=1; leak=false
+PASS  [C] Employee cannot open results, report, suggestions or the step form  => pages 403=true,true; API 403,403,403; actions=1
+PASS  [F] Manager of TĂ­m Beta cannot see results of TĂ­m Alfa (acceptance step 3)  => pages 403=true,true,true,true; API=403,403,403,403,403; action status still IN_PROGRESS
+PASS  [A] HR sees the same results, but has no step form and cannot write a step  => averages=true, step form=0, status selects=0, issue link=1, API 403,403
+PASS  [G] Printable report: results, steps and suggestions, but no comments  => averages present=true, step=true, comment texts in HTML=0, print button=1
+PASS  [G] Report in print media hides the menu and the buttons  => nav visible=false, print button visible=false
+PASS  [D] Team trend: round A has values equal to the results, with the 'few rounds' warning  => cells=6|3,83|3,17|4,17|3,0; few-rounds note=true
+PASS  [D] Comparison of teams: TĂ­m Alfa has values from round A, TĂ­m Beta (4 and 4 responses) is absent or empty  => Alfa='TĂ­m Alfa 1 kolo 3,83 3,17 4,17 3,0'; Beta cells='â€“|â€“|â€“|â€“'
+PASS  [D] HR overview after one step: numbers recomputed from the database  => DB closed=3, with action=1; API total={"closedRounds":3,"roundsWithAction":1,"sharePercent":33,"medianDaysToFirstAction":0,"actions":{"planned":0,"inProgress":1,"done":0,"overdue":0}}; headline='Ako ÄŤ
+PASS  [G] HR list of rounds: summary tiles and 'ÄŚakĂˇ na krok' badges equal the database  => tiles='OtvorenĂ© kolĂˇ 0 ÄŚakajĂş na krok 2 VĹˇetky kolĂˇ 3', badge A=false, B=true, seed Beta=true
+PASS  [A] Next round: after submitting, the thank-you screen shows the steps of the last closed round  => ÄŽakujeme, tvoj hlas sa poÄŤĂ­ta. ÄŽakujeme za odpoveÄŹ Tvoja odpoveÄŹ je odoslanĂˇ. VĂ˝sledky uvidĂ­ manaĹľĂ©r aĹľ po uzavretĂ­ kola. ÄŚo sa urobilo po kole â€žPulse â€“ 46. tĂ˝ĹľdeĹâ€ś Rast, uznanie a silnĂ© strĂˇnky Prebi
+PASS  [A] Round closes automatically on the first load after its deadline, dated at the deadline  => row='Pulse â€“ ÄŹalĹˇie kolo QA Stav: UzavretĂ© ÄŚakĂˇ na krok UzĂˇvierka 12. 11. 2026 ĂšÄŤasĹĄ 1 z 6 VĂ˝sledky', db=CLOSED, closedAt==closesAt: true, fill page closed=true
+PASS  [A] Team page orders closed rounds by the real closing time, newest first (BUG-019)  => order=Pulse â€“ 46. tĂ˝ĹľdeĹ > Pulse â€“ ÄŹalĹˇie kolo QA; first has today's date=true
+PASS  [G] Manager home: closed round without a step becomes a task that leads to its results  => task='Kolo â€žPulse â€“ ÄŹalĹˇie kolo QAâ€ś je uzavretĂ© od dnes a tĂ­m ÄŤakĂˇ, ÄŤo sa s vĂ˝sledkami stane. Pozri vĂ˝sledky a zapĂ­Ĺˇ krok.', href=/rounds/cmwe37hxf0067pkf4bqwswh6p/results
+PASS  [D] Whole-database integrity after the cycle  => Pulse â€“ zĂˇĹĄaĹľ a sĂşstredenie: 4/4; Pulse â€“ 46. tĂ˝ĹľdeĹ: 6/6; Pulse â€“ prah QA: 4/4; Pulse â€“ ÄŹalĹˇie kolo QA: 1/1
+PASS  [G] No uncaught JavaScript error on any page during the whole cycle  => page errors=0 

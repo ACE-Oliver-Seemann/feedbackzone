@@ -140,7 +140,7 @@ export default async function run() {
     const r = await L("?group=NOPE&status=NOPE");
     return { ok: r.status === 400 || r.json.issues.length === 0, actual: `${r.status}; returned ${r.json?.issues?.length} of ${all} issues (filter ignored: ${r.json?.issues?.length === all})` };
   });
-  await t("HR-ISSUE-FILTER", "SQL-injection string in the filter", "200, treated as data; no error", async () => (await L("?group=" + encodeURIComponent("' OR 1=1 --") + "&status=" + encodeURIComponent("OPEN' UNION SELECT * FROM User--"))).status === 200);
+  await t("HR-ISSUE-FILTER", "SQL-injection string in the filter", "400 validation_error (unknown filter value, BUG-009 fix); treated as data, no 500", async () => (await L("?group=" + encodeURIComponent("' OR 1=1 --") + "&status=" + encodeURIComponent("OPEN' UNION SELECT * FROM User--"))).status === 400); // updated in session 2026-11-12_002
   await t("HR-ISSUE-FILTER", "list is sorted newest first", "createdAt descending", async () => { const r = (await L("")).json.issues; return r.every((x, i) => i === 0 || Date.parse(r[i - 1].createdAt) >= Date.parse(x.createdAt)); });
   await t("HR-ISSUE", "DELETE / PUT on issues", "405", async () => (await req("DELETE", `/api/hr/issues/${issue.id}`, { as: "hr" })).status === 405 && (await req("PUT", `/api/hr/issues`, { as: "hr", body: {} })).status === 405);
 

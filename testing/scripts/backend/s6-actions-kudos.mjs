@@ -177,12 +177,14 @@ export default async function run() {
     const id = r.json.kudos.id;
     return r.status === 201 && (await feed(ctx.teamA, "a1")).some((k) => k.id === id) && !(await feed(ctx.teamB, "b1")).some((k) => k.id === id);
   });
-  await t("KUDOS", "HR sends kudos; public kudos to HR (no team) is visible only in HR's 'my kudos'", "201 both; kudos to HR in no team feed", async () => {
+  // Updated in session 2026-11-12_002: since the BUG-024 fix a public kudos for a recipient without a team is refused.
+  await t("KUDOS", "HR sends kudos; public kudos to HR (no team) is refused, private one is visible only in HR's 'my kudos'", "201 from HR; public to HR 400 visibility=no_team; private to HR 201 and in no team feed (BUG-024 fix)", async () => {
     const a = await K(kb({ text: "Poďakovanie od HR za spoluprácu." }), "hr");
     const b = await K(kb({ toUserId: ctx.users.hr.id, text: "Verejné poďakovanie pre HR tím." }), "a1");
-    const id = b.json.kudos.id;
+    const c = await K(kb({ toUserId: ctx.users.hr.id, text: "Súkromné poďakovanie pre HR tím.", visibility: "PRIVATE" }), "a1");
+    const id = c.json?.kudos?.id;
     const inFeeds = (await feed(ctx.teamA, "hr")).some((k) => k.id === id) || (await feed(ctx.teamB, "hr")).some((k) => k.id === id);
-    return { ok: a.status === 201 && b.status === 201 && !inFeeds && (await mine("hr")).some((k) => k.id === id), actual: `${a.status}/${b.status}; in a team feed: ${inFeeds}` };
+    return { ok: a.status === 201 && b.status === 400 && b.json.fields?.visibility === "no_team" && c.status === 201 && !inFeeds && (await mine("hr")).some((k) => k.id === id), actual: `${a.status}/${b.status} ${b.text}/${c.status}; in a team feed: ${inFeeds}` };
   });
   await t("KUDOS", "text with HTML/script and SQL is stored verbatim", "201; same text returned", async () => {
     const text = `<script>alert('k')</script> '; DELETE FROM "Kudos";-- ok`;

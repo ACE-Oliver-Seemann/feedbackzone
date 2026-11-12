@@ -1,0 +1,24 @@
+PASS  [A] After submitting, 'SpĂ¤ĹĄ na moje prieskumy' shows the round as 'OdoslanĂ©' without a manual reload  => 'OdoslanĂ©'=true, 'NiÄŤ neÄŤakĂˇ.'=true, 'VyplniĹĄ' links=0
+FAIL  [A] Browser Back from the thank-you screen does not offer the survey again as unfilled  => stale 'VyplniĹĄ' links after Back=2; following it shows 'Toto kolo uĹľ mĂˇĹˇ vyplnenĂ©'; responses=2
+PASS  [A] After the manager closes a round and writes the first step, the list reached through the menu shows the new state  => Pulse â€“ nadvĂ¤zujĂşce QA Stav: UzavretĂ© UzĂˇvierka 19. 11. 2026 ĂšÄŤasĹĄ 5 z 6 VĂ˝sledky
+PASS  [A] Manager's home, reached through the menu after writing the step, no longer asks for it  => ÄŚo treba urobiĹĄ teraz NiÄŤ neÄŤakĂˇ. KaĹľdĂ© uzavretĂ© kolo mĂˇ zapĂ­sanĂ˝ krok a Ĺľiadny krok nie je po termĂ­ne.
+PASS  [A] Browser Back to the results page after the step was added still shows the step  => step listed after Back=true
+PASS  [A] Employee's team page, reached through the menu, shows the new step and the round on top  => Pulse â€“ nadvĂ¤zujĂşce QA UzavretĂ© 12. 11. 2026 Odpovedalo 5 z 6 Celkovo, akĂ© boli pre mĹa poslednĂ© dva tĂ˝Ĺľdne v prĂˇci? Priemer 2,6 SpĂ¤tnĂˇ vĂ¤zba od mĂ´jho manaĹľĂ©ra mi pomĂˇha zlepĹˇovaĹĄ sa. Priemer 3,8 Viem
+PASS  [A] A closed round disappears from the employee's 'Moje prieskumy' list of open rounds  => text='ÄŚo treba urobiĹĄ teraz NiÄŤ neÄŤakĂˇ. MomentĂˇlne nemĂˇĹˇ Ĺľiadny prieskum na vyplnenie. ÄŚo sa zmenilo po minulĂ˝ch, nĂˇjdeĹˇ v ÄŤasti MĂ´j tĂ­m.'; fill links=0
+PASS  [A] A round with today's date as the deadline can be created, started and filled in today  => closesAt stored=2026-11-12T22:59:59.999Z; after start db=OPEN; row='Pulse â€“ uzĂˇvierka dnes QA TĂ­m Alfa Stav: OtvorenĂ© UzĂˇvierka 12. 11. 2026 ĂšÄŤasĹĄ 0 z 6 VĂ˝sledky UzavrieĹĄ'; member's answer â†’ HTTP 201;
+PASS  [A] A deadline in the past is refused by the form  => message=true; rounds 3â†’3
+PASS  [G] HR choosing the other team in the new-round form gets that team's defaults and saves for it  => ticked=3, ticked in collapsed topics=0, saved for Beta=true, questions=4
+PASS  [G] Results and report of a draft say it is a draft and show no participation of a closed round  => results draft text=true, report draft text=true, 'Odpovedalo 0 z 6' present=false
+PASS  [E] Escape closes the confirm dialog without starting the round  => dialog text='SpustiĹĄ kolo? Po spustenĂ­ sa uĹľ nedĂˇ upravovaĹĄ. ZruĹˇiĹĄ SpustiĹĄ'; open after Escape=0; db=DRAFT
+PASS  [A] Whole employee journey with the keyboard only: login, open the survey, answer, submit  => stored=1,2,3,4; comment ok=true; element focused after two Tabs from the comment='OdoslaĹĄ'
+PASS  [A] Manager's journey on a 360 px phone: menu â†’ new round â†’ save â†’ start â†’ own survey  => round OPEN; responses in the filled round=1; scrollWidth per step=360,360,360,360,360,360,360,360,360,360
+PASS  [A] With the system setting 'reduce motion' the submit still completes and no confetti is drawn  => confetti canvas=0; html data-motion='reduce'
+PASS  [A] The confetti canvas never intercepts clicks and removes itself  => pointer-events='none'; removed after â‰1901 ms
+FAIL  [B] New kudos arriving while the recipient opens the 'PoslaĹĄ kudos' tab directly: the notice is not lost  => on the send tab: notice hidden=true, confetti canvas=1; after switching to 'Moje kudos': notice=true
+PASS  [B] Unknown ?tab value falls back to the received tab  => HTTP 200; selected='Moje kudos'
+PASS  [G] A toast disappears by itself and can be dismissed; it never covers the dialog buttons  => dismiss buttons=1; toast after dismiss=0; steps in DB=2
+PASS  [G] Toast does not stay forever  => toast removed after â‰3830 ms
+PASS  [G] Thank-you screen shows the steps of the round that was closed last, not of the one with the latest deadline  => Y status=CLOSED; thank-you names Y=true, shows Y's step=true, shows X's step=false; team page order='Kolo Y QA > Kolo X QA'
+PASS  [E] Server log of the whole session holds no answer values, comments or kudos texts  => log bytes=157; needles found=none; '[api]' lines=0, not in the expected form=0
+BLOCKED  [E] Backend or database unavailable while a server-rendered page loads  => BLOCKED: the shared QA server and its database must not be stopped or locked in this session; failures of API calls were simulated in the browser instead (m4)
+PASS  [G] No uncaught JavaScript error in the follow-up scenarios  => page errors=0 

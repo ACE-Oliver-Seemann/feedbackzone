@@ -9,7 +9,8 @@ import { fileURLToPath } from "node:url";
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 export const BASE = "http://localhost:3301";
 const DBFILE = path.join(ROOT, "prisma", "qa-backend.db").replace(/\\/g, "/");
-export const EVID = path.join(ROOT, "testing", "reports", "2026-11-12_001", "evidence", "backend");
+export const SESSION = process.env.QA_SESSION || "2026-11-12_002";
+export const EVID = path.join(ROOT, "testing", "reports", SESSION, "evidence", "backend");
 fs.mkdirSync(EVID, { recursive: true });
 
 export const db = new PrismaClient({ datasources: { db: { url: "file:" + DBFILE } } });
@@ -36,6 +37,9 @@ export const ctx = {};
 export const results = [];
 const requestLog = [];
 let counter = 0;
+let idPrefix = "BE-T";
+/** Session 002: the new suite numbers its tests separately (BE2-T…). */
+export const setIdPrefix = (p) => { idPrefix = p; counter = 0; };
 let cur = null;
 let suiteName = "";
 let suitePre = "";
@@ -149,7 +153,7 @@ export async function reset(demo = true) {
  * Steps and the actual result default to the recorded HTTP traffic.
  */
 export async function t(area, desc, expected, fn, opts = {}) {
-  const id = "BE-T" + String(++counter).padStart(3, "0");
+  const id = idPrefix + String(++counter).padStart(3, "0");
   cur = { id, reqs: [] };
   let status, actual;
   try {

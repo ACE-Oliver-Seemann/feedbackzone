@@ -1,0 +1,102 @@
+PASS    [G] Structure of / (home) as hr: title, one h1, heading order, landmarks => title "Domov · Feedback portál"; h1: ["Čo treba urobiť teraz"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on / (home) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on / (home) as hr => all measured text >= AA
+PASS    [G] Structure of /hr/rounds (hr-rounds) as hr: title, one h1, heading order, landmarks => title "Prieskumy · Feedback portál"; h1: ["Prieskumy všetkých tímov"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /hr/rounds (hr-rounds) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /hr/rounds (hr-rounds) as hr => all measured text >= AA
+PASS    [G] Structure of /rounds/new (new-round) as hr: title, one h1, heading order, landmarks => title "Nové kolo · Feedback portál"; h1: ["Nové kolo"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /rounds/new (new-round) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /rounds/new (new-round) as hr => all measured text >= AA
+PASS    [G] Structure of /rounds/:id/results (results) as hr: title, one h1, heading order, landmarks => title "Výsledky kola · Feedback portál"; h1: ["Pulse – 46. týždeň"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /rounds/:id/results (results) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /rounds/:id/results (results) as hr => all measured text >= AA
+PASS    [G] Structure of /rounds/:id/results (results-low) as hr: title, one h1, heading order, landmarks => title "Výsledky kola · Feedback portál"; h1: ["Pulse – 42. týždeň"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /rounds/:id/results (results-low) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /rounds/:id/results (results-low) as hr => all measured text >= AA
+PASS    [G] Structure of /rounds/:id/report (report) as hr: title, one h1, heading order, landmarks => title "Report kola · Feedback portál"; h1: ["Pulse – 44. týždeň"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /rounds/:id/report (report) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: th:11 caption:false
+PASS    [G] Colour contrast of text on /rounds/:id/report (report) as hr => all measured text >= AA
+PASS    [G] Structure of /team/:id (team) as hr: title, one h1, heading order, landmarks => title "Povedali ste, urobili sme · Feedback portál"; h1: ["Povedali ste, urobili sme"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia, Tím Alfa
+PASS    [G] Names and labels on /team/:id (team) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /team/:id (team) as hr => all measured text >= AA
+PASS    [G] Structure of /team/:id/trend (trend) as hr: title, one h1, heading order, landmarks => title "Vývoj tímu · Feedback portál"; h1: ["Vývoj tímu"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia, Tím Alfa
+PASS    [G] Names and labels on /team/:id/trend (trend) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: th:13 caption:false
+PASS    [G] Colour contrast of text on /team/:id/trend (trend) as hr => all measured text >= AA
+PASS    [G] Structure of /hr/overview (overview) as hr: title, one h1, heading order, landmarks => title "Plnenie reakcie · Feedback portál"; h1: ["Plnenie reakcie"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia, Prehľady
+PASS    [G] Names and labels on /hr/overview (overview) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /hr/overview (overview) as hr => all measured text >= AA
+PASS    [G] Structure of /hr/heatmap (heatmap) as hr: title, one h1, heading order, landmarks => title "Porovnanie tímov · Feedback portál"; h1: ["Porovnanie tímov"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia, Prehľady
+PASS    [G] Names and labels on /hr/heatmap (heatmap) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: th:10 caption:false
+PASS    [G] Colour contrast of text on /hr/heatmap (heatmap) as hr => all measured text >= AA
+PASS    [G] Structure of /hr/issues (issues) as hr: title, one h1, heading order, landmarks => title "Podnety · Feedback portál"; h1: ["Podnety"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia, Podnety
+PASS    [G] Names and labels on /hr/issues (issues) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /hr/issues (issues) as hr => all measured text >= AA
+PASS    [G] Structure of /hr/notes (notes) as hr: title, one h1, heading order, landmarks => title "Poznámky zo stretnutí · Feedback portál"; h1: ["Poznámky zo stretnutí"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia, Podnety
+PASS    [G] Names and labels on /hr/notes (notes) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /hr/notes (notes) as hr => all measured text >= AA
+PASS    [G] Structure of /kudos (kudos) as hr: title, one h1, heading order, landmarks => title "Kudos · Feedback portál"; h1: ["Kudos"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /kudos (kudos) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /kudos (kudos) as hr => all measured text >= AA
+FAIL    [G] Structure of /kudos?tab=send (kudos-send) as hr: title, one h1, heading order, landmarks => title "Kudos · Feedback portál"; h1: ["Kudos"]; skipped levels: h1 "Kudos" -> h3 "Náhľad"; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /kudos?tab=send (kudos-send) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /kudos?tab=send (kudos-send) as hr => all measured text >= AA
+PASS    [G] Structure of /nic-take (404) as hr: title, one h1, heading order, landmarks => title "Túto stránku sme nenašli · Feedback portál"; h1: ["Túto stránku sme nenašli"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: 
+PASS    [G] Names and labels on /nic-take (404) as hr => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /nic-take (404) as hr => all measured text >= AA
+PASS    [G] Structure of / (home) as mgrA: title, one h1, heading order, landmarks => title "Domov · Feedback portál"; h1: ["Čo treba urobiť teraz"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on / (home) as mgrA => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on / (home) as mgrA => all measured text >= AA
+PASS    [G] Structure of /rounds (rounds) as mgrA: title, one h1, heading order, landmarks => title "Prieskumy · Feedback portál"; h1: ["Prieskumy môjho tímu"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /rounds (rounds) as mgrA => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /rounds (rounds) as mgrA => all measured text >= AA
+PASS    [G] Structure of /rounds/:id/fill (fill) as mgrA: title, one h1, heading order, landmarks => title "Vyplnenie prieskumu · Feedback portál"; h1: ["Toto kolo už máš vyplnené"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /rounds/:id/fill (fill) as mgrA => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /rounds/:id/fill (fill) as mgrA => all measured text >= AA
+FAIL    [G] Structure of /hr/overview (403) as mgrA: title, one h1, heading order, landmarks => title "Plnenie reakcie · Feedback portál"; h1: ["Sem nemáš prístup"]; skipped levels: none; <main> elements: 2 (nested: 1); navs: Hlavná navigácia
+PASS    [G] Names and labels on /hr/overview (403) as mgrA => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /hr/overview (403) as mgrA => all measured text >= AA
+PASS    [G] Structure of / (home) as adam: title, one h1, heading order, landmarks => title "Domov · Feedback portál"; h1: ["Čo treba urobiť teraz"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on / (home) as adam => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on / (home) as adam => all measured text >= AA
+PASS    [G] Structure of /team/:id (team) as adam: title, one h1, heading order, landmarks => title "Povedali ste, urobili sme · Feedback portál"; h1: ["Povedali ste, urobili sme"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /team/:id (team) as adam => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /team/:id (team) as adam => all measured text >= AA
+PASS    [G] Structure of /kudos (kudos) as adam: title, one h1, heading order, landmarks => title "Kudos · Feedback portál"; h1: ["Kudos"]; skipped levels: none; <main> elements: 1 (nested: 0); navs: Hlavná navigácia
+PASS    [G] Names and labels on /kudos (kudos) as adam => unlabelled fields: none; unnamed controls: none; duplicate ids: none; images without alt: 0; broken ARIA refs: none; tables: none
+PASS    [G] Colour contrast of text on /kudos (kudos) as adam => all measured text >= AA
+PASS    [G] Structure and contrast of /login => title "Prihlásenie · Feedback portál"; h1 ["Prihlásenie"]; mains 1; low contrast: none
+PASS    [G] Page titles are specific and tell screens apart (BUG-027) => 23 screens; without a specific title: none; titles shared by different screens: "Prieskumy · Feedback portál": /hr/rounds, /rounds
+PASS    [F] NFR-04: the word 'anonym…' is nowhere in the HTML of any screen => 0 occurrences on 23 screens
+PASS    [F] No English UI leftovers in visible text => none found
+PASS    [G] Skip link is the first Tab stop and moves to the content => first stop "Preskočiť na obsah" visible true; next Tab inside main: true
+FAIL    [G] Keyboard walk on /hr/rounds: every stop has a visible focus indicator and is not hidden under the sticky header => 68 stops; without indicator: none; hidden under the header or off-screen: Uzavrieť(back, 32/32px hidden), Výsledky(back, 32/32px hidden), Tím Beta(back, 20/20px hidden)
+FAIL    [G] Keyboard walk on /rounds/:id/results: every stop has a visible focus indicator and is not hidden under the sticky header => 36 stops; without indicator: none; hidden under the header or off-screen: Prejsť na kroky(back, 18/18px hidden)
+PASS    [G] Keyboard walk on /hr/issues: every stop has a visible focus indicator and is not hidden under the sticky header => 44 stops; without indicator: none; hidden under the header or off-screen: none
+FAIL    [G] Keyboard walk on /kudos?tab=send: every stop has a visible focus indicator and is not hidden under the sticky header => 44 stops; without indicator: none; hidden under the header or off-screen: ⭐(back, 48/48px hidden), ❤️(back, 48/48px hidden), 🎉(back, 48/48px hidden), 💪(back, 48/48px hidden), 🙌(back, 48/48px hidden), 👏(back, 48/48px hidden)
+PASS    [G] Keyboard walk on /hr/overview: every stop has a visible focus indicator and is not hidden under the sticky header => 38 stops; without indicator: none; hidden under the header or off-screen: none
+PASS    [B] Motion menu: opens under its button, three options, closes with Esc, focus returns => {"box":[783,58,1071,246],"vw":1280,"legend":"Animácie","options":["Podľa systému*","Zapnuté","Obmedzené"],"hint":"Systém má animácie zapnuté."}; after Esc open=0, focus on "Nastavenie animácií"
+PASS    [G] Motion menu: keyboard operation and expanded state => aria-expanded (none; native popovertarget exposes it); focus moved into the popover true; full:on -> reduce:reduced -> back full:system:null
+PASS    [B] Motion menu: click outside closes it (light dismiss) and does not trigger what is underneath => open popovers 0; url /
+PASS    [D] Motion setting is shared with other tabs of the same browser => tab 2 after 'Obmedzené': reduce; after 'Podľa systému': full
+PASS    [D] Page transition forward: content slides in from the right, header stays, <= 1.5 s => attempt 1: ::view-transition-old(_t_0_)|vt-out-left|140 ; ::view-transition-new(_t_1_)|vt-in-right|280 ; ::view-transition-group(root)|undefined|0 ; ::view-transition|undefined|0
+PASS    [D] Page transition back: mirrored direction when moving to an item on the left => ::view-transition-old(_t_0_)|vt-out-right|140 ; ::view-transition-new(_t_1_)|vt-in-left|280 ; ::view-transition-group(root)|undefined|0 ; ::view-transition|undefined|0
+PASS    [D] Clicks are not blocked while a page transition runs => ended on /kudos
+PASS    [D] Browser Back is instant (no slide) => animations: none; url /hr/overview
+PASS    [D] Nav pill slides to the new item within 0.3 s and ends exactly under it => {"dur":"0s","prop":"all","dx":0,"dw":0}
+PASS    [D] Hover feedback on buttons and menu items => button rgb(0, 121, 176) -> rgb(0, 106, 155); menu item rgba(0, 0, 0, 0) -> lab(96.286 -0.852466 -2.46847)
+PASS    [D] Reduced motion: page transition becomes a short fade => undefined|0
+PASS    [D] Reduced motion: no element on any main screen runs a moving animation => no moving animation on 8 screens
+PASS    [D] Reduced motion: nav pill jumps (no slide) => {"pill":"opacity, color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, box-shadow"}
+PASS    [D] No layout shift while / loads and animates => CLS 0; shifted: none
+PASS    [D] No layout shift while /hr/rounds loads and animates => CLS 0; shifted: none
+PASS    [D] No layout shift while /rounds/:id/results loads and animates => CLS 0; shifted: none
+PASS    [D] No layout shift while /kudos loads and animates => CLS 0; shifted: none
+PASS    [D] No layout shift while /rounds/new loads and animates => CLS 0; shifted: none
+PASS    [G] Text scaled to 200 % on /hr/rounds (1280 px) => overflow 0px; clipped: none; sticky header height 129px of 800
+PASS    [G] Text scaled to 200 % on /rounds/:id/results (1280 px) => overflow 0px; clipped: none; sticky header height 129px of 800
+PASS    [G] Text scaled to 200 % on /kudos?tab=send (1280 px) => overflow 0px; clipped: none; sticky header height 129px of 800
+PASS    [G] Text scaled to 200 % on /rounds/new (1280 px) => overflow 0px; clipped: none; sticky header height 129px of 800
+PASS    [F] One font family and the brand palette on every screen; no old teal classes => fonts: Outfit/Outfit; loaded faces 2; teal classes 0; logo {"w":135,"h":32,"name":"Asseco Central Europe"}
+PASS    [F] Favicon and brand assets load without errors => favicon 200; failed requests: none
+FAIL    [G] Non-text contrast of form field borders (BUG-030, known open) => ring rgb(211,214,218) on rgb(255, 255, 255) = 1.46:1
+FAIL    [E] Motion menu at 320 px: panel fits the screen, options are large enough to tap => {"left":-26,"right":262,"vw":320,"rows":[32,32,32]}

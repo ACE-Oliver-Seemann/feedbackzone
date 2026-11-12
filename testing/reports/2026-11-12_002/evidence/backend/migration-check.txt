@@ -1,0 +1,49 @@
+﻿== prisma migrate deploy on an empty throwaway database (DATABASE_URL=file:./qa-backend-migcheck.db) ==
+npx.cmd : warn The configuration property `package.json#prisma` is deprecated and will be removed in Prisma 7. Please m
+igrate to a Prisma config file (e.g., `prisma.config.ts`).
+At line:1 char:491
++ ... kend-migcheck.db"; $out = (npx.cmd prisma migrate deploy 2>&1 | Out-S ...
++                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warn The config...ma.config.ts`).:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+For more information, see: https://pris.ly/prisma-config
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": SQLite database "qa-backend-migcheck.db" at "file:./qa-backend-migcheck.db"
+
+SQLite database qa-backend-migcheck.db created at file:./qa-backend-migcheck.db
+
+6 migrations found in prisma/migrations
+
+Applying migration `20261111140553_init`
+Applying migration `20261112103031_question_scales_fixed_and_reaction_time`
+Applying migration `20261112142130_kudos_emoji`
+Applying migration `20261112142427_question_team`
+Applying migration `20261112143135_hr_issues_and_notes`
+Applying migration `20261113090000_qa_logout_and_unique_question`
+
+The following migration(s) have been applied:
+
+migrations/
+  └─ 20261111140553_init/
+    └─ migration.sql
+  └─ 20261112103031_question_scales_fixed_and_reaction_time/
+    └─ migration.sql
+  └─ 20261112142130_kudos_emoji/
+    └─ migration.sql
+  └─ 20261112142427_question_team/
+    └─ migration.sql
+  └─ 20261112143135_hr_issues_and_notes/
+    └─ migration.sql
+  └─ 20261113090000_qa_logout_and_unique_question/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+
+== testing/scripts/backend/migration-check.mjs ==
+Participation WITHOUT ROWID: true CHECK constraints: 0
+Response WITHOUT ROWID: true CHECK constraints: 6
+tables: Action,Issue,Kudos,MeetingNote,Participation,Question,Response,Round,RoundQuestion,Team,User,_prisma_migrations
+

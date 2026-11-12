@@ -32,10 +32,10 @@ export default async function run() {
     const r = await submit("b1", R, [3, 3, 3], "v poriadku");
     return { ok: before === 0 && r.status === 201, actual: `participation rows after the 500: ${before}; retry: ${r.status}` };
   });
-  await t("UNICODE", "NUL character inside a comment is stored and returned intact", "stored comment equals the sent string (length 7)", async () => {
+  await t("UNICODE", "NUL character inside a comment is removed before storing", "201; stored comment is 'predza!' (control characters are stripped, BUG-007 fix)", async () => { // updated in session 2026-11-12_002
     const r = await submit("b2", R, [3, 3, 3], "pred\u0000za!");
     const row = await db.response.findFirst({ where: { roundId: R, comment: { startsWith: "pred" } } });
-    return { ok: r.status === 400 || (r.status === 201 && row?.comment === "pred\u0000za!"), actual: `${r.status}; stored length ${row?.comment?.length}; equal: ${row?.comment === "pred\u0000za!"}` };
+    return { ok: r.status === 201 && row?.comment === "predza!", actual: `${r.status}; stored length ${row?.comment?.length}; NUL removed: ${row?.comment === "predza!"}` };
   });
   await t("UNICODE", "length limits count UTF-16 units, not characters: kudos text of 300 emoji (300 characters)", "201 – MVP-16 allows up to 500 characters", async () => {
     const r = await req("POST", "/api/kudos", { as: "a1", body: { toUserId: ctx.users.a2.id, text: "🎉".repeat(300), value: "QUALITY", visibility: "PRIVATE" } });
@@ -130,10 +130,12 @@ export default async function run() {
     const codes = [(await req("POST", `/api/rounds/${d.id}/open`, { as: "hr" })).status, (await closeR(d.id)).status, (await req("DELETE", `/api/rounds/${d.id}`, { as: "hr" })).status, (await req("PATCH", `/api/rounds/${d.id}`, { as: "hr", body: { closesAt: dateStr(5) } })).status];
     return { ok: true, actual: `open/close/DELETE/PATCH → ${codes}; draft stays in every manager/HR list forever` };
   });
-  await t("HOME", "home shows at most 3 tasks", "at most 3 task links for manager Alfa and HR (IT-11)", async () => {
-    const count = (html) => (html.match(/href="\/rounds\/[a-z0-9]+\/(results|fill)"|href="\/rounds\/new"|href="\/hr\/overview"|href="\/hr\/issues"/g) ?? []).length;
+  await t("HOME", "home shows at most 3 tasks", "at most 3 task rows for manager Alfa and HR, at least 1 for the manager (IT-11)", async () => {
+    // updated in session 2026-11-12_002: counts the task sentences (one <p> per task in home-tasks.tsx), not links –
+    // the menu and the list of own surveys link to the same pages
+    const count = (html) => (html.match(/<p class="min-w-0 text-\[0\.9375rem\] leading-relaxed font-medium text-ink">/g) ?? []).length;
     const a = count(await home("mA")), h = count(await home("hr"));
-    return { ok: a <= 3 && h <= 3 && a >= 1, actual: `manager Alfa task links: ${a}; HR task links: ${h}` };
+    return { ok: a <= 3 && h <= 3 && a >= 1, actual: `manager Alfa task rows: ${a}; HR task rows: ${h}` };
   });
 
   for (const [picked, n] of [[4, 5], [2, 3]]) {
@@ -177,8 +179,8 @@ export default async function run() {
     }
     return { ok: hits.length === 0, actual: hits.length ? "found on " + hits.join(",") : "none" };
   });
-  await t("AUTHZ-PAGE", "kudos form page lists every user as a recipient but exposes no e-mail or role", "HTML of /kudos/new has names, no '@example.test'", async () => {
-    const r = await req("GET", "/kudos/new", { as: "b1" });
+  await t("AUTHZ-PAGE", "kudos form page lists every user as a recipient but exposes no e-mail or role", "HTML of /kudos?tab=send has names, no '@example.test' (/kudos/new redirects there since the frontend merge)", async () => {
+    const r = await req("GET", "/kudos?tab=send", { as: "b1" }); // updated in session 2026-11-12_002
     return { ok: r.status === 200 && !r.text.includes("@example.test") && !r.text.includes("passwordHash"), actual: `HTTP ${r.status}; e-mails present: ${r.text.includes("@example.test")}` };
   });
   await t("SESSION", "pages accept a session whose cookie was already 'logged out' (token replay on pages)", "redirect to /login – MVP-01", async () => {

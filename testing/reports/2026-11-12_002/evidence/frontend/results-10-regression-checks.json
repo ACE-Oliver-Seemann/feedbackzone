@@ -1,0 +1,96 @@
+[
+ {
+  "section": "G",
+  "desc": "Questionnaire question step has a heading (BUG-028, known partial)",
+  "pre": "hugo.beta, open Beta round",
+  "steps": "Open the questionnaire, click 'Začať'; list headings",
+  "expected": "The question is exposed as a heading (h1) or the page keeps one h1",
+  "req": "BUG-028; WCAG 2.4.6",
+  "status": "FAIL",
+  "actual": "headings in main: none; question is a <legend>: \"Celkovo, aké boli pre mňa posledné dva t\"",
+  "evidence": ""
+ },
+ {
+  "section": "D",
+  "desc": "Progress bar does not animate under reduced motion (BUG-031)",
+  "pre": "",
+  "steps": "Set 'Obmedzené' via data-motion=reduce; read the transition of the progress segments",
+  "expected": "No transform transition",
+  "req": "BUG-031, IT-02",
+  "status": "PASS",
+  "actual": "reduce: opacity, color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, box-shadow; full: transform, translate, scale, rotate",
+  "evidence": ""
+ },
+ {
+  "section": "C",
+  "desc": "Comment field accepts 1 000 characters when emoji are used (BUG-006 residual)",
+  "pre": "",
+  "steps": "Go to the comment step; type 990 letters followed by 10 emoji",
+  "expected": "All 1 000 characters accepted (the counter counts characters, so the limit should too)",
+  "req": "MVP-08, BUG-006",
+  "status": "FAIL",
+  "actual": "accepted 995 characters (1000 UTF-16 units, maxlength=1000); counter \"995 / 1000\"",
+  "evidence": "shots/fill-comment-emoji-limit.png",
+  "defect": "FE2-011"
+ },
+ {
+  "section": "C",
+  "desc": "Kudos text accepts 500 characters when emoji are used (BUG-006 residual)",
+  "pre": "",
+  "steps": "/kudos?tab=send; type 490 letters + 10 emoji",
+  "expected": "500 characters accepted",
+  "req": "MVP-16, BUG-006",
+  "status": "FAIL",
+  "actual": "accepted 495 characters (500 UTF-16 units)",
+  "evidence": "",
+  "defect": "FE2-011"
+ },
+ {
+  "section": "G",
+  "desc": "Kudos: focus after a rejected submit stays on a meaningful element (BUG-016 residual)",
+  "pre": "",
+  "steps": "Click 'Poslať kudos' with an empty form using the mouse and using Enter from the keyboard",
+  "expected": "Focus is not dropped to <body> (it should stay on the button or move to the first invalid field)",
+  "req": "BUG-016; WCAG 2.4.3",
+  "status": "FAIL",
+  "actual": "after mouse click: BODY; after Enter on the button: BODY",
+  "evidence": "",
+  "defect": "FE2-007"
+ },
+ {
+  "section": "G",
+  "desc": "Login: focus after a rejected login stays on a meaningful element",
+  "pre": "",
+  "steps": "Tab to 'Prihlásiť sa' with a wrong password and press Enter",
+  "expected": "Focus not dropped to <body>",
+  "req": "MVP-01; WCAG 2.4.3",
+  "status": "FAIL",
+  "actual": "focus after the error: BODY",
+  "evidence": "",
+  "defect": "FE2-007"
+ },
+ {
+  "section": "G",
+  "desc": "Issue and note forms: error is linked to the invalid field (BUG-029, known open)",
+  "pre": "",
+  "steps": "Submit the empty issue form and the empty note form; read aria-invalid / aria-describedby of the fields",
+  "expected": "Invalid fields carry aria-invalid and reference the message",
+  "req": "BUG-029; WCAG 3.3.1",
+  "status": "FAIL",
+  "actual": "issue title: aria-invalid=null describedby=null; note title: aria-invalid=null; note meetingDate: aria-invalid=null; note text: aria-invalid=null",
+  "evidence": "",
+  "defect": "FE2-013"
+ },
+ {
+  "section": "G",
+  "desc": "Required fields are marked as required (BUG-029, known open)",
+  "pre": "",
+  "steps": "Read required / aria-required on the fields of the new round, action, kudos, issue and note forms",
+  "expected": "Mandatory fields expose 'required' to assistive technology or show a visible mark",
+  "req": "BUG-029; WCAG 3.3.2",
+  "status": "FAIL",
+  "actual": "/rounds/new name: required=false; /rounds/new closesAt: required=false; /kudos?tab=send toUserId: required=false; /hr/notes title: required=false; /hr/notes meetingDate: required=false; /hr/notes text: required=false",
+  "evidence": "",
+  "defect": "FE2-013"
+ }
+]

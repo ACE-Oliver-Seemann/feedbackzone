@@ -1,0 +1,98 @@
+{
+ "total": 361,
+ "PASS": 361,
+ "FAIL": 0,
+ "BLOCKED": 0,
+ "bySuite": {
+  "N1 Page permission matrix (role x page, incl. new /kudos hub and /rounds)": {
+   "executed": 126,
+   "PASS": 126,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N2 Session, cookies and token tampering": {
+   "executed": 20,
+   "PASS": 20,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N3 Kudos with emoji (IT-06) – extended validation matrix": {
+   "executed": 25,
+   "PASS": 25,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N4 Own questions of a manager (IT-07) – extended": {
+   "executed": 17,
+   "PASS": 17,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N5 Suggestions (IT-09), threshold in trend/heatmap with time simulation (IT-08, NFR-02)": {
+   "executed": 33,
+   "PASS": 33,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N6 HR issues and meeting notes (IT-10) – extended": {
+   "executed": 32,
+   "PASS": 32,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N7 HR overview maths with time simulation (IT-05)": {
+   "executed": 6,
+   "PASS": 6,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N8 Injection-style and malformed inputs (safe, non-destructive)": {
+   "executed": 20,
+   "PASS": 20,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N9 Concurrency": {
+   "executed": 11,
+   "PASS": 11,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N10 NFR-01 storage and log, database integrity after the whole run": {
+   "executed": 20,
+   "PASS": 20,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N11 Home tasks through the page (IT-11)": {
+   "executed": 5,
+   "PASS": 5,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N12 Residual checks of the session-001 fixes (BUG-003, 006, 007, 008) with new inputs": {
+   "executed": 17,
+   "PASS": 17,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N13 Known risks of session 001 – one-line confirmation (not defects)": {
+   "executed": 6,
+   "PASS": 6,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N14 Framework-level access: RSC requests and internal headers": {
+   "executed": 14,
+   "PASS": 14,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "N15 Submissions under concurrent load (defect BE2-001)": {
+   "executed": 9,
+   "PASS": 9,
+   "FAIL": 0,
+   "BLOCKED": 0
+  }
+ }
+}
