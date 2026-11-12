@@ -2,15 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Field, Input, Select, Textarea } from "@/components/ui/field";
+import { IconPlus } from "@/components/ui/icons";
+import { Notice } from "@/components/ui/notice";
+import { Panel } from "@/components/ui/surface";
+import { useToast } from "@/components/ui/toast";
 import { t } from "@/lib/texts.sk";
 
 const STATUSES = ["PLANNED", "IN_PROGRESS", "DONE"] as const;
+type FieldName = keyof typeof t.actions.fieldErrors;
 
 // Form "Pridať krok" on the results screen (MVP-13).
 export function ActionForm({ roundId }: { roundId: string }) {
   const router = useRouter();
+  const toast = useToast();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldName, true>>>({});
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -18,6 +27,7 @@ export function ActionForm({ roundId }: { roundId: string }) {
     const form = new FormData(formElement);
     setPending(true);
     setError(null);
+    setFieldErrors({});
     try {
       const response = await fetch(`/api/rounds/${roundId}/actions`, {
         method: "POST",
@@ -32,8 +42,21 @@ export function ActionForm({ roundId }: { roundId: string }) {
       if (response.status === 201) {
         formElement.reset();
         router.refresh();
+        // The new step appears in the list above; the toast confirms it.
+        toast.success(t.toasts.actionAdded);
+      } else if (response.status === 400) {
+        // The API names the invalid fields (FE-005); without them, the summary message.
+        const body = await response.json().catch(() => ({}));
+        const invalid = Object.keys(body?.fields ?? {}).filter(
+          (field): field is FieldName => field in t.actions.fieldErrors,
+        );
+        if (invalid.length > 0) {
+          setFieldErrors(Object.fromEntries(invalid.map((field) => [field, true])));
+        } else {
+          setError(t.actions.invalid);
+        }
       } else {
-        setError(response.status === 400 ? t.actions.invalid : t.errors.generic);
+        setError(t.errors.generic);
       }
     } catch {
       setError(t.errors.generic);
@@ -41,58 +64,46 @@ export function ActionForm({ roundId }: { roundId: string }) {
     setPending(false);
   }
 
-  const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
+  const errorText = (field: FieldName) => fieldErrors[field] && t.actions.fieldErrors[field];
 
   return (
-    <form
-      onSubmit={onSubmit}
-      noValidate
-      className="mt-4 space-y-4 rounded-lg border border-slate-200 bg-white p-4"
-    >
-      <h3 className="font-medium">{t.actions.addTitle}</h3>
-      <label className="block text-sm font-medium">
-        {t.actions.topic}
-        <input
-          name="topic"
-          type="text"
-          maxLength={120}
-          placeholder={t.actions.topicPlaceholder}
-          className={inputClass}
-        />
-      </label>
-      <label className="block text-sm font-medium">
-        {t.actions.description}
-        <textarea name="description" rows={3} maxLength={1000} className={inputClass} />
-      </label>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="block text-sm font-medium">
-          {t.actions.dueDate}
-          <input name="dueDate" type="date" className={inputClass} />
-        </label>
-        <label className="block text-sm font-medium">
-          {t.actions.status}
-          <select name="status" defaultValue="PLANNED" className={inputClass}>
-            {STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {t.actions.statuses[status]}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-      {error && (
-        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">
-          {error}
-        </p>
-      )}
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60 sm:w-auto"
-      >
-        {pending ? t.actions.submitting : t.actions.submit}
-      </button>
-    </form>
+    <Panel className="mt-4 p-5 sm:p-6">
+      <form onSubmit={onSubmit} noValidate aria-labelledby="action-form-title" className="space-y-5">
+        <h3 id="action-form-title" className="text-base font-semibold tracking-[-0.01em] text-ink">
+          {t.actions.addTitle}
+        </h3>
+        <Field label={t.actions.topic} error={errorText("topic")}>
+          <Input name="topic" type="text" maxLength={120} placeholder={t.actions.topicPlaceholder} />
+        </Field>
+        <Field label={t.actions.description} error={errorText("description")}>
+          <Textarea name="description" rows={3} maxLength={1000} />
+        </Field>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label={t.actions.dueDate} error={errorText("dueDate")}>
+            <Input name="dueDate" type="date" />
+          </Field>
+          <Field label={t.actions.status} error={errorText("status")}>
+            <Select name="status" defaultValue="PLANNED">
+              {STATUSES.map((status) => (
+                <option key={status} value={status}>
+                  {t.actions.statuses[status]}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+        {error && (
+          <Notice tone="error" role="alert">
+            {error}
+          </Notice>
+        )}
+        <div className="flex justify-end border-t border-line pt-5">
+          <Button type="submit" disabled={pending} pending={pending} className="w-full sm:w-auto">
+            {!pending && <IconPlus size={16} className="-ml-0.5" />}
+            {pending ? t.actions.submitting : t.actions.submit}
+          </Button>
+        </div>
+      </form>
+    </Panel>
   );
 }

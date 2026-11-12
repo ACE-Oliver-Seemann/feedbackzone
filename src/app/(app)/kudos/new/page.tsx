@@ -1,18 +1,8 @@
-import { KudosForm } from "@/components/kudos-form";
-import { pageData, requirePageUser } from "@/lib/page-auth";
-import { t } from "@/lib/texts.sk";
-import { listKudosRecipients } from "@/server/kudos";
+import { redirect } from "next/navigation";
+import { requirePageUser } from "@/lib/page-auth";
 
-// Screen "Poslať kudos" for everyone (MVP-16).
+// Old "Poslať kudos" route (MVP-16), kept for links and bookmarks.
 export default async function NewKudosPage() {
-  const user = await requirePageUser();
-  const recipients = await pageData(() => listKudosRecipients(user));
-
-  return (
-    <section className="max-w-xl">
-      <h1 className="text-xl font-semibold">{t.kudos.newTitle}</h1>
-      <p className="mt-1 text-sm text-slate-600">{t.kudos.newIntro}</p>
-      <KudosForm recipients={recipients} />
-    </section>
-  );
+  await requirePageUser();
+  redirect("/kudos?tab=send");
 }

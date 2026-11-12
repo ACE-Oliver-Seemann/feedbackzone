@@ -1,18 +1,26 @@
-import Link from "next/link";
+import { ButtonLink } from "@/components/ui/button";
+import { IconLock } from "@/components/ui/icons";
 import { t } from "@/lib/texts.sk";
 
+// 403 page. Renders outside the app shell.
 export default function Forbidden() {
   return (
-    <main className="mx-auto max-w-md px-4 py-16 text-center">
-      <p className="text-sm font-semibold text-teal-700">403</p>
-      <h1 className="mt-2 text-2xl font-semibold">{t.errors.forbiddenTitle}</h1>
-      <p className="mt-2 text-slate-600">{t.errors.forbiddenText}</p>
-      <Link
-        href="/"
-        className="mt-6 inline-block rounded-md bg-teal-700 px-4 py-2 text-sm font-medium text-white hover:bg-teal-800"
-      >
-        {t.errors.backHome}
-      </Link>
+    <main className="flex min-h-screen items-center justify-center px-4 py-16">
+      <div className="flex max-w-sm animate-rise flex-col items-center text-center">
+        <span className="grid size-14 place-items-center rounded-full bg-brand-50 text-brand-600">
+          <IconLock size={26} />
+        </span>
+        <h1 className="mt-6 text-[1.75rem] leading-tight font-medium tracking-[-0.02em] text-ink">
+          {t.errors.forbiddenTitle}
+        </h1>
+        <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-soft">
+          {t.errors.forbiddenText}
+        </p>
+        <ButtonLink href="/" className="mt-8">
+          {t.errors.backHome}
+        </ButtonLink>
+        <p className="mt-6 text-xs text-muted">{t.errors.forbiddenCode}</p>
+      </div>
     </main>
   );
 }
