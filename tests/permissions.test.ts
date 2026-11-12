@@ -13,6 +13,7 @@ import { POST as openRound } from "@/app/api/rounds/[id]/open/route";
 import { POST as postResponse } from "@/app/api/rounds/[id]/responses/route";
 import { GET as getResults } from "@/app/api/rounds/[id]/results/route";
 import { GET as getRound } from "@/app/api/rounds/[id]/route";
+import { GET as getSuggestions } from "@/app/api/rounds/[id]/suggestions/route";
 import { GET as getRounds, POST as postRound } from "@/app/api/rounds/route";
 import { GET as getSummary } from "@/app/api/teams/[id]/summary/route";
 import { db } from "@/lib/db";
@@ -150,6 +151,14 @@ const CASES: Case[] = [
     call: async (as) => {
       const round = await createRound(fx, fx.a.team.id, "CLOSED");
       return invoke(getResults, `/api/rounds/${round.id}/results`, as, { id: round.id });
+    },
+    expected: status([401, 403, 200, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/rounds/:id/suggestions",
+    call: async (as) => {
+      const round = await createRound(fx, fx.a.team.id, "CLOSED");
+      return invoke(getSuggestions, `/api/rounds/${round.id}/suggestions`, as, { id: round.id });
     },
     expected: status([401, 403, 200, 403, 403, 200]),
   },

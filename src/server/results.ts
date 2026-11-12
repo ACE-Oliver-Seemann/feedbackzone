@@ -51,7 +51,10 @@ export async function loadRoundForResults(user: SessionUser, roundId: string) {
       team: { select: { name: true, _count: { select: { members: true } } } },
       questions: {
         orderBy: { position: "asc" },
-        select: { position: true, question: { select: { text: true, scale: true } } },
+        select: {
+          position: true,
+          question: { select: { text: true, scale: true, topic: true, fixed: true } },
+        },
       },
     },
   });

@@ -122,6 +122,14 @@ export const t = {
     commentsHint: "V náhodnom poradí, bez mien.",
     commentsEmpty: "Nikto nepridal komentár.",
   },
+  suggestions: {
+    title: "Návrhy krokov",
+    // IT-09: must stay honest about where the suggestions come from.
+    rulesNote:
+      "Návrhy podľa pravidiel, nie AI: k dvom najslabším otázkam kola sa vyberie pripravený krok. Vychádzajú iba z priemerov, komentáre sa nepoužívajú. Ber ich ako inšpiráciu a uprav si ich.",
+    because: (question: string, average: string) => `Reaguje na otázku „${question}“ (priemer ${average}).`,
+    use: "Použiť ako krok",
+  },
   actions: {
     title: "Kroky po kole",
     empty: "Zatiaľ nie je zapísaný žiadny krok.",

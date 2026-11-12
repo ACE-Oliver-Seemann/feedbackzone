@@ -1,4 +1,4 @@
-import { ActionForm } from "@/components/action-form";
+import { ActionForm, SuggestionText } from "@/components/action-form";
 import { ActionList } from "@/components/action-list";
 import { Badge, StatusBadge } from "@/components/round-list";
 import { MIN_GROUP_SIZE } from "@/config/privacy";
@@ -7,14 +7,21 @@ import { pageData, requirePageUser } from "@/lib/page-auth";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listRoundActions } from "@/server/actions";
 import { getRoundResults, type QuestionResult } from "@/server/results";
+import { getRoundSuggestions } from "@/server/suggestions";
 
 // Screen "Výsledky kola a kroky" for manager and HR (MVP-10, MVP-11, MVP-13, MVP-15).
 export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/results">) {
   const user = await requirePageUser("MANAGER", "HR");
   const { id } = await params;
-  const [results, actions] = await pageData(() =>
-    Promise.all([getRoundResults(user, id), listRoundActions(user, id)]),
+  const [results, actions, suggested] = await pageData(() =>
+    Promise.all([
+      getRoundResults(user, id),
+      listRoundActions(user, id),
+      getRoundSuggestions(user, id),
+    ]),
   );
+  // IT-09: only for a closed round above the confidentiality threshold.
+  const suggestions = suggested.status === "ok" ? suggested.suggestions : [];
   const { round, participation } = results;
   const isClosed = round.status === "CLOSED";
   // Only the team's manager writes actions; HR reads them (permission matrix).
@@ -94,7 +101,26 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
         {isClosed ? (
           <>
             <ActionList actions={actions} editable={canWriteActions} />
-            {canWriteActions && <ActionForm roundId={round.id} />}
+            {suggestions.length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-semibold">{t.suggestions.title}</h3>
+                <p className="mt-1 text-sm text-slate-600">{t.suggestions.rulesNote}</p>
+                {/* HR reads the suggestions; the manager gets them with a button in the form. */}
+                {!canWriteActions && (
+                  <ul className="mt-3 space-y-3">
+                    {suggestions.map((suggestion) => (
+                      <li
+                        key={suggestion.questionText}
+                        className="rounded-lg border border-teal-200 bg-teal-50 p-4"
+                      >
+                        <SuggestionText suggestion={suggestion} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+            {canWriteActions && <ActionForm roundId={round.id} suggestions={suggestions} />}
           </>
         ) : (
           <p className="mt-3 text-sm text-slate-600">{t.actions.onlyAfterClose}</p>
