@@ -44,6 +44,14 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
         {round.teamName} · {t.rounds.deadline(formatDate(round.closesAt))}
       </p>
 
+      {isClosed && (
+        <Link
+          href={`/rounds/${round.id}/report`}
+          className="mr-2 mt-3 inline-block rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+        >
+          {t.report.open}
+        </Link>
+      )}
       {user.role === "HR" && isClosed && (
         <Link
           href={`/hr/issues?round=${round.id}#new`}

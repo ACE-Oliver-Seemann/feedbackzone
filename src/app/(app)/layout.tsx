@@ -13,11 +13,15 @@ function navFor(teamId: string | null): NavItem[] {
     { href: "/", label: t.nav.mySurveys, roles: ["EMPLOYEE", "MANAGER"] },
     { href: "/hr/rounds", label: t.nav.hrRounds, roles: ["HR"] },
     { href: "/hr/overview", label: t.nav.hrOverview, roles: ["HR"] },
+    { href: "/hr/heatmap", label: t.nav.hrHeatmap, roles: ["HR"] },
     { href: "/hr/issues", label: t.nav.hrIssues, roles: ["HR"] },
     { href: "/hr/notes", label: t.nav.hrNotes, roles: ["HR"] },
     // HR has no team of its own; it reaches team pages from the round overview.
     ...(teamId
       ? [{ href: `/team/${teamId}`, label: t.nav.myTeam, roles: ["EMPLOYEE", "MANAGER"] as Role[] }]
+      : []),
+    ...(teamId
+      ? [{ href: `/team/${teamId}/trend`, label: t.nav.teamTrend, roles: ["MANAGER"] as Role[] }]
       : []),
     { href: "/rounds/new", label: t.nav.newRound, roles: ["MANAGER", "HR"] },
     { href: "/kudos/new", label: t.nav.sendKudos, roles: ["EMPLOYEE", "MANAGER", "HR"] },
@@ -31,7 +35,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-white print:hidden">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
           <span className="font-semibold text-teal-800">{t.app.name}</span>
           <div className="flex items-center gap-3">

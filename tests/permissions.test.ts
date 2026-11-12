@@ -19,6 +19,8 @@ import { GET as getRound } from "@/app/api/rounds/[id]/route";
 import { GET as getSuggestions } from "@/app/api/rounds/[id]/suggestions/route";
 import { GET as getRounds, POST as postRound } from "@/app/api/rounds/route";
 import { GET as getSummary } from "@/app/api/teams/[id]/summary/route";
+import { GET as getTrend } from "@/app/api/teams/[id]/trend/route";
+import { GET as getHeatmap } from "@/app/api/hr/heatmap/route";
 import { db } from "@/lib/db";
 import { createRound, dateInDays, params, request, resetDb, type Fixture } from "./helpers";
 
@@ -214,6 +216,16 @@ const CASES: Case[] = [
   {
     name: "GET /api/hr/overview",
     call: (as) => invoke(getHrOverview, "/api/hr/overview", as),
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/teams/:id/trend",
+    call: (as) => invoke(getTrend, `/api/teams/${fx.a.team.id}/trend`, as, { id: fx.a.team.id }),
+    expected: status([401, 403, 200, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/hr/heatmap",
+    call: (as) => invoke(getHeatmap, "/api/hr/heatmap", as),
     expected: status([401, 403, 403, 403, 403, 200]),
   },
   {

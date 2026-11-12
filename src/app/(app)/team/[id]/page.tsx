@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ActionList } from "@/components/action-list";
 import { KudosList } from "@/components/kudos-list";
 import { MIN_GROUP_SIZE } from "@/config/privacy";
@@ -16,6 +17,15 @@ export default async function TeamPage({ params }: PageProps<"/team/[id]">) {
     <div className="max-w-2xl">
       <p className="text-sm font-medium text-teal-800">{summary.team.name}</p>
       <h1 className="mt-1 text-xl font-semibold">{t.team.title}</h1>
+      {/* Trend is for the manager and HR only (IT-08); the page checks again. */}
+      {user.role !== "EMPLOYEE" && (
+        <Link
+          href={`/team/${summary.team.id}/trend`}
+          className="mt-3 inline-block rounded-md border border-teal-700 px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50"
+        >
+          {t.trend.showTrend}
+        </Link>
+      )}
 
       {summary.rounds.length === 0 ? (
         <p className="mt-3 text-slate-600">{t.team.roundsEmpty}</p>

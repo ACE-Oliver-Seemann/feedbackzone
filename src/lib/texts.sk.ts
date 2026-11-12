@@ -16,6 +16,8 @@ export const t = {
     mySurveys: "Moje prieskumy",
     hrRounds: "Prehľad kôl",
     hrOverview: "Plnenie reakcie",
+    hrHeatmap: "Porovnanie tímov",
+    teamTrend: "Vývoj tímu",
     hrIssues: "Podnety",
     hrNotes: "Poznámky",
     newRound: "Nové kolo",
@@ -123,6 +125,52 @@ export const t = {
     commentsTitle: "Komentáre",
     commentsHint: "V náhodnom poradí, bez mien.",
     commentsEmpty: "Nikto nepridal komentár.",
+  },
+  // IT-08: results over time, across teams, and the printable report.
+  trend: {
+    title: "Vývoj tímu",
+    intro:
+      "Výsledky uzavretých kôl v čase. Počítajú sa iba kolá s aspoň 5 odpoveďami; kolo s menej odpoveďami je v grafe medzera.",
+    empty: "Tím zatiaľ nemá žiadne uzavreté kolo.",
+    chartTitle: "Stála otázka: ako sa tímu pracovalo",
+    chartCaption: "Priemer na škále 1 (veľmi zlé) až 5 (veľmi dobré). Prerušovaná čiara označuje kolo bez hodnoty.",
+    noFixed: "Žiadne uzavreté kolo nad prahom dôvernosti zatiaľ nemá stálu otázku, preto nie je čo vykresliť.",
+    noValue: "bez hodnoty",
+    fewRounds: (count: number) =>
+      `Graf vychádza iba z ${count} ${count === 1 ? "kola" : "kôl"}. Na posúdenie vývoja je to málo, ber ho s rezervou.`,
+    tableTitle: "Skóre podľa okruhov",
+    tableHint:
+      "Skóre 1 až 5, kde vyššie je vždy lepšie. Pri otázkach, kde je nižšia odpoveď lepšia (nadčasy, vyčerpanie), je hodnota otočená.",
+    colRound: "Kolo",
+    colResponded: "Odpovedí",
+    showTrend: "Vývoj v čase",
+  },
+  heatmap: {
+    title: "Porovnanie tímov",
+    intro: (days: number) =>
+      `Priemerné skóre tímov podľa okruhov za posledných ${days} dní. Počítajú sa iba uzavreté kolá s aspoň 5 odpoveďami.`,
+    empty: "V tomto období nemá žiadny tím uzavreté kolo nad prahom dôvernosti.",
+    colTeam: "Tím",
+    roundsCounted: (count: number) =>
+      `${count} ${count === 1 ? "kolo" : count >= 2 && count <= 4 ? "kolá" : "kôl"}`,
+    noData: "Bez dát",
+    legend: "Skóre:",
+    legendRange: (from: string, to: string) => `${from} až ${to}`,
+    legendFrom: (from: string) => `${from} a viac`,
+    legendNoData: "– bez dát",
+    scoreHint:
+      "Skóre 1 až 5, kde vyššie je vždy lepšie. Porovnávaj opatrne: tímy mohli dostať rôzne otázky a jedno kolo je málo na záver.",
+  },
+  report: {
+    title: "Report kola",
+    print: "Vytlačiť alebo uložiť ako PDF",
+    back: "Späť na výsledky",
+    open: "Report na tlač",
+    colQuestion: "Otázka",
+    distributionHint: "Stĺpce 1 až 5 ukazujú, koľko ľudí zvolilo danú hodnotu.",
+    noComments:
+      "Komentáre nie sú súčasťou reportu, aby sa voľný text nedostal mimo aplikáciu. Sú dostupné na obrazovke výsledkov.",
+    generated: (date: string) => `Vytvorené ${date}. Výsledky sú dôverné a zobrazujú sa iba za skupinu aspoň 5 ľudí.`,
   },
   // IT-10: HR's issues and notes from offline meetings.
   ownerGroups: {

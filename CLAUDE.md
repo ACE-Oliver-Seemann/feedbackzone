@@ -71,6 +71,13 @@ Testovacie účty sú v `prisma/seed.ts` (doména `example.test`, spoločné hes
 - `src/config/privacy.ts` – `MIN_GROUP_SIZE` (NFR-02), jediné miesto. `src/config/kudos.ts` – pravidlá kudos.
   `src/config/scales.ts` – škály odpovedí (IT-03); popisy bodov sú v `texts.sk.ts`.
 - `prisma/seed.ts` – knižnica otázok podľa `docs/research/otazky-do-pulse.md`. Znenie otázok nemeň bez schválenia.
+- `src/config/suggestions.ts` – knižnica návrhov krokov (IT-09); `src/server/suggestions.ts` má rozhranie
+  `SuggestionProvider`. Skutočná AI sa nesmie zapojiť bez výslovného rozhodnutia používateľa.
+- `src/config/owner-groups.ts` – skupiny, zdroje a stavy podnetov HR (IT-10); logika v `src/server/hr-issues.ts`.
+- `src/server/trends.ts` – vývoj tímu a porovnanie tímov (IT-08). Kolo pod prahom dôvernosti nesmie prispieť
+  ani do priemeru za viac kôl.
+- Dátový model má po iteráciách 11 tabuliek (pribudli `Issue` a `MeetingNote`). `Response` a `Participation`
+  sa nemenili a meniť nesmú.
 - `src/lib/authz.ts` – matica oprávnení (NFR-03). `src/lib/session.ts` – podpísaná cookie, `requireUser`.
 - `src/lib/errors.ts` – `route()` obaľuje každý endpoint; loguje iba metódu, cestu a typ chyby (NFR-01).
 - `src/server/*` – logika. Volajú ju endpointy v `src/app/api/**/route.ts` aj serverové stránky; oprávnenia sa overujú tu.

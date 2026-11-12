@@ -55,4 +55,8 @@ Overenie:
 - `npm run acceptance` – akceptačný scenár z mvp.md (kroky 1 až 6) proti bežiacej aplikácii.
   Spusti ho nad čerstvým seedom: `npm run setup`, `npm run dev` a v druhom termináli `npm run acceptance`.
 
+Po MVP pribudli iterácie IT-03 až IT-10: knižnica otázok podľa výskumu, stála otázka, prehľad plnenia reakcie,
+kudos emotikonom, vlastné otázky manažéra, návrhy krokov, podnety a poznámky HR, grafy a report na tlač.
+Stav každej je v `docs/requirements/iteracie.md`.
+
 Podklady k otázkam v prieskumoch (výskum so zdrojmi) sú v [docs/research/otazky-do-pulse.md](docs/research/otazky-do-pulse.md).
