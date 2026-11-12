@@ -4,10 +4,16 @@ import { db } from "@/lib/db";
 import { assertCanFillRound, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
-import { charLength, cleanText } from "@/lib/text";
+import { charLength, cleanText, serialQueue } from "@/lib/text";
 import { closeExpiredRounds, type RoundStatus } from "@/server/rounds";
 
 export const MAX_COMMENT_LENGTH = 1000;
+
+// One submission is written at a time (BE2-001): many interactive transactions
+// started together only queue on SQLite's single write lock until some time out.
+// The order of writing says nothing about who answered: a Response has no
+// timestamp and its key is a random UUID (NFR-01).
+const submitInTurn = serialQueue();
 
 export type FillRound = {
   id: string;
@@ -104,8 +110,16 @@ export async function submitResponse(
   if (Object.keys(fields).length > 0) throw validationError(fields);
   const values = answers as number[];
 
+  // A repeated submission is refused before it takes a place in the queue, so
+  // repeating a request many times cannot hold up other people's answers.
+  const already = await db.participation.findUnique({
+    where: { roundId_userId: { roundId: round.id, userId: user.id } },
+    select: { userId: true },
+  });
+  if (already) throw conflict("already_submitted");
+
   try {
-    await db.$transaction(async (tx) => {
+    await submitInTurn(() => db.$transaction(async (tx) => {
       // A real write on the round takes the database write lock first, so the
       // check "still open and before the deadline" and the two inserts cannot
       // be separated by someone closing the round (QA BE-002).
@@ -128,7 +142,7 @@ export async function submitResponse(
           comment,
         },
       });
-    });
+    }));
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       throw conflict("already_submitted");

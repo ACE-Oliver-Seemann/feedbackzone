@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
+import { useFocusFirstError } from "@/components/ui/focus-error";
 import { Notice } from "@/components/ui/notice";
 import { t } from "@/lib/texts.sk";
 
 export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  useFocusFirstError(formRef, error);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,7 +38,7 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-8 space-y-5">
+    <form ref={formRef} onSubmit={onSubmit} className="mt-8 space-y-5">
       <Field label={t.login.email}>
         <Input name="email" type="email" autoComplete="username" required />
       </Field>

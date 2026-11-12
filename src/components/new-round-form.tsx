@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { addTransitionType, startTransition, useMemo, useState, type FormEvent } from "react";
+import { addTransitionType, startTransition, useMemo, useRef, useState, type FormEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import { Field, FieldError, Input, Select } from "@/components/ui/field";
+import { useFocusFirstError } from "@/components/ui/focus-error";
 import { IconCheck, IconChevronDown, IconPlus } from "@/components/ui/icons";
 import { Notice } from "@/components/ui/notice";
 import { Panel, Section } from "@/components/ui/surface";
@@ -74,6 +75,9 @@ export function NewRoundForm({
   const [customText, setCustomText] = useState("");
   const [customError, setCustomError] = useState<CustomError | null>(null);
   const [customPending, setCustomPending] = useState(false);
+  // The save button stays in view while the errors may be far above or below it.
+  const formRef = useRef<HTMLFormElement>(null);
+  useFocusFirstError(formRef, fieldErrors, error);
 
   // Shared questions plus the own questions of the chosen team.
   const visible = useMemo(
@@ -202,7 +206,7 @@ export function NewRoundForm({
   const errorText = (field: FieldName) => fieldErrors[field] && t.newRound.fieldErrors[field];
 
   return (
-    <form onSubmit={onSubmit} noValidate>
+    <form ref={formRef} onSubmit={onSubmit} noValidate>
       <Section title={t.newRound.basicsTitle}>
         <Panel className="space-y-5 p-5 sm:p-6">
           <Field label={t.newRound.name} error={errorText("name")}>

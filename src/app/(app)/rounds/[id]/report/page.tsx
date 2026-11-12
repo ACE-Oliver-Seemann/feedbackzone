@@ -44,7 +44,7 @@ export default async function RoundReportPage({ params }: PageProps<"/rounds/[id
         <Link
           href={`/rounds/${round.id}/results`}
           transitionTypes={BACK}
-          className="-ml-1 inline-flex items-center gap-0.5 rounded-md px-1 py-0.5 text-sm font-medium text-brand-700 hover:text-brand-900"
+          className="-ml-1 inline-flex items-center gap-0.5 rounded-md px-1 py-0.5 pointer-coarse:min-h-11 text-sm font-medium text-brand-700 hover:text-brand-900"
         >
           <IconChevronLeft size={16} />
           {t.report.back}

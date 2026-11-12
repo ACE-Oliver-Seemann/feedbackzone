@@ -31,7 +31,7 @@ export function LogoutButton() {
       type="button"
       onClick={logout}
       title={t.nav.logout}
-      className={buttonClass({ variant: "ghost", size: "sm", className: "text-ink-soft" })}
+      className={buttonClass({ variant: "ghost", size: "sm", className: "text-ink-soft pointer-coarse:min-w-11" })}
     >
       <IconLogout size={16} />
       <span className="sr-only sm:not-sr-only">{t.nav.logout}</span>

@@ -12,7 +12,10 @@ function place(button: HTMLElement | null, panel: HTMLElement | null) {
   if (!button || !panel) return;
   const rect = button.getBoundingClientRect();
   panel.style.top = `${Math.round(rect.bottom + 8)}px`;
-  panel.style.right = `${Math.max(16, Math.round(window.innerWidth - rect.right))}px`;
+  // Aligned with the button's right edge, but never past the left edge of a narrow screen.
+  const width = Math.min(288, window.innerWidth - 32);
+  const wanted = Math.round(window.innerWidth - rect.right);
+  panel.style.right = `${Math.max(16, Math.min(wanted, window.innerWidth - width - 16))}px`;
 }
 
 /**
@@ -75,7 +78,7 @@ export function MotionMenu() {
             {OPTIONS.map((option) => (
               <label
                 key={option}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm transition-colors duration-150 hover:bg-canvas has-checked:bg-brand-50 has-checked:text-brand-800"
+                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2 py-1.5 pointer-coarse:min-h-11 text-sm transition-colors duration-150 hover:bg-canvas has-checked:bg-brand-50 has-checked:text-brand-800"
               >
                 <input
                   type="radio"

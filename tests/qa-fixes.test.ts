@@ -402,3 +402,95 @@ describe("Slovak plurals in generated sentences [BUG-015]", () => {
     expect(t.hrOverview.teamLine(1, 1)).toBe("Krok má 1 z 1 uzavretého kola.");
   });
 });
+
+// Regression tests for defects found by QA session 2026-11-12_002
+// (testing/reports/2026-11-12_002/BUG_REGISTER.md).
+
+describe("many submissions at once neither fail nor stall [BE2-001, MVP-09]", () => {
+  const submit = (as: { id: string }, id: string) =>
+    postResponse(
+      request(`/api/rounds/${id}/responses`, { method: "POST", as, body: { answers: [3, 3, 3, 3] } }),
+      params({ id }),
+    );
+
+  it("30 parallel submissions from six people: six stored, the rest refused, none fail", async () => {
+    const round = await createRound(fx, fx.a.team.id, "OPEN");
+    const people = [fx.a.manager, ...fx.a.employees];
+    const responses = await Promise.all(
+      Array.from({ length: 30 }, (_, index) => submit(people[index % people.length], round.id)),
+    );
+    const statuses = responses.map((response) => response.status);
+    expect(statuses.filter((status) => status === 201)).toHaveLength(people.length);
+    expect(statuses.filter((status) => status === 409)).toHaveLength(30 - people.length);
+    expect(await db.response.count()).toBe(people.length);
+    expect(await db.participation.count()).toBe(people.length);
+  });
+
+  it("a failed submission does not block the next one", async () => {
+    const round = await createRound(fx, fx.a.team.id, "OPEN");
+    vi.spyOn(db, "$transaction").mockImplementationOnce(async () => {
+      throw new Error("database unavailable");
+    });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    expect((await submit(fx.a.employees[0], round.id)).status).toBe(500);
+    expect((await submit(fx.a.employees[1], round.id)).status).toBe(201);
+  });
+});
+
+describe("own questions differing only in case or Unicode form are one question [BE2-002, BE2-004, IT-07]", () => {
+  const add = (text: string) =>
+    postQuestion(request("/api/questions", { method: "POST", as: fx.a.manager, body: { text } }), undefined);
+
+  it("five parallel requests with different letter case create one question", async () => {
+    const variants = [
+      "Porady v tíme majú jasný cieľ.",
+      "PORADY V TÍME MAJÚ JASNÝ CIEĽ.",
+      "porady v tíme majú jasný cieľ.",
+      "Porady V Tíme Majú Jasný Cieľ.",
+      "pORADY v TÍME majú JASNÝ cieľ.",
+    ];
+    const statuses = (await Promise.all(variants.map(add))).map((response) => response.status);
+    expect(statuses.filter((status) => status === 201)).toHaveLength(1);
+    expect(statuses.filter((status) => status === 400)).toHaveLength(4);
+    expect(await db.question.count({ where: { teamId: fx.a.team.id } })).toBe(1);
+  });
+
+  it("composed and decomposed accents are the same wording", async () => {
+    const composed = "Úlohy v tíme sú rozdelené férovo.";
+    expect((await add(composed)).status).toBe(201);
+    expect((await add(composed.normalize("NFD"))).status).toBe(400);
+  });
+});
+
+describe("more kinds of invisible text are treated as empty [BE2-003]", () => {
+  it("helpers", () => {
+    // Direction marks and overrides are removed, blank-looking letters alone are empty.
+    expect(cleanText("‎ahoj‮")).toBe("ahoj");
+    for (const blank of ["ㅤ", "⠀", "ᅟ", "ᅠ", "ﾠ", "‎", "‮"]) {
+      expect(cleanText(blank.repeat(25))).toBe("");
+    }
+    expect(cleanText("á")).toBe("á");
+    // Marks that only modify a neighbour are nothing on their own.
+    for (const mark of [0x034f, 0xfe0f, 0xe0061]) {
+      expect(cleanText(String.fromCodePoint(mark).repeat(25))).toBe("");
+    }
+    expect(cleanText(String.fromCodePoint(0x2764, 0xfe0f))).toBe(String.fromCodePoint(0x2764, 0xfe0f));
+    // Emoji sequences and subdivision flags survive.
+    expect(cleanText("👨‍👩‍👧")).toBe("👨‍👩‍👧");
+    const scotland = "\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}";
+    expect(cleanText(scotland)).toBe(scotland);
+  });
+
+  it("kudos made of blank braille patterns is refused", async () => {
+    const response = await postKudos(
+      request("/api/kudos", {
+        method: "POST",
+        as: fx.a.employees[0],
+        body: { toUserId: fx.a.employees[1].id, text: "⠀".repeat(30), value: "HELPING", visibility: "TEAM" },
+      }),
+      undefined,
+    );
+    expect(response.status).toBe(400);
+    expect(await db.kudos.count()).toBe(0);
+  });
+});

@@ -41,6 +41,9 @@
 
   --animate-rise: rise 260ms var(--ease-out-soft) both;
   --animate-grow-x: grow-x 600ms var(--ease-out-soft) both;
+  /* Questionnaire steps slide in from the side they come from (IT-02). */
+  --animate-slide-next: slide-next 260ms var(--ease-out-soft) both;
+  --animate-slide-back: slide-back 260ms var(--ease-out-soft) both;
   --animate-shimmer: shimmer 1.4s linear infinite;
   /* Celebration kit (src/components/ui/celebrate.tsx) */
   --animate-pop: pop 420ms var(--ease-out-soft) both;
@@ -70,6 +73,18 @@
     }
   }
 
+  @keyframes slide-next {
+    from {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+  }
+  @keyframes slide-back {
+    from {
+      opacity: 0;
+      transform: translateX(-24px);
+    }
+  }
   @keyframes rise {
     from {
       opacity: 0;
@@ -93,8 +108,17 @@
 
 @layer base {
   html {
+    /* Focused or linked content never ends up under the sticky header or the
+       sticky save bar (FE2-004, FE2-005). Below xl the header has two rows. */
+    scroll-padding-top: 8.5rem;
+    scroll-padding-bottom: 7rem;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
+  }
+  @media (min-width: 80rem) {
+    html {
+      scroll-padding-top: 5.5rem;
+    }
   }
   body {
     /* A long word or a pasted link wraps instead of widening the page (BUG-011). */
@@ -325,6 +349,8 @@ header:has(+ #main) {
     transform: none;
   }
   & .animate-rise,
+  & .animate-slide-next,
+  & .animate-slide-back,
   & .animate-pop,
   & .animate-grow-x {
     animation: fade-in 150ms ease-out both !important;
@@ -363,6 +389,8 @@ header:has(+ #main) {
       transition-property: opacity, overlay, display !important;
     }
     & .animate-rise,
+    & .animate-slide-next,
+    & .animate-slide-back,
     & .animate-pop,
     & .animate-grow-x {
       animation: fade-in 150ms ease-out both !important;

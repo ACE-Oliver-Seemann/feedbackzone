@@ -25,6 +25,13 @@ export function ActionStatusSelect({ actionId, status }: { actionId: string; sta
   const router = useRouter();
   const toast = useToast();
   const [value, setValue] = useState<Status>(status);
+  // The status can change elsewhere (another tab, another person). When the
+  // page data is refreshed, show what the server has (E2E2-002).
+  const [serverStatus, setServerStatus] = useState<Status>(status);
+  if (serverStatus !== status) {
+    setServerStatus(status);
+    setValue(status);
+  }
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [doneCheck, setDoneCheck] = useState(false);

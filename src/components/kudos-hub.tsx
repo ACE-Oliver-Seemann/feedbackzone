@@ -29,6 +29,8 @@ export type KudosHubProps = {
   recipients: KudosRecipient[];
   /** Tab to show first, from the ?tab= search param. */
   initialTab: KudosTab;
+  /** Id of the signed-in user: one "seen" counter per account on a shared browser. */
+  viewerId: string;
 };
 
 const TABS: KudosTab[] = ["received", "send"];
@@ -38,14 +40,14 @@ const TAB_LABELS: Record<KudosTab, string> = {
 };
 
 /** localStorage key of the received count the user has already seen. */
-const seenKey = (recipientName: string) => `feedback-portal:kudos-seen:${recipientName}`;
+const seenKey = (viewerId: string) => `feedback-portal:kudos-seen:${viewerId}`;
 
 /**
  * "Moje kudos" and "Poslať kudos" in one place (MVP-16, MVP-17). Both tab
  * panels are always rendered (the inactive one is `hidden`), so the server
  * HTML contains both. The URL follows the tab via history.replaceState.
  */
-export function KudosHub({ received, recipients, initialTab }: KudosHubProps) {
+export function KudosHub({ received, recipients, initialTab, viewerId }: KudosHubProps) {
   const [tab, setTab] = useState<KudosTab>(initialTab);
   const [newCount, setNewCount] = useState(0);
   const tabRefs = useRef<Record<KudosTab, HTMLButtonElement | null>>({ received: null, send: null });
@@ -56,9 +58,9 @@ export function KudosHub({ received, recipients, initialTab }: KudosHubProps) {
   // "New kudos" moment: compare with the count seen on the last visit. Read
   // only after mount (no hydration mismatch); storage may be unavailable.
   useEffect(() => {
-    if (received.length === 0) return;
-    // All received kudos share the recipient: one counter per account on a shared browser.
-    const key = seenKey(received[0].toName);
+    // Stored even while the count is zero, so that the very first kudos is
+    // announced on the next visit too (E2E2-001).
+    const key = seenKey(viewerId);
     let seen: number | null = null;
     try {
       const stored = window.localStorage.getItem(key);
@@ -72,7 +74,7 @@ export function KudosHub({ received, recipients, initialTab }: KudosHubProps) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setNewCount(received.length - seen);
     }
-  }, [received]);
+  }, [received, viewerId]);
 
   function select(next: KudosTab, focus = false) {
     setTab(next);
@@ -173,7 +175,12 @@ export function KudosHub({ received, recipients, initialTab }: KudosHubProps) {
         className="focus-visible:outline-offset-4"
       >
         {/* Mounted with fire=false; fires once when new kudos were found. */}
-        <Confetti fire={newCount > 0} intensity="light" origin={{ x: 0.5, y: 0.3 }} />
+        {/* Only with its notice in view: on the send tab it waits for the switch (E2E2-005). */}
+        <Confetti
+          fire={newCount > 0 && tab === "received"}
+          intensity="light"
+          origin={{ x: 0.5, y: 0.3 }}
+        />
         {newCount > 0 && (
           <Notice tone="success" role="status" title={t.kudos.newKudos(newCount)} className="mb-4">
             {t.kudos.newKudosText}

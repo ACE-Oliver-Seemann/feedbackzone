@@ -11,6 +11,7 @@ import { Notice } from "@/components/ui/notice";
 import { Panel } from "@/components/ui/surface";
 import { SCALES, type ScaleKey } from "@/config/scales";
 import { BACK } from "@/lib/page-motion";
+import { limitChars } from "@/lib/text";
 import { t } from "@/lib/texts.sk";
 
 const MAX_COMMENT_LENGTH = 1000; // mirrors src/server/responses.ts
@@ -38,6 +39,8 @@ export function FillWizard({
 }) {
   const [step, setStep] = useState<Step>("intro");
   const [index, setIndex] = useState(0);
+  // Which way the user is moving, so the next step slides in from that side (IT-02).
+  const [direction, setDirection] = useState<"next" | "back">("next");
   const [answers, setAnswers] = useState<(number | null)[]>(() => questions.map(() => null));
   const [comment, setComment] = useState("");
   const [pending, setPending] = useState(false);
@@ -63,6 +66,7 @@ export function FillWizard({
   }, [step, index]);
 
   function back() {
+    setDirection("back");
     setError(null);
     if (step === "comment") {
       setStep("questions");
@@ -75,6 +79,7 @@ export function FillWizard({
   }
 
   function next() {
+    setDirection("next");
     if (index === total - 1) setStep("comment");
     else setIndex(index + 1);
   }
@@ -114,7 +119,12 @@ export function FillWizard({
         {/* The done step exists only after the server answered 201 and is
             terminal (nothing leaves it), so this burst mounts – and fires – once. */}
         <Confetti intensity="full" origin={{ x: 0.5, y: 0.32 }} />
-        <Panel className="animate-rise overflow-hidden text-center" role="status">
+        <Panel
+          ref={stepRef}
+          tabIndex={-1}
+          className="animate-rise overflow-hidden text-center outline-none"
+          role="status"
+        >
           {/* Static composition reads as a success even with motion off:
               the check sits on a soft brand halo. */}
           <div className="px-6 pt-10 pb-8 sm:px-10 sm:pt-12">
@@ -186,7 +196,10 @@ export function FillWizard({
         <>
           <Progress current={index + 1} total={total} />
 
-          <fieldset key={`question-${index}`} className="mt-8 animate-rise">
+          <fieldset
+            key={`question-${index}`}
+            className={cx("mt-8", direction === "back" ? "animate-slide-back" : "animate-slide-next")}
+          >
             <legend className="text-[1.375rem] leading-snug font-semibold tracking-[-0.015em] text-ink sm:text-[1.5rem]">
               {questions[index].text}
             </legend>
@@ -224,9 +237,8 @@ export function FillWizard({
             <span className="sr-only">{t.fill.commentLabel}</span>
             <Textarea
               rows={5}
-              maxLength={MAX_COMMENT_LENGTH}
               value={comment}
-              onChange={(event) => setComment(event.target.value)}
+              onChange={(event) => setComment(limitChars(event.target.value, MAX_COMMENT_LENGTH))}
               className="min-h-36 resize-y"
             />
           </label>

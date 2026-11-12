@@ -20,7 +20,12 @@ export default async function KudosPage({ searchParams }: PageProps<"/kudos">) {
   return (
     <Page>
       <PageHeader title={t.kudos.hubTitle} description={t.kudos.hubIntro} />
-      <KudosHub received={received} recipients={recipients} initialTab={initialTab} />
+      <KudosHub
+        received={received}
+        recipients={recipients}
+        initialTab={initialTab}
+        viewerId={user.id}
+      />
     </Page>
   );
 }

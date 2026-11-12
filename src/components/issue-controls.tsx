@@ -40,6 +40,13 @@ export function IssueControls({
   const router = useRouter();
   const toast = useToast();
   const [current, setCurrent] = useState({ status, ownerGroup });
+  // Another HR session may have changed the issue; after the list refreshes,
+  // show what the server has (E2E2-003).
+  const [server, setServer] = useState({ status, ownerGroup });
+  if (server.status !== status || server.ownerGroup !== ownerGroup) {
+    setServer({ status, ownerGroup });
+    setCurrent({ status, ownerGroup });
+  }
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

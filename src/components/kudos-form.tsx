@@ -18,6 +18,8 @@ import {
   KUDOS_VALUES as VALUES,
   KUDOS_VISIBILITIES as VISIBILITIES,
 } from "@/config/kudos";
+import { useFocusFirstError } from "@/components/ui/focus-error";
+import { limitChars } from "@/lib/text";
 import { errorForStatus, t } from "@/lib/texts.sk";
 
 type Recipient = { id: string; name: string; teamName: string | null };
@@ -58,6 +60,8 @@ export function KudosForm({
   const [sent, setSent] = useState(false);
   const [pending, setPending] = useState(false);
   const recipientRef = useRef<HTMLSelectElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  useFocusFirstError(formRef, fieldErrors, error);
   const fireConfetti = useConfetti();
 
   // The select and the radios stay uncontrolled (form.reset() clears them);
@@ -127,6 +131,7 @@ export function KudosForm({
   return (
     <Panel className="p-5 sm:p-6">
       <form
+        ref={formRef}
         onSubmit={onSubmit}
         onChange={(event) => readChoices(event.currentTarget)}
         noValidate
@@ -198,9 +203,8 @@ export function KudosForm({
         >
           <Textarea
             rows={4}
-            maxLength={MAX_LENGTH}
             value={text}
-            onChange={(event) => setText(event.target.value)}
+            onChange={(event) => setText(limitChars(event.target.value, MAX_LENGTH))}
             aria-invalid={fieldErrors.text}
           />
         </Field>
@@ -282,9 +286,9 @@ export function KudosForm({
         {/* Live preview: how the recipient will see the kudos, so the sender can review it. */}
         <section aria-labelledby="kudos-preview-title">
           <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-3">
-            <h3 id="kudos-preview-title" className="text-sm font-medium text-ink">
+            <h2 id="kudos-preview-title" className="text-sm font-medium text-ink">
               {t.kudos.previewTitle}
-            </h3>
+            </h2>
             <p className="text-xs text-muted">{t.kudos.previewHint}</p>
           </div>
           <KudosCard

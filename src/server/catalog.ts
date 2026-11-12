@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { requireRole } from "@/lib/authz";
 import { forbidden, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
-import { charLength, cleanText } from "@/lib/text";
+import { charLength, cleanText, serialQueue } from "@/lib/text";
 
 export type QuestionItem = {
   id: string;
@@ -68,9 +68,17 @@ export async function createTeamQuestion(
   if (charLength(text) < CUSTOM_QUESTION_MIN_LENGTH) throw validationError({ text: "too_short" });
   if (charLength(text) > CUSTOM_QUESTION_MAX_LENGTH) throw validationError({ text: "too_long" });
 
+  return createInTurn(() => insertTeamQuestion(user.teamId as string, text));
+}
+
+// The duplicate check and the insert run as one step per server process, so two
+// requests whose wording differs only in letter case cannot both pass (BE2-002).
+const createInTurn = serialQueue();
+
+async function insertTeamQuestion(teamId: string, text: string): Promise<QuestionItem> {
   // The same wording must not exist twice for the team, nor shadow the shared library.
   const candidates = await db.question.findMany({
-    where: { OR: [{ teamId: null }, { teamId: user.teamId }] },
+    where: { OR: [{ teamId: null }, { teamId }] },
     select: { text: true },
   });
   const normalized = text.toLocaleLowerCase("sk");
@@ -80,7 +88,7 @@ export async function createTeamQuestion(
 
   try {
     const question = await db.question.create({
-      data: { text, topic: CUSTOM_QUESTION_TOPIC, scale: "AGREEMENT", teamId: user.teamId },
+      data: { text, topic: CUSTOM_QUESTION_TOPIC, scale: "AGREEMENT", teamId },
       select: QUESTION_SELECT,
     });
     return { ...question, scale: toScaleKey(question.scale) };

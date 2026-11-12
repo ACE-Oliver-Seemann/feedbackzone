@@ -86,7 +86,7 @@ export function fireConfetti({ intensity = "full", origin = { x: 0.5, y: 0.35 } 
 
   const full = intensity === "full";
   const count = full ? 130 : 48;
-  const duration = full ? 1900 : 1400;
+  const duration = full ? 1450 : 1400; // IT-02: at most 1.5 s
   const spread = (full ? 110 : 80) * (Math.PI / 180);
   const speed = full ? 1050 : 760;
   const ox = origin.x * width;
