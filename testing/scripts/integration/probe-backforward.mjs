@@ -1,0 +1,32 @@
+// Probe (not a test): what the address bar and the page show after Back / Forward in the wizard.
+import { BASE, U, api, teams, apiRound, session, closeBrowser, resetDb, shot } from "./lib.mjs";
+resetDb(false);
+const { A } = await teams();
+const id = await apiRound(await api(U.mgrA), { teamId: A.id, name: "Pulse – probe" });
+const p = await session(U.alfa[4]);
+const state = async (label) => {
+  await p.waitForTimeout(1500);
+  const h = await p.locator("main#main h1, main#main legend").allInnerTexts();
+  console.log(label, "| url:", p.url().replace(BASE, "").replace(id, ":id"), "| headings:", h.join(" / "), "| history.length:", await p.evaluate(() => history.length));
+};
+await p.goto(`${BASE}/`, { waitUntil: "networkidle" });
+await state("home");
+await p.locator("main#main").getByRole("link", { name: "Vyplniť" }).first().click();
+await p.waitForURL("**/fill");
+await state("after click Vyplniť");
+await p.getByRole("button", { name: "Začať" }).click();
+await p.locator("fieldset button[aria-pressed]").nth(0).click();
+await p.getByRole("button", { name: "Ďalej" }).click();
+await state("question 2");
+await p.goBack();
+await state("after Back");
+await p.goForward();
+await state("after Forward");
+await shot(p, "probe-forward");
+await p.goBack();
+await state("after Back 2");
+await p.goForward();
+await state("after Forward 2");
+await p.reload();
+await state("after reload");
+await closeBrowser();

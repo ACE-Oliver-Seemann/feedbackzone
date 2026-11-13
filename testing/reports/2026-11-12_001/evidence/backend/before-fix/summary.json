@@ -1,0 +1,62 @@
+{
+ "total": 746,
+ "PASS": 714,
+ "FAIL": 32,
+ "BLOCKED": 0,
+ "bySuite": {
+  "S1 Authentication & session": {
+   "executed": 81,
+   "PASS": 79,
+   "FAIL": 2,
+   "BLOCKED": 0
+  },
+  "S2 Authorization matrix (role x endpoint)": {
+   "executed": 170,
+   "PASS": 170,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "S3 Rounds: creation, validation, lifecycle": {
+   "executed": 81,
+   "PASS": 80,
+   "FAIL": 1,
+   "BLOCKED": 0
+  },
+  "S4 Responses & confidentiality storage": {
+   "executed": 76,
+   "PASS": 74,
+   "FAIL": 2,
+   "BLOCKED": 0
+  },
+  "S5 Results, threshold 4 vs 5, suggestions, summary, trend, heatmap": {
+   "executed": 44,
+   "PASS": 44,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "S6 Actions and kudos": {
+   "executed": 90,
+   "PASS": 89,
+   "FAIL": 1,
+   "BLOCKED": 0
+  },
+  "S7 Question library, own questions, HR issues/notes/overview, home tasks": {
+   "executed": 93,
+   "PASS": 87,
+   "FAIL": 6,
+   "BLOCKED": 0
+  },
+  "S8 HTTP methods, headers, injection, error handling": {
+   "executed": 65,
+   "PASS": 64,
+   "FAIL": 1,
+   "BLOCKED": 0
+  },
+  "S9 Deep probes: invalid unicode, races, pages, load": {
+   "executed": 46,
+   "PASS": 27,
+   "FAIL": 19,
+   "BLOCKED": 0
+  }
+ }
+}

@@ -40,6 +40,7 @@ describe("questions of a round [MVP-08]", () => {
       fx.questions.slice(0, 4).map((question, index) => ({
         position: index + 1,
         text: question.text,
+        scale: "AGREEMENT",
       })),
     );
   });

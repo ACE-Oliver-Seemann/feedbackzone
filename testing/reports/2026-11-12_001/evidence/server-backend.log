@@ -1,0 +1,40 @@
+▲ Next.js 16.4.6
+- Local:         http://localhost:3301
+- Network:       http://172.16.33.57:3301
+✓ Ready in 480ms
+✓ Running next.config.ts took 46ms
+[api] POST /api/rounds/cmwdqnsqr003jpkt8qy2qll5m/responses failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdqryqb007tpkt8i8mj3kf0/responses failed: PrismaClientKnownRequestError
+[api] POST /api/kudos failed: PrismaClientKnownRequestError
+[api] POST /api/rounds failed: PrismaClientKnownRequestError
+[api] POST /api/questions failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdqrxyg000hpk3kntq0xyhx/actions failed: PrismaClientKnownRequestError
+[api] POST /api/hr/issues failed: PrismaClientKnownRequestError
+[api] POST /api/hr/notes failed: PrismaClientKnownRequestError
+[api] POST /api/login failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdqugvg00gjpkt80x4lllp5/responses failed: PrismaClientKnownRequestError
+[api] POST /api/kudos failed: PrismaClientKnownRequestError
+[api] POST /api/rounds failed: PrismaClientKnownRequestError
+[api] POST /api/questions failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdqv18p000hpk78cndyodw4/actions failed: PrismaClientKnownRequestError
+[api] POST /api/hr/issues failed: PrismaClientKnownRequestError
+[api] POST /api/hr/notes failed: PrismaClientKnownRequestError
+[api] POST /api/login failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdqv1xp00ktpkt8igx9zcyg/responses failed: PrismaClientKnownRequestError
+[api] POST /api/kudos failed: PrismaClientKnownRequestError
+[api] POST /api/rounds failed: PrismaClientKnownRequestError
+[api] POST /api/questions failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdqwg37000hpkk0ip6d4pg0/actions failed: PrismaClientKnownRequestError
+[api] POST /api/hr/issues failed: PrismaClientKnownRequestError
+[api] POST /api/hr/notes failed: PrismaClientKnownRequestError
+[api] POST /api/login failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdqwh9p00q9pkt87e3cqibj/responses failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdqznng00z5pkt8g6fxcjnh/responses failed: PrismaClientKnownRequestError
+[api] POST /api/kudos failed: PrismaClientKnownRequestError
+[api] POST /api/rounds failed: PrismaClientKnownRequestError
+[api] POST /api/questions failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdr0rr3000hpk3oocyw6a3p/actions failed: PrismaClientKnownRequestError
+[api] POST /api/hr/issues failed: PrismaClientKnownRequestError
+[api] POST /api/hr/notes failed: PrismaClientKnownRequestError
+[api] POST /api/login failed: PrismaClientKnownRequestError
+[api] POST /api/rounds/cmwdr0u2p013fpkt8h728pq6f/responses failed: PrismaClientKnownRequestError

@@ -1,0 +1,110 @@
+{
+ "cpus": 12,
+ "threshold": [
+  {
+   "concurrent": 12,
+   "statuses": {
+    "409": 12
+   },
+   "wallMs": 199
+  },
+  {
+   "concurrent": 13,
+   "statuses": {
+    "409": 13
+   },
+   "wallMs": 215
+  },
+  {
+   "concurrent": 14,
+   "statuses": {
+    "409": 8,
+    "500": 6
+   },
+   "wallMs": 5714
+  },
+  {
+   "concurrent": 15,
+   "statuses": {
+    "409": 10,
+    "500": 5
+   },
+   "wallMs": 5751
+  },
+  {
+   "concurrent": 16,
+   "statuses": {
+    "409": 8,
+    "500": 8
+   },
+   "wallMs": 5683
+  },
+  {
+   "concurrent": 17,
+   "statuses": {
+    "409": 9,
+    "500": 8
+   },
+   "wallMs": 5842
+  },
+  {
+   "concurrent": 18,
+   "statuses": {
+    "409": 8,
+    "500": 10
+   },
+   "wallMs": 5821
+  },
+  {
+   "concurrent": 20,
+   "statuses": {
+    "409": 8,
+    "500": 12
+   },
+   "wallMs": 5857
+  },
+  {
+   "concurrent": 30,
+   "statuses": {
+    "409": 11,
+    "500": 19
+   },
+   "wallMs": 11474
+  }
+ ],
+ "stall": {
+  "submissions": {
+   "409": 9,
+   "500": 11
+  },
+  "GET /api/me": "200 in 5451 ms",
+  "GET /api/rounds": "200 in 8 ms",
+  "POST /api/kudos": "201 in 11 ms"
+ },
+ "retry": {
+  "first": {
+   "201": 11,
+   "500": 13
+  },
+  "failed": 13,
+  "retryStatuses": {
+   "201": 13
+  },
+  "participations": 24,
+  "responses": 24
+ },
+ "kudosControl": {
+  "statuses": {
+   "201": 24
+  },
+  "wallMs": 448
+ },
+ "rootCause": {
+  "transactionsAtOnce": 20,
+  "wallMs": 5834,
+  "outcomes": {
+   "PrismaClientKnownRequestError P2002 Unique constraint failed on the fields: (`roundId`,`userId`)": 8,
+   "PrismaClientKnownRequestError P1008 Socket timeout (the database failed to respond to a query within the configured timeout— see https://pris.ly/d/sqlite-connector for more details).": 12
+  }
+ }
+}

@@ -1,0 +1,32 @@
+PASS  [J7] Fill: request aborted (network interruption) on submit  => alert shown; comment kept=true; submit enabled=true; DB participations/responses=0/0
+PASS  [J7] Fill: the answers chosen before the failure are still there  => answers=4,2,5,3; comment kept=true
+PASS  [J7] Fill: server error 500 on submit  => alert shown; DB=0/0
+PASS  [J7] Fill: invalid (non-JSON) body with status 409  => alerts=["Niečo sa nepodarilo. Skús to znova."]; form still shown=true; page errors=0
+PASS  [J7] Fill: unexpected success status 200 with an empty body  => alerts=["Niečo sa nepodarilo. Skús to znova."]; thank-you shown=0
+PASS  [J7] Fill: browser goes offline, then online again  => offline DB=0/0; after retry DB=1/1; values=4,2,5,3; comment kept=true
+PASS  [J7] Fill: slow response (3 s)  => pending label shown, disabled=true, back disabled=true, requests=1, DB=2/2
+PASS  [J7] Fill: the server stored the answer but the reply was lost (connection dropped after processing)  => after lost reply DB=3/3; after retry UI='Toto kolo už máš vyplnené', DB=3/3
+PASS  [J7] Fill: reloading the page in the middle of the wizard  => intro shown again=true; DB=3/3 (unchanged)
+PASS  [J7] Fill: leaving the wizard through the browser Back button and returning  => back → /; forward → wizard usable=true; page errors=0; DB=3/3
+PASS  [J7] New round: request fails with 500  => name kept='QA kolo po chybe', ticked=3, rounds 2→2
+PASS  [J7] New round: retry after the failure works and creates exactly one draft  => drafts named 'QA kolo po chybe'=1
+FAIL  [J7] New round: the server created the round but the reply was lost; the user retries  => drafts with that name after retry=2 (the list shows both; a draft cannot be deleted in the UI)
+PASS  [J7] New round: adding an own question fails with 500  => text kept=true; custom questions=0
+PASS  [J7] Round list: 'Spustiť' fails with 500, then succeeds  => after failure=DRAFT; after retry=OPEN
+PASS  [J7] Round list: 'Uzavrieť' on a round that somebody else closed meanwhile (stale list)  => message='Kolo medzitým zmenilo stav. Obnov stránku.'
+PASS  [J7] Round list: a draft whose deadline has passed cannot be started  => message='Uzávierka kola už prešla, kolo sa nedá spustiť.'
+PASS  [J7] Kudos: request aborted on send, then retried  => kept text=true, recipient='Barbora Skúšobná (Tím Alfa)', emoji pressed=true; rows after retry=1
+PASS  [J7] Kudos: slow response (2.5 s)  => pending button disabled=true; rows=2
+PASS  [J7] Kudos: success message disappears when the next send fails  => success message still visible=0; rows=2
+PASS  [J7] Action form: 500 on save, then retry  => kept=["QA krok pri chybe","QA: opis kroku, ktorý má zostať.","2026-11-17"]; actions after retry=1
+PASS  [J7] Action status: change fails → the select returns to the stored value and says so  => select=PLANNED; DB=PLANNED
+PASS  [J7] Action status: the manager's session ended (401) while changing the status  => path=/rounds/cmwdv88ox001upk6g70vpwlkq/results; message=["Prihlásenie vypršalo. Prihlás sa znova v novej karte a potom to tu skús ešte raz. Čo máš vyplnené, zostane."]; DB=PLANNED
+PASS  [J7] Issue form: request aborted, then retried  => title kept='QA podnet pri výpadku'; issues 2→3
+PASS  [J7] Issue status select: failure reverts the value  => select=OPEN; DB=OPEN
+PASS  [J7] Note form: 500 on save keeps the long text  => text kept=true; notes 1→1
+PASS  [J7] Login: network failure, then retry  => e-mail kept=true; retry reached '/'
+FAIL  [J7] Logout: the logout request fails (network) — is the user really logged out?  => after click path=/; session cookie still present=true; opening '/' afterwards shows Dana's home=true
+BLOCKED  [J7] Server-rendered page when the backend/database is down  => Not executed: the QA server on :3303 is shared for the whole session and must not be stopped; client-side failures were simulated with page.route instead.
+
+J7 done: 29 checks, 2 failed
+exit 0

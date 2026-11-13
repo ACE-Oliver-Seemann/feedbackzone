@@ -14,7 +14,8 @@
     "acceptance": "node scripts/acceptance.mjs",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "demo": "npm install && npm run setup && npm run dev"
+    "demo": "npm install && npm run setup && npm run dev",
+    "db:demo": "tsx prisma/seed.ts && tsx scripts/demo-data.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

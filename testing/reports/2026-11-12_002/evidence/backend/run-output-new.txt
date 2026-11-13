@@ -1,0 +1,416 @@
+
+===== N1 Page permission matrix (role x page, incl. new /kudos hub and /rounds) =====
+BE2-T001 PASS    [AUTHZ-PAGE] page / as anonymous => 307 location=/login
+BE2-T002 PASS    [AUTHZ-PAGE] page / as a1 => 200
+BE2-T003 PASS    [AUTHZ-PAGE] page / as mA => 200
+BE2-T004 PASS    [AUTHZ-PAGE] page / as mB => 200
+BE2-T005 PASS    [AUTHZ-PAGE] page / as hr => 200
+BE2-T006 PASS    [AUTHZ-PAGE] page /login as anonymous => 200
+BE2-T007 PASS    [AUTHZ-PAGE] page /login as a1 => 307 location=/
+BE2-T008 PASS    [AUTHZ-PAGE] page /login as mA => 307 location=/
+BE2-T009 PASS    [AUTHZ-PAGE] page /login as mB => 307 location=/
+BE2-T010 PASS    [AUTHZ-PAGE] page /login as hr => 307 location=/
+BE2-T011 PASS    [AUTHZ-PAGE] page /kudos as anonymous => 307 location=/login
+BE2-T012 PASS    [AUTHZ-PAGE] page /kudos as a1 => 200
+BE2-T013 PASS    [AUTHZ-PAGE] page /kudos as mA => 200
+BE2-T014 PASS    [AUTHZ-PAGE] page /kudos as mB => 200
+BE2-T015 PASS    [AUTHZ-PAGE] page /kudos as hr => 200
+BE2-T016 PASS    [AUTHZ-PAGE] page /kudos?tab=send as anonymous => 307 location=/login
+BE2-T017 PASS    [AUTHZ-PAGE] page /kudos?tab=send as a1 => 200
+BE2-T018 PASS    [AUTHZ-PAGE] page /kudos?tab=send as mA => 200
+BE2-T019 PASS    [AUTHZ-PAGE] page /kudos?tab=send as mB => 200
+BE2-T020 PASS    [AUTHZ-PAGE] page /kudos?tab=send as hr => 200
+BE2-T021 PASS    [AUTHZ-PAGE] page /kudos/new as anonymous => 307 location=/login
+BE2-T022 PASS    [AUTHZ-PAGE] page /kudos/new as a1 => 307 location=/kudos?tab=send
+BE2-T023 PASS    [AUTHZ-PAGE] page /kudos/new as mA => 307 location=/kudos?tab=send
+BE2-T024 PASS    [AUTHZ-PAGE] page /kudos/new as mB => 307 location=/kudos?tab=send
+BE2-T025 PASS    [AUTHZ-PAGE] page /kudos/new as hr => 307 location=/kudos?tab=send
+BE2-T026 PASS    [AUTHZ-PAGE] page /kudos/me as anonymous => 307 location=/login
+BE2-T027 PASS    [AUTHZ-PAGE] page /kudos/me as a1 => 307 location=/kudos
+BE2-T028 PASS    [AUTHZ-PAGE] page /kudos/me as mA => 307 location=/kudos
+BE2-T029 PASS    [AUTHZ-PAGE] page /kudos/me as mB => 307 location=/kudos
+BE2-T030 PASS    [AUTHZ-PAGE] page /kudos/me as hr => 307 location=/kudos
+BE2-T031 PASS    [AUTHZ-PAGE] page /rounds as anonymous => 307 location=/login
+BE2-T032 PASS    [AUTHZ-PAGE] page /rounds as a1 => 403
+BE2-T033 PASS    [AUTHZ-PAGE] page /rounds as mA => 200
+BE2-T034 PASS    [AUTHZ-PAGE] page /rounds as mB => 200
+BE2-T035 PASS    [AUTHZ-PAGE] page /rounds as hr => 307 location=/hr/rounds
+BE2-T036 PASS    [AUTHZ-PAGE] page /rounds/new as anonymous => 307 location=/login
+BE2-T037 PASS    [AUTHZ-PAGE] page /rounds/new as a1 => 403
+BE2-T038 PASS    [AUTHZ-PAGE] page /rounds/new as mA => 200
+BE2-T039 PASS    [AUTHZ-PAGE] page /rounds/new as mB => 200
+BE2-T040 PASS    [AUTHZ-PAGE] page /rounds/new as hr => 200
+BE2-T041 PASS    [AUTHZ-PAGE] page /hr/rounds as anonymous => 307 location=/login
+BE2-T042 PASS    [AUTHZ-PAGE] page /hr/rounds as a1 => 403
+BE2-T043 PASS    [AUTHZ-PAGE] page /hr/rounds as mA => 403
+BE2-T044 PASS    [AUTHZ-PAGE] page /hr/rounds as mB => 403
+BE2-T045 PASS    [AUTHZ-PAGE] page /hr/rounds as hr => 200
+BE2-T046 PASS    [AUTHZ-PAGE] page /hr/overview as anonymous => 307 location=/login
+BE2-T047 PASS    [AUTHZ-PAGE] page /hr/overview as a1 => 403
+BE2-T048 PASS    [AUTHZ-PAGE] page /hr/overview as mA => 403
+BE2-T049 PASS    [AUTHZ-PAGE] page /hr/overview as mB => 403
+BE2-T050 PASS    [AUTHZ-PAGE] page /hr/overview as hr => 200
+BE2-T051 PASS    [AUTHZ-PAGE] page /hr/heatmap as anonymous => 307 location=/login
+BE2-T052 PASS    [AUTHZ-PAGE] page /hr/heatmap as a1 => 403
+BE2-T053 PASS    [AUTHZ-PAGE] page /hr/heatmap as mA => 403
+BE2-T054 PASS    [AUTHZ-PAGE] page /hr/heatmap as mB => 403
+BE2-T055 PASS    [AUTHZ-PAGE] page /hr/heatmap as hr => 200
+BE2-T056 PASS    [AUTHZ-PAGE] page /hr/issues as anonymous => 307 location=/login
+BE2-T057 PASS    [AUTHZ-PAGE] page /hr/issues as a1 => 403
+BE2-T058 PASS    [AUTHZ-PAGE] page /hr/issues as mA => 403
+BE2-T059 PASS    [AUTHZ-PAGE] page /hr/issues as mB => 403
+BE2-T060 PASS    [AUTHZ-PAGE] page /hr/issues as hr => 200
+BE2-T061 PASS    [AUTHZ-PAGE] page /hr/notes as anonymous => 307 location=/login
+BE2-T062 PASS    [AUTHZ-PAGE] page /hr/notes as a1 => 403
+BE2-T063 PASS    [AUTHZ-PAGE] page /hr/notes as mA => 403
+BE2-T064 PASS    [AUTHZ-PAGE] page /hr/notes as mB => 403
+BE2-T065 PASS    [AUTHZ-PAGE] page /hr/notes as hr => 200
+BE2-T066 PASS    [AUTHZ-PAGE] page /team/:alfa as anonymous => 307 location=/login
+BE2-T067 PASS    [AUTHZ-PAGE] page /team/:alfa as a1 => 200
+BE2-T068 PASS    [AUTHZ-PAGE] page /team/:alfa as mA => 200
+BE2-T069 PASS    [AUTHZ-PAGE] page /team/:alfa as mB => 403
+BE2-T070 PASS    [AUTHZ-PAGE] page /team/:alfa as hr => 200
+BE2-T071 PASS    [AUTHZ-PAGE] page /team/:beta as anonymous => 307 location=/login
+BE2-T072 PASS    [AUTHZ-PAGE] page /team/:beta as a1 => 403
+BE2-T073 PASS    [AUTHZ-PAGE] page /team/:beta as mA => 403
+BE2-T074 PASS    [AUTHZ-PAGE] page /team/:beta as mB => 200
+BE2-T075 PASS    [AUTHZ-PAGE] page /team/:beta as hr => 200
+BE2-T076 PASS    [AUTHZ-PAGE] page /team/:alfa/trend as anonymous => 307 location=/login
+BE2-T077 PASS    [AUTHZ-PAGE] page /team/:alfa/trend as a1 => 403
+BE2-T078 PASS    [AUTHZ-PAGE] page /team/:alfa/trend as mA => 200
+BE2-T079 PASS    [AUTHZ-PAGE] page /team/:alfa/trend as mB => 403
+BE2-T080 PASS    [AUTHZ-PAGE] page /team/:alfa/trend as hr => 200
+BE2-T081 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/fill as anonymous => 307 location=/login
+BE2-T082 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/fill as a1 => 200
+BE2-T083 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/fill as mA => 200
+BE2-T084 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/fill as mB => 403
+BE2-T085 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/fill as hr => 403
+BE2-T086 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/results as anonymous => 307 location=/login
+BE2-T087 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/results as a1 => 403
+BE2-T088 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/results as mA => 200
+BE2-T089 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/results as mB => 403
+BE2-T090 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/results as hr => 200
+BE2-T091 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/report as anonymous => 307 location=/login
+BE2-T092 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/report as a1 => 403
+BE2-T093 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/report as mA => 200
+BE2-T094 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/report as mB => 403
+BE2-T095 PASS    [AUTHZ-PAGE] page /rounds/:openAlfa/report as hr => 200
+BE2-T096 PASS    [AUTHZ-PAGE] page /rounds/:closedBeta/results as anonymous => 307 location=/login
+BE2-T097 PASS    [AUTHZ-PAGE] page /rounds/:closedBeta/results as a1 => 403
+BE2-T098 PASS    [AUTHZ-PAGE] page /rounds/:closedBeta/results as mA => 403
+BE2-T099 PASS    [AUTHZ-PAGE] page /rounds/:closedBeta/results as mB => 200
+BE2-T100 PASS    [AUTHZ-PAGE] page /rounds/:closedBeta/results as hr => 200
+BE2-T101 PASS    [AUTHZ-PAGE] page /rounds/:draftAlfa/fill as anonymous => 307 location=/login
+BE2-T102 PASS    [AUTHZ-PAGE] page /rounds/:draftAlfa/fill as a1 => 404
+BE2-T103 PASS    [AUTHZ-PAGE] page /rounds/:draftAlfa/fill as mA => 404
+BE2-T104 PASS    [AUTHZ-PAGE] page /rounds/:draftAlfa/fill as mB => 403
+BE2-T105 PASS    [AUTHZ-PAGE] page /rounds/:draftAlfa/fill as hr => 403
+BE2-T106 PASS    [AUTHZ-PAGE] page /team/:unknown as anonymous => 307 location=/login
+BE2-T107 PASS    [AUTHZ-PAGE] page /team/:unknown as a1 => 403
+BE2-T108 PASS    [AUTHZ-PAGE] page /team/:unknown as mA => 403
+BE2-T109 PASS    [AUTHZ-PAGE] page /team/:unknown as mB => 403
+BE2-T110 PASS    [AUTHZ-PAGE] page /team/:unknown as hr => 404
+BE2-T111 PASS    [AUTHZ-PAGE] page /rounds/:unknown/results as anonymous => 307 location=/login
+BE2-T112 PASS    [AUTHZ-PAGE] page /rounds/:unknown/results as a1 => 403
+BE2-T113 PASS    [AUTHZ-PAGE] page /rounds/:unknown/results as mA => 403
+BE2-T114 PASS    [AUTHZ-PAGE] page /rounds/:unknown/results as mB => 403
+BE2-T115 PASS    [AUTHZ-PAGE] page /rounds/:unknown/results as hr => 404
+BE2-T116 PASS    [AUTHZ-PAGE] page /rounds/:unknown/fill as anonymous => 307 location=/login
+BE2-T117 PASS    [AUTHZ-PAGE] page /rounds/:unknown/fill as a1 => 403
+BE2-T118 PASS    [AUTHZ-PAGE] page /rounds/:unknown/fill as mA => 403
+BE2-T119 PASS    [AUTHZ-PAGE] page /rounds/:unknown/fill as mB => 403
+BE2-T120 PASS    [AUTHZ-PAGE] page /rounds/:unknown/fill as hr => 403
+BE2-T121 PASS    [AUTHZ-PAGE] 403 page of a foreign team does not leak the team name or round names => 403, round name present: false
+BE2-T122 PASS    [AUTHZ-PAGE] /kudos with unexpected query (?tab=send&tab=x&tab[]=y) => 200 <!DOCTYPE html><html lang="sk" class="h-full QGVM8G_variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, init…(+48 chars)
+BE2-T123 PASS    [AUTHZ-PAGE] /hr/issues with unknown filters and garbage prefill ids as HR => 200 <!DOCTYPE html><html lang="sk" class="h-full QGVM8G_variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, init…(+48 chars)
+BE2-T124 PASS    [AUTHZ-PAGE] /hr/issues?round=<Beta round> as manager Beta (prefill must not be reachable) => 403 <!DOCTYPE html><html id="__next_error__"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link r…(+48 chars)
+BE2-T125 PASS    [AUTHZ-PAGE] unknown page for a logged-in user and for anonymous => 404 / 404
+BE2-T126 PASS    [HEADER] authenticated pages are not cacheable => private, no-cache, no-store, max-age=0, must-revalidate | private, no-cache, no-store, max-age=0, must-revalidate | private, no-cache, no-store, max-a…(+21 chars)
+
+===== N2 Session, cookies and token tampering =====
+BE2-T127 PASS    [SESSION] token payload has only uid, iat, exp (no role, no e-mail) => exp,iat,uid
+BE2-T128 PASS    [SESSION] payload swapped to the HR user id, signature of the employee kept => 401 {"error":"unauthorized"}
+BE2-T129 PASS    [SESSION] payload with exp extended by a year, old signature => 401 {"error":"unauthorized"}
+BE2-T130 PASS    [SESSION] valid payload with an empty signature / signature 'none' => 401/401
+BE2-T131 PASS    [SESSION] valid token with an extra segment appended (.x) => 401 {"error":"unauthorized"}
+BE2-T132 PASS    [SESSION] signature with one character changed => 401 {"error":"unauthorized"}
+BE2-T133 PASS    [SESSION] cookie name in upper case (FZ_SESSION) => 401 {"error":"unauthorized"}
+BE2-T134 PASS    [SESSION] token sent as Authorization: Bearer instead of the cookie => 401 {"error":"unauthorized"}
+BE2-T135 PASS    [SESSION] two fz_session cookies: garbage first, valid second => 200
+BE2-T136 PASS    [SESSION] 8 kB of garbage in the cookie => 401
+BE2-T137 PASS    [SESSION] login Set-Cookie attributes => fz_session=<token>; Path=/; Expires=Fri, 13 Nov 2026 05:36:53 GMT; Max-Age=28800; Secure; HttpOnly; SameSite=lax
+BE2-T138 PASS    [SESSION] login response body => home,user / id,name,role,teamId
+BE2-T139 PASS    [SESSION] e-mail is case-insensitive and trimmed on login => 200 {"user":{"id":"cmwe2ivyf0017pkuwrcufhrx5","name":"Adam Vzorový","role":"EMPLOYEE","teamId":"cmwe2ivy90015pkuw6uhwc47k"},"home":"/"}
+BE2-T140 PASS    [SESSION] password is case-sensitive and not trimmed => 401/401
+BE2-T141 PASS    [SESSION] password with a NUL byte after the real password ('Heslo123\u0000x') => 401 {"error":"invalid_credentials"}
+BE2-T142 PASS    [SESSION] failed login sets no session cookie => 401 set-cookie=0
+BE2-T143 PASS    [SESSION] logout: Set-Cookie clears the cookie; old token is dead on API and pages; other users unaffected (BUG-001 regression) => logout 200, cookie 'fz_session=; Path=/; Max-Age=0; Secure; …', old token: api 401, page 307; other user 200
+BE2-T144 PASS    [SESSION] two sessions of one user: both valid; logout of one ends both (documented behaviour of the BUG-001 fix) => before 200/200, after 401/401
+BE2-T145 PASS    [SESSION] logout without a session => 401 {"error":"unauthorized"}
+BE2-T146 PASS    [SESSION] login right after logout works and the new token is accepted => 200 {"user":{"id":"cmwe2ivyp001dpkuwh1bwmzy1","name":"Dana Príkladná","role":"EMPLOYEE","teamId":"cmwe2ivy90015pkuw6uhwc47k"}}
+
+===== N3 Kudos with emoji (IT-06) – extended validation matrix =====
+BE2-T147 PASS    [KUDOS-EMOJI] emoji + text of exactly 500 characters => 201 len=500
+BE2-T148 PASS    [KUDOS-EMOJI] emoji + whitespace-only text => 201 ""
+BE2-T149 PASS    [KUDOS-EMOJI] emoji + text null => 201 {"kudos":{"id":"cmwe2iy7n017tpk00efvlwh5y","fromName":"Adam Vzorový","toName":"Barbora Skúšobná","text":"","emoji":"💪","value":"HELPING","visibil…(+46 chars)
+BE2-T150 PASS    [KUDOS-EMOJI] emoji + text of 30 zero-width spaces => 201 ""
+BE2-T151 PASS    [KUDOS-EMOJI] emoji + text as a number => 400 {"error":"validation_error","fields":{"text":"invalid"}}
+BE2-T152 PASS    [KUDOS-EMOJI] heart with the text-presentation selector (U+2764 U+FE0E) => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE2-T153 PASS    [KUDOS-EMOJI] valid emoji prefixed with a BOM (U+FEFF) => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE2-T154 PASS    [KUDOS-EMOJI] emoji as boolean true => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE2-T155 PASS    [KUDOS-EMOJI] emoji as boolean false with a short text => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE2-T156 PASS    [KUDOS-EMOJI] invalid emoji with a valid 20+ character text => 400 {"error":"validation_error","fields":{"emoji":"invalid"}}
+BE2-T157 PASS    [KUDOS-EMOJI] mass assignment: body carries fromUserId (HR), id and createdAt => 201 from=sender idSpoofed=false createdAt=2026-11-12T21:36:54.741Z
+BE2-T158 PASS    [KUDOS-EMOJI] response item of POST /api/kudos => createdAt,emoji,fromName,id,text,toName,value,visibility
+BE2-T159 PASS    [KUDOS-EMOJI] emoji-only row in the database => text="" emoji code points=2764 fe0f
+BE2-T160 PASS    [KUDOS-EMOJI] emoji-only PRIVATE kudos: only the recipient sees it => recipient true, sender false, colleague false, manager false, HR false
+BE2-T161 PASS    [KUDOS-EMOJI] private emoji kudos is not rendered on other users' pages => manager page has id: false, colleague team page has id: false
+BE2-T162 PASS    [KUDOS-EMOJI] emoji-only TEAM kudos to HR (no team) => 400 {"error":"validation_error","fields":{"visibility":"no_team"}}
+BE2-T163 PASS    [KUDOS-EMOJI] emoji-only PRIVATE kudos to HR => 201 {"kudos":{"id":"cmwe2iybk0185pk007n5bt7rw","fromName":"Adam Vzorový","toName":"Hana Personálna","text":"","emoji":"👏","value":"HELPING","visibili…(+46 chars)
+BE2-T164 PASS    [KUDOS-EMOJI] emoji-only kudos to oneself => 400 {"error":"validation_error","fields":{"toUserId":"self"}}
+BE2-T165 PASS    [KUDOS-EMOJI] emoji-only kudos to an unknown user id => 400 {"error":"validation_error","fields":{"toUserId":"unknown"}}
+BE2-T166 PASS    [KUDOS-EMOJI] HR sends an emoji kudos to an employee => 201 {"kudos":{"id":"cmwe2iyc00187pk00gsanhwwt","fromName":"Hana Personálna","toName":"Filip Vzorka","text":"","emoji":"⭐","value":"HELPING","visibilit…(+46 chars)
+BE2-T167 PASS    [KUDOS-EMOJI] cross-team public kudos (Alfa → Beta) appears only in the recipient's team feed => Beta feed true, Alfa feed false
+BE2-T168 PASS    [KUDOS] empty body object => 400 {"error":"validation_error","fields":{"toUserId":"required","text":"too_short","value":"invalid","visibility":"invalid"}}
+BE2-T169 PASS    [KUDOS] three kudos in a row: 'my kudos' is newest first => order ok: true
+BE2-T170 PASS    [KUDOS] HTML in the kudos text is escaped on the new /kudos hub page => /kudos escaped: true, team page escaped: true
+BE2-T171 PASS    [KUDOS] /kudos hub page lists recipients without the user themself and without e-mails => 200, e-mail present: false
+
+===== N4 Own questions of a manager (IT-07) – extended =====
+BE2-T172 PASS    [QUESTIONS] inner whitespace is collapsed => 201 "Mám v tíme dosť podpory QA2?"
+BE2-T173 PASS    [QUESTIONS] same wording in another letter case => 400 {"error":"validation_error","fields":{"text":"duplicate"}}
+BE2-T174 PASS    [QUESTIONS] same wording with extra spaces => 400 {"error":"validation_error","fields":{"text":"duplicate"}}
+BE2-T175 PASS    [QUESTIONS] wording of a shared library question (upper case) => 400 {"error":"validation_error","fields":{"text":"duplicate"}}
+BE2-T176 PASS    [QUESTIONS] the other manager may use the same wording for their own team => 201
+BE2-T177 PASS    [QUESTIONS] mass assignment: scale, fixed, starter, teamId (Beta), topic sent by manager Alfa => 201 {"id":":id","text":"QA2 otázka s cudzími poľami?","type":"SCALE_1_5","topic":"Vlastné otázky tímu","scale":"AGREEMENT","starter":false,"fixed":fal…(+18 chars)
+BE2-T178 PASS    [QUESTIONS] length is checked after collapsing spaces ('Abcde    fg?' = 9 characters) => 400 {"error":"validation_error","fields":{"text":"too_short"}}
+BE2-T179 PASS    [QUESTIONS] library as seen by each role => mA own true/foreign false; mB own true/foreign false; hr true
+BE2-T180 PASS    [QUESTIONS] manager Beta puts Alfa's own question into a Beta round => 400 {"error":"validation_error","fields":{"questionIds":"unknown"}}
+BE2-T181 PASS    [QUESTIONS] HR puts Alfa's own question into a Beta round => 400 {"error":"validation_error","fields":{"questionIds":"unknown"}}
+BE2-T182 PASS    [QUESTIONS] HR puts Alfa's own question into an Alfa round => 201 {"round":{"id":"cmwe2iyjy018ppk00xkg9sz1z"}}
+BE2-T183 PASS    [QUESTIONS] own question counts into the 3–5 limit: fixed + own + 3 library => 201 {"round":{"id":"cmwe2iykg018rpk000nodq0jy"}}
+BE2-T184 PASS    [QUESTIONS] own question counts into the limit: fixed + own + 4 library => 400 {"error":"validation_error","fields":{"questionIds":"too_many"}}
+BE2-T185 PASS    [QUESTIONS] an own question cannot be edited or deleted => statuses 405,404,405,404,405,404; row intact: true
+BE2-T186 PASS    [QUESTIONS] employee and HR cannot create an own question => 403/403
+BE2-T187 PASS    [QUESTIONS] HTML in an own question is escaped on /rounds/new => create 201, page 200, escaped true
+BE2-T188 FAIL    [QUESTIONS-RACE] 5 concurrent requests with the same wording in 5 letter-case variants => statuses 201,201,201,201,201; rows with this wording in the DB: 5
+
+===== N5 Suggestions (IT-09), threshold in trend/heatmap with time simulation (IT-08, NFR-02) =====
+(node:16988) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of ./src/config/suggestions.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to \\?\.\package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+BE2-T189 PASS    [SUGGEST] open round S1 with 6 responses => 200 {"status":"not_closed"}
+BE2-T190 PASS    [SUGGEST] S1 [fixed=1, overtime=5 (reversed), A=2, B=4]: two suggestions => [["Záťaž a energia",5],["Dôvera v prieskum",2]]
+BE2-T191 PASS    [SUGGEST] suggestion texts come from the rule library of the question's topic => match: true / true
+BE2-T192 PASS    [SUGGEST] suggestion item shape => provider,status,suggestions / average,questionText,suggestion,topic
+BE2-T193 PASS    [SUGGEST] deterministic: three calls, manager and HR => 200 {"status":"ok","provider":"rules","suggestions":[{"topic":"Záťaž a energia","questionText":"Ako často bolo za posledné dva týždne potrebné pracova…(+47 chars)
+BE2-T194 PASS    [SUGGEST] S2 [fixed, two questions of ONE topic]: fill-up from the same topic => [["Hybridná práca a prostredie",2],["Hybridná práca a prostredie",4]]
+BE2-T195 PASS    [SUGGEST] S3 with the team's own question as the weakest => [["Vlastné otázky tímu",1],["Jasnosť a priority",3]] fallback text: true
+BE2-T196 PASS    [SUGGEST] LOW (4 responses): suggestions for manager and HR => {"status":"insufficient_responses","responseCount":4}
+BE2-T197 PASS    [SUGGEST] suggestions of an Alfa round for employee, manager Beta, anonymous => 403,403,401
+BE2-T198 PASS    [RESULTS] S1 results: averages, distributions, comments => avg 1,5,2,4 comments 6
+BE2-T199 PASS    [RESULTS] S1 results carry nothing about respondents => leak: false
+BE2-T200 PASS    [THRESHOLD] LOW (4 responses) results for manager and HR => insufficient_responses/insufficient_responses
+BE2-T201 PASS    [THRESHOLD] pages of the LOW round never contain its comments or averages => no marker on 8 pages
+BE2-T202 PASS    [TREND] trend of Alfa: 5 closed rounds, oldest first => insufficient_responses(0), ok(6), ok(5), ok(5), insufficient_responses(4)
+BE2-T203 PASS    [TREND] points below the threshold are gaps => closedAt,responded,roundId,roundName,status
+BE2-T204 PASS    [TREND] S1 point: fixed score and topic scores, reversed scale flipped => {"fixed":1,"topics":[1,2,4]}
+BE2-T205 PASS    [TREND] a topic asked only in the below-threshold round is not listed => topics: 5, contains Z-topic: false
+BE2-T206 PASS    [TREND] trend as HR equals trend as the manager; employee and foreign manager refused => same: true; 403/403
+BE2-T207 PASS    [HEATMAP] Alfa: mean over rounds above the threshold only => counted 3, fixed 3, topic B 3.5
+BE2-T208 PASS    [HEATMAP] topic asked only below the threshold has no column and no cell => in topics: false
+BE2-T209 PASS    [HEATMAP] Beta has only a round with 4 responses => {} counted 0
+BE2-T210 PASS    [HEATMAP] heatmap shape => teams,topics,windowDays window 90 first 'Stála otázka'
+BE2-T211 PASS    [HEATMAP] time simulation: S1 closed 100 days ago => counted 2, fixed 4
+BE2-T212 PASS    [TREND] time simulation: the 100-day-old round stays in the trend and moves to the first place => first is S1: true
+BE2-T213 PASS    [HEATMAP] time simulation: S3 closed 90 days + 1 hour ago / 90 days − 1 hour ago => outside: 1/3; inside: 2/4
+BE2-T214 PASS    [HEATMAP] time simulation: legacy round without closedAt (S2: closedAt NULL, deadline 10 days ago) => counted 2, point date equals deadline: true
+BE2-T215 PASS    [SUMMARY] team page data for an employee after the simulation => LOW {"status":"insufficient_responses"}; S1 keys average,position,scale,text
+BE2-T216 PASS    [SUMMARY] team summary is ordered by the real closing time, newest first => first LOW: true, last S1: true
+BE2-T217 PASS    [ROUND-LIFE] time simulation: deadline passes; the first request afterwards is a submission => first 201, late 409 {"error":"round_closed"}; participations 1, responses 1
+BE2-T218 PASS    [ROUND-LIFE] the automatically closed round counts as closed at its deadline => CLOSED, closedAt==deadline: true
+BE2-T219 PASS    [ROUND-LIFE] closing or opening the automatically closed round by hand => 409 {"error":"invalid_state"} / 409 {"error":"invalid_state"}
+BE2-T220 PASS    [ROUND-LIFE] employee's round list after the deadline => employee sees it: false; manager: CLOSED, awaitingAction true
+BE2-T221 PASS    [ROUND-LIFE] known BUG-010 remainder: draft whose deadline passed => 409 {"error":"deadline_passed"}; still listed as DRAFT: true
+
+===== N6 HR issues and meeting notes (IT-10) – extended =====
+BE2-T222 PASS    [HR-ISSUE] issue with a round of Beta and teamId of Alfa => 201 team is Beta: true
+BE2-T223 PASS    [HR-ISSUE] issue item shape => createdAt,description,dueDate,id,note,ownerGroup,round,source,status,team,title
+BE2-T224 PASS    [HR-ISSUE] mass assignment on create: status DONE, createdById (manager), id, createdAt => 201 status OPEN, author is HR: true
+BE2-T225 PASS    [HR-ISSUE] issue created from a note shows up under that note => 201 listed: true
+BE2-T226 PASS    [HR-ISSUE] issue with both a note and a round => 201 {"issue":{"id":"cmwe2izeh019npk00b6mj35a2","title":"QA2 podnet 3qkff","description":"","source":"OTHER","ownerGroup":"OTHER","status":"OPEN","dueD…(+47 chars)
+BE2-T227 PASS    [HR-ISSUE] title of 120 emoji / 121 emoji => 201/400
+BE2-T228 PASS    [HR-ISSUE] PATCH with only a title => 400 {"error":"validation_error","fields":{"status":"required"}}
+BE2-T229 PASS    [HR-ISSUE] PATCH status + title + description + teamId + createdById => 200 status IN_PROGRESS; title/team/author intact: true
+BE2-T230 PASS    [HR-ISSUE] PATCH dueDate: set, clear with null, clear with '' => 200:date 200:null 200:date 200:null
+BE2-T231 PASS    [HR-ISSUE-VALID] PATCH dueDate invalid: 2026-02-30 => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE2-T232 PASS    [HR-ISSUE-VALID] PATCH dueDate invalid: number 20270101 => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE2-T233 PASS    [HR-ISSUE-VALID] PATCH dueDate invalid: '31.12.2026' => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE2-T234 PASS    [HR-ISSUE-VALID] PATCH dueDate invalid: ISO with time => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE2-T235 PASS    [HR-ISSUE-VALID] PATCH dueDate invalid: array => 400 {"error":"validation_error","fields":{"dueDate":"invalid"}}
+BE2-T236 PASS    [HR-ISSUE] status can go back: DONE → OPEN => 200 {"issue":{"id":"cmwe2izdk019hpk00lea9jwz1","title":"QA2 podnet hvkmo","description":"","source":"SURVEY","ownerGroup":"OTHER","status":"OPEN","due…(+47 chars)
+BE2-T237 PASS    [HR-ISSUE] PATCH status in lower case / null / number => 400,400,400
+BE2-T238 PASS    [HR-ISSUE] PATCH of an unknown issue: HR, manager, employee, anonymous => 404,403,403,401
+BE2-T239 PASS    [HR-ISSUE] no delete and no single-item read => 405/405
+BE2-T240 PASS    [HR-ISSUE-FILTER] status=ACTIVE => 6 issues, statuses OPEN,IN_PROGRESS
+BE2-T241 PASS    [HR-ISSUE-FILTER] status=ALL and no filter => ALL 7, none 7, DB 7
+BE2-T242 PASS    [HR-ISSUE-FILTER] group=FACILITY&status=DONE => 1 issues
+BE2-T243 PASS    [HR-ISSUE-FILTER] filter values in lower case (status=open, group=facility) => 400 {"error":"validation_error","fields":{"status":"invalid"}} / 400 {"error":"validation_error","fields":{"group":"invalid"}}
+BE2-T244 PASS    [HR-ISSUE-FILTER] SQL-style filter value (status=OPEN' OR '1'='1, group=FACILITY;DROP TABLE Issue) => 400/400, issues in DB: 7
+BE2-T245 PASS    [HR-ISSUE-FILTER] repeated parameter (status=DONE&status=OPEN) => 200, statuses DONE
+BE2-T246 PASS    [HR-ISSUE] list is newest first => 200 {"issues":[{"id":"cmwe2izeq019ppk009t091ls2","title":"🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉…(+48 chars)
+BE2-T247 PASS    [HR-ISSUE] issue list and filters for non-HR => 403,403,401
+BE2-T248 PASS    [HR-NOTE] note text of 10 000 / 10 001 characters => 201/400
+BE2-T249 PASS    [HR-NOTE] mass assignment on a note: createdById, id, issues => 201 author HR: true, issues 0
+BE2-T250 PASS    [HR-NOTE] notes are ordered by meeting date, newest first; item shape => 3 notes, keys createdAt,id,issues,meetingDate,text,title
+BE2-T251 PASS    [HR-NOTE] HTML in a note and in an issue title is escaped on /hr/notes and /hr/issues => notes escaped true, issues escaped true
+BE2-T252 PASS    [HR-NOTE] notes for non-HR (GET and POST) => 403,403,401
+BE2-T253 PASS    [HR-ISSUE] issues and notes never read responses => 200 {"notes":[{"id":"cmwe2izk4019vpk00r5aomvm8","title":"QA2 <img src=x onerror=qa1337()>","meetingDate":"2026-11-12T22:59:59.999Z","text":"Text <img …(+48 chars)
+
+===== N7 HR overview maths with time simulation (IT-05) =====
+BE2-T254 PASS    [HR-OVERVIEW] Beta before any action => {"closed":2,"share":0,"median":null,"waiting":[3,0]}
+BE2-T255 PASS    [HR-OVERVIEW] manager Beta writes an action for the seed round (closed 3 days ago) => {"with":1,"share":50,"median":3,"actions":{"planned":1,"inProgress":0,"done":0,"overdue":0}}
+BE2-T256 PASS    [HR-OVERVIEW] time simulation: action created 36 hours after the round closed => median 1.5
+BE2-T257 PASS    [HR-OVERVIEW] time simulation: action past its due date; then marked DONE => {"planned":1,"inProgress":0,"done":0,"overdue":1} → {"planned":0,"inProgress":0,"done":1,"overdue":0}
+BE2-T258 PASS    [HR-OVERVIEW] totals equal the sum of the teams => total closed 7, with action 1
+BE2-T259 PASS    [HR-OVERVIEW] overview contains nothing from responses => 200 {"total":{"closedRounds":7,"roundsWithAction":1,"sharePercent":14,"medianDaysToFirstAction":1.5,"actions":{"planned":0,"inProgress":0,"done":1,"ov…(+47 chars)
+
+===== N8 Injection-style and malformed inputs (safe, non-destructive) =====
+BE2-T260 PASS    [INJECTION] login: SQL in e-mail => 401 {"error":"invalid_credentials"}
+BE2-T261 PASS    [INJECTION] login: SQL in password => 401 {"error":"invalid_credentials"}
+BE2-T262 PASS    [INJECTION] login: operator object as e-mail => 401 {"error":"invalid_credentials"}
+BE2-T263 PASS    [INJECTION] login: operator object as password => 401 {"error":"invalid_credentials"}
+BE2-T264 PASS    [INJECTION] login: array as e-mail => 401 {"error":"invalid_credentials"}
+BE2-T265 PASS    [INJECTION] login: e-mail with a trailing NUL => 401 {"error":"invalid_credentials"}
+BE2-T266 PASS    [INJECTION] login: e-mail with a wildcard % => 401 {"error":"invalid_credentials"}
+BE2-T267 PASS    [INJECTION] kudos: toUserId as a Prisma operator object {not:''} => 400 {"error":"validation_error","fields":{"toUserId":"required"}}
+BE2-T268 PASS    [INJECTION] kudos: __proto__ and constructor keys carrying an emoji => 400 {"error":"validation_error","fields":{"text":"too_short"}}; next request 400
+BE2-T269 PASS    [INJECTION] round: questionIds as objects / nested arrays => 400 {"error":"validation_error","fields":{"questionIds":"invalid"}} / 400
+BE2-T270 PASS    [INJECTION] round: teamId as an operator object as HR => 400 {"error":"validation_error","fields":{"teamId":"required"}}
+BE2-T271 PASS    [INJECTION] round: teamId as an operator object as manager Alfa => 201 team is own: true
+BE2-T272 PASS    [INJECTION] responses: answers as numeric strings, floats, booleans, nested arrays, object => statuses 400,400,400,400,400,400,400,400,400,400,400; stored 0
+BE2-T273 PASS    [INJECTION] path traversal in ids (/api/rounds/..%2F..%2Fme/results, /api/teams/%2e%2e/summary, /api/actions/..%2Fme) => 404,404,403
+BE2-T274 PASS    [INJECTION] SQL text in ids of every id-carrying page => 404,404,404,403,403
+BE2-T275 PASS    [INJECTION] HTML in a round name is escaped on /rounds, /hr/rounds and the fill page => 200:true 200:true 200:true 200:true
+BE2-T276 PASS    [INJECTION] no user was created, removed or changed role by any request so far => {"EMPLOYEE":10,"HR":1,"MANAGER":2}
+BE2-T277 PASS    [BODY] JSON with a UTF-8 BOM / with duplicate keys / deeply nested (2 000 levels) => 400/201/400
+BE2-T278 PASS    [URL] trailing slash, double slash and upper-case path on the API => 308,308,404,308
+BE2-T279 PASS    [URL] known BUG-014: malformed percent-encoding in an API path and a page path => api 500 'Internal Server Error', page 500
+
+===== N9 Concurrency =====
+BE2-T280 PASS    [RACE] 5 concurrent 'open' on one draft => 200,409,409,409,409
+BE2-T281 PASS    [RACE] 6 team members submit concurrently => 201,201,201,201,201,201; participations 6, responses 6
+BE2-T282 FAIL    [RACE] each member re-submits 3 times concurrently (18 requests) => 409,500; responses 6
+BE2-T283 PASS    [RACE] 5 concurrent 'close' on one open round (HR and manager mixed) => 409,409,200,409,409
+BE2-T284 PASS    [RACE] submit and close fired together, 8 rounds (BUG-002 regression) => 409/200:0+0 409/200:0+0 409/200:0+0 409/200:0+0 409/200:0+0 409/200:0+0 409/200:0+0 409/200:0+0
+BE2-T285 PASS    [RACE] 12 different users send kudos concurrently => 201; +12 rows
+BE2-T286 PASS    [RACE] 6 concurrent PATCH of one action with different statuses => 200,200,200,200,200,200 final PLANNED
+BE2-T287 PASS    [RACE] 5 concurrent PATCH of one issue (status, group, due date mixed) => 200,200,200,200,200 → IN_PROGRESS/IT_SUPPORT
+BE2-T288 PASS    [RACE] 13 concurrent logins of 13 different users => 13/13 resolved to the right user
+BE2-T289 PASS    [RACE] 3 concurrent logouts with the same token + a request racing with them => 200,200,200,200 → after 401
+BE2-T290 PASS    [RACE] 20 parallel reads of results/summary/trend/heatmap while a round is closing => 200
+
+===== N10 NFR-01 storage and log, database integrity after the whole run =====
+BE2-T291 PASS    [NFR-01-DB] columns of Response => id,roundId,teamId,v1,v2,v3,v4,v5,comment
+BE2-T292 PASS    [NFR-01-DB] columns of Participation => roundId,userId
+BE2-T293 PASS    [NFR-01-DB] Response and Participation have no hidden rowid => no rowid / no rowid
+BE2-T294 PASS    [NFR-01-DB] all Response ids are random UUIDs (v4) => 36 responses, 0 not UUID v4
+BE2-T295 PASS    [NFR-01-DB] the only columns shared by Response and Participation are the round => shared: roundId
+BE2-T296 PASS    [NFR-01-DB] no other table references a response or stores answer text => tables 11; suspicious columns: none
+BE2-T297 PASS    [NFR-01-LOG] server log holds no response bodies => log 18698 bytes, 182 '[api]' error lines; forbidden markers found: none
+BE2-T298 PASS    [NFR-01-LOG] error lines of the server log have only method, path and error class => 181 lines, 0 with extra content
+BE2-T299 PASS    [NFR-01-API] the submit reply carries no id of the stored response => 201 {"ok":true}
+BE2-T300 PASS    [DB-INTEGRITY] PRAGMA integrity_check and foreign_key_check => ok, fk violations 0
+BE2-T301 PASS    [DB-INTEGRITY] every round has as many responses as participations => 0 rounds differ
+BE2-T302 PASS    [DB-INTEGRITY] no participation of a user outside the round's team; no response with a foreign teamId => 0/0
+BE2-T303 PASS    [DB-INTEGRITY] no round has more responses than team members; DRAFT rounds have none => 0/0
+BE2-T304 PASS    [DB-INTEGRITY] answer values and comment length => 0 out of range, 0 with a wrong number of answers
+BE2-T305 PASS    [DB-INTEGRITY] rounds: 3–5 questions, positions 1..n without gaps, fixed question first, valid status => count 0, positions 0, fixed-first 0, status/closedAt 0
+BE2-T306 PASS    [DB-INTEGRITY] own questions are used only in rounds of their team => 0
+BE2-T307 PASS    [DB-INTEGRITY] kudos rows => 28 kudos, 0 violate a rule
+BE2-T308 PASS    [DB-INTEGRITY] issues, notes, actions => issues 0, actions 0, issue/round team 0, notes 0
+BE2-T309 PASS    [DB-INTEGRITY] passwords are stored only as bcrypt hashes; e-mails are test addresses => 13 users checked
+BE2-T310 FAIL    [DB-INTEGRITY] duplicate check => 0/1/0
+
+===== N11 Home tasks through the page (IT-11) =====
+BE2-T311 PASS    [HOME] employee with an open, unanswered round => 200 <!DOCTYPE html><html lang="sk" class="h-full QGVM8G_variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, init…(+48 chars)
+BE2-T312 PASS    [HOME] after answering, the link to fill is gone => 200 <!DOCTYPE html><html lang="sk" class="h-full QGVM8G_variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, init…(+48 chars)
+BE2-T313 PASS    [HOME] employee of the other team and HR get no fill task for it => 200/200
+BE2-T314 PASS    [HOME] manager Alfa is pointed at closed rounds without an action => 3 result links, all Alfa: true
+BE2-T315 PASS    [HOME] home pages never show response content => 200 <!DOCTYPE html><html lang="sk" class="h-full QGVM8G_variable"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, init…(+48 chars)
+
+===== N12 Residual checks of the session-001 fixes (BUG-003, 006, 007, 008) with new inputs =====
+BE2-T316 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+200E left-to-right mark => 201 stored, text length 25
+BE2-T317 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+202E right-to-left override => 201 stored, text length 25
+BE2-T318 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+2800 braille blank => 201 stored, text length 25
+BE2-T319 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+3164 Hangul filler => 201 stored, text length 25
+BE2-T320 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+115F Hangul choseong filler => 201 stored, text length 25
+BE2-T321 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+034F combining grapheme joiner => 201 stored, text length 25
+BE2-T322 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+2063 invisible separator => 201 stored, text length 25
+BE2-T323 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+180E Mongolian vowel separator => 201 stored, text length 25
+BE2-T324 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+FE0F variation selector alone => 201 stored, text length 25
+BE2-T325 FAIL    [TEXT-INVISIBLE] kudos without emoji whose text is 25 × U+E0061 tag character => 201 stored, text length 25
+BE2-T326 FAIL    [TEXT-INVISIBLE] round name of 5 × U+3164 (renders as nothing) => 201 draft created with an invisible name
+BE2-T327 FAIL    [TEXT-INVISIBLE] own question of 12 × U+2800 (renders as nothing) => 201 question created with invisible text
+BE2-T328 FAIL    [TEXT-INVISIBLE] issue title of 5 × U+3164 and action topic of 5 × U+2800 => issue 201, action 201
+BE2-T329 FAIL    [TEXT-NORMALIZATION] own question: same wording typed with composed and decomposed accents (NFC vs NFD) => NFC 201, NFD 201 (two visually identical questions in the team library)
+BE2-T330 PASS    [UNICODE] lone surrogate in the emoji field, in a nested value and in a key name (BUG-003 regression, new inputs) => 400 invalid_text / 400 invalid_text / 400 invalid_text
+BE2-T331 PASS    [UNICODE] own question of exactly 200 emoji / 201 emoji (BUG-006 regression, new input) => 201/400
+BE2-T332 PASS    [HR-ISSUE-VALID] issue with noteId as a number, roundId as an array, teamId as boolean (BUG-008 regression, new inputs) => 400 {"error":"validation_error","fields":{"roundId":"invalid","teamId":"invalid","noteId":"invalid"}}
+
+===== N13 Known risks of session 001 – one-line confirmation (not defects) =====
+BE2-T333 PASS    [RISK] R-1 no limit on login attempts => 15 × 401, then 200; no 429
+BE2-T334 PASS    [RISK] R-2 session cookie carries Secure in the production build => Secure present: true
+BE2-T335 PASS    [RISK] R-3/R-4 no CSRF token, no security headers, no Cache-Control on API answers => api cache-control=null, nosniff=null; page csp=null, x-frame-options=null, x-powered-by=Next.js
+BE2-T336 PASS    [RISK] R-5 no request body size limit => 400 {"error":"validation_error","fields":{"text":"too_long"}}
+BE2-T337 PASS    [RISK] R-6 a repeated request creates a duplicate (no idempotency; BUG-037 open) => 201/201
+BE2-T338 PASS    [RISK] R-7 a team member can tell a draft of the own team (404) from an unknown id (403) => 404 vs 403
+
+===== N14 Framework-level access: RSC requests and internal headers =====
+BE2-T339 PASS    [AUTHZ-RSC] RSC request (header 'rsc: 1') for /hr/issues as a1 => HTTP 200 text/x-component, 403 digest in payload: true, protected text present: false
+BE2-T340 PASS    [AUTHZ-RSC] RSC request (header 'rsc: 1') for /hr/notes as mA => HTTP 200 text/x-component, 403 digest in payload: true, protected text present: false
+BE2-T341 PASS    [AUTHZ-RSC] RSC request (header 'rsc: 1') for /hr/rounds as a1 => HTTP 200 text/x-component, 403 digest in payload: true, protected text present: false
+BE2-T342 PASS    [AUTHZ-RSC] RSC request (header 'rsc: 1') for /hr/overview as mB => HTTP 200 text/x-component, 403 digest in payload: true, protected text present: false
+BE2-T343 PASS    [AUTHZ-RSC] RSC request (header 'rsc: 1') for /team/:id as a1 => HTTP 200 text/x-component, 403 digest in payload: true, protected text present: false
+BE2-T344 PASS    [AUTHZ-RSC] RSC request (header 'rsc: 1') for /rounds/:id/results as mA => HTTP 200 text/x-component, 403 digest in payload: true, protected text present: false
+BE2-T345 PASS    [AUTHZ-RSC] RSC request (header 'rsc: 1') for /team/:id/trend as mA => HTTP 200 text/x-component, 403 digest in payload: true, protected text present: false
+BE2-T346 PASS    [AUTHZ-RSC] RSC request for /hr/issues and / without a session => 200 redirect digest: true / 200 redirect digest: true
+BE2-T347 PASS    [AUTHZ-RSC] RSC request for /hr/issues as HR (control) => 200, text present: true
+BE2-T348 PASS    [AUTHZ-RSC] prefetch request (next-router-prefetch: 1) for /hr/notes as employee => HTTP 200, 306 bytes, note text present: false
+BE2-T349 PASS    [AUTHZ-RSC] internal header x-middleware-subrequest on a protected page and endpoint => 403/403/401
+BE2-T350 PASS    [AUTHZ-RSC] POST with a Next-Action header (there are no server actions) to / and /kudos => 400/400
+BE2-T351 PASS    [HEADER] X-Forwarded-Host / Host of another site on a redirecting page => 307 location=/login
+BE2-T352 PASS    [HEADER] an unknown API path answers 404 without touching the session => 404/404/404
+
+===== N15 Submissions under concurrent load (defect BE2-001) =====
+BE2-T353 PASS    [LOAD-SUBMIT] 12 first-time submissions at once: both teams answer one round each => {"201":12}, slowest 212.2 ms
+BE2-T354 FAIL    [LOAD-SUBMIT] 24 first-time submissions at once: both teams answer two open rounds each => {"201":11,"500":13}; fastest 5707.2 ms, slowest 6088.2 ms
+BE2-T355 PASS    [LOAD-SUBMIT] consistency after the failed burst => per round participations/responses 3/3 1/1 4/4 3/3; stored 11, accepted 11
+BE2-T356 PASS    [LOAD-SUBMIT] the refused users try again one by one => 13 retries: {"201":13}; responses 24
+BE2-T357 PASS    [LOAD-SUBMIT] 13 duplicate submissions at once (everybody already answered) => {"409":13}, slowest 128.2 ms
+BE2-T358 FAIL    [LOAD-SUBMIT] 14 duplicate submissions at once (everybody already answered) => {"409":11,"500":3}, slowest 5882.2 ms
+BE2-T359 FAIL    [LOAD-SUBMIT] an unrelated read while 20 submissions are in flight => GET /api/me 200 after 5451 ms; submissions {"409":8,"500":12}
+BE2-T360 PASS    [LOAD-SUBMIT] control: 24 kudos at once (plain insert, no interactive transaction) => {"201":24}, slowest 282.7 ms
+BE2-T361 PASS    [NFR-01-LOG] server log after the 500 answers of this suite => 209 error lines, 0 with extra content; comment marker in the log: false
+
+TOTAL 361  PASS 341  FAIL 20  BLOCKED 0
+┌─────────────────────────────────────────────────────────────────────────────────────────┬──────────┬──────┬──────┬─────────┐
+│ (index)                                                                                 │ executed │ PASS │ FAIL │ BLOCKED │
+├─────────────────────────────────────────────────────────────────────────────────────────┼──────────┼──────┼──────┼─────────┤
+│ N1 Page permission matrix (role x page, incl. new /kudos hub and /rounds)               │ 126      │ 126  │ 0    │ 0       │
+│ N2 Session, cookies and token tampering                                                 │ 20       │ 20   │ 0    │ 0       │
+│ N3 Kudos with emoji (IT-06) – extended validation matrix                                │ 25       │ 25   │ 0    │ 0       │
+│ N4 Own questions of a manager (IT-07) – extended                                        │ 17       │ 16   │ 1    │ 0       │
+│ N5 Suggestions (IT-09), threshold in trend/heatmap with time simulation (IT-08, NFR-02) │ 33       │ 33   │ 0    │ 0       │
+│ N6 HR issues and meeting notes (IT-10) – extended                                       │ 32       │ 32   │ 0    │ 0       │
+│ N7 HR overview maths with time simulation (IT-05)                                       │ 6        │ 6    │ 0    │ 0       │
+│ N8 Injection-style and malformed inputs (safe, non-destructive)                         │ 20       │ 20   │ 0    │ 0       │
+│ N9 Concurrency                                                                          │ 11       │ 10   │ 1    │ 0       │
+│ N10 NFR-01 storage and log, database integrity after the whole run                      │ 20       │ 19   │ 1    │ 0       │
+│ N11 Home tasks through the page (IT-11)                                                 │ 5        │ 5    │ 0    │ 0       │
+│ N12 Residual checks of the session-001 fixes (BUG-003, 006, 007, 008) with new inputs   │ 17       │ 3    │ 14   │ 0       │
+│ N13 Known risks of session 001 – one-line confirmation (not defects)                    │ 6        │ 6    │ 0    │ 0       │
+│ N14 Framework-level access: RSC requests and internal headers                           │ 14       │ 14   │ 0    │ 0       │
+│ N15 Submissions under concurrent load (defect BE2-001)                                  │ 9        │ 6    │ 3    │ 0       │
+└─────────────────────────────────────────────────────────────────────────────────────────┴──────────┴──────┴──────┴─────────┘

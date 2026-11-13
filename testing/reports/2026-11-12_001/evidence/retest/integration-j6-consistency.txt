@@ -1,0 +1,85 @@
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 38. týždeň: participation, averages and distributions  => UI avg=2,33 | 2,17 | 2,17 | 2,0; DB avg=2,33 | 2,17 | 2,17 | 2,0; UI dist=[[0,4,2,0,0],[1,3,2,0,0],[0,5,1,0,0],[0,6,0,0,0]]
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 38. týždeň: lower-is-better note only on reversed scales  => UI=false,false,false,false; DB=false,false,false,false
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 38. týždeň: number and set of comments  => heading='Komentáre (3)'; DB comments=3; sets equal=true
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 38. týždeň: 'V skratke' and the two suggestions  => best ok=true, weakest ok=true; suggestions UI=["Reaguje na otázku „Priority nášho tímu boli za posledné dva týždne stabilné.“ (priemer 2,0).","Reaguje na otázku „Mám dosť súvislého času na sústredenú 
+PASS  [J6] Results – Tím Alfa / Pulse – 38. týždeň: badge 'Čaká na krok' and the action list  => badge=0, DB actions=1; statuses UI=DONE DB=DONE
+PASS  [J6] Results – Tím Alfa / Pulse – 38. týždeň: HR sees the same numbers as the manager; API equals the page  => HR page averages=2,33 | 2,17 | 2,17 | 2,0; API ok for both roles=true
+PASS  [J6] Report – Tím Alfa / Pulse – 38. týždeň: printable report equals the results  => rows=2,33;0;4;2;0;0 | 2,17;1;3;2;0;0 | 2,17;0;5;1;0;0 | 2,0;0;6;0;0;0; actions ok=true; comment leak=false
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 40. týždeň: participation, averages and distributions  => UI avg=3,2 | 2,8 | 3,0 | 3,4; DB avg=3,2 | 2,8 | 3,0 | 3,4; UI dist=[[0,1,2,2,0],[0,2,2,1,0],[0,1,3,1,0],[0,0,3,2,0]]
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 40. týždeň: lower-is-better note only on reversed scales  => UI=false,false,false,false; DB=false,false,false,false
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 40. týždeň: number and set of comments  => heading='Komentáre (2)'; DB comments=2; sets equal=true
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 40. týždeň: 'V skratke' and the two suggestions  => best ok=true, weakest ok=true; suggestions UI=["Reaguje na otázku „Moja pracovná záťaž bola za posledné dva týždne zvládnuteľná.“ (priemer 2,8).","Reaguje na otázku „Porady, na ktorých sa zúčastňujem,
+PASS  [J6] Results – Tím Alfa / Pulse – 40. týždeň: badge 'Čaká na krok' and the action list  => badge=0, DB actions=2; statuses UI=DONE,IN_PROGRESS DB=DONE,IN_PROGRESS
+PASS  [J6] Results – Tím Alfa / Pulse – 40. týždeň: HR sees the same numbers as the manager; API equals the page  => HR page averages=3,2 | 2,8 | 3,0 | 3,4; API ok for both roles=true
+PASS  [J6] Report – Tím Alfa / Pulse – 40. týždeň: printable report equals the results  => rows=3,2;0;1;2;2;0 | 2,8;0;2;2;1;0 | 3,0;0;1;3;1;0 | 3,4;0;0;3;2;0; actions ok=true; comment leak=false
+PASS  [J6] Results (manager) – Tím Beta / Pulse – 40. týždeň: participation, averages and distributions  => UI avg=3,8 | 3,2 | 3,6 | 4,2; DB avg=3,8 | 3,2 | 3,6 | 4,2; UI dist=[[0,0,2,2,1],[0,0,4,1,0],[0,0,2,3,0],[0,0,2,0,3]]
+PASS  [J6] Results (manager) – Tím Beta / Pulse – 40. týždeň: lower-is-better note only on reversed scales  => UI=false,false,false,false; DB=false,false,false,false
+PASS  [J6] Results (manager) – Tím Beta / Pulse – 40. týždeň: number and set of comments  => heading='Komentáre (1)'; DB comments=1; sets equal=true
+PASS  [J6] Results (manager) – Tím Beta / Pulse – 40. týždeň: 'V skratke' and the two suggestions  => best ok=true, weakest ok=true; suggestions UI=["Reaguje na otázku „Moja pracovná záťaž bola za posledné dva týždne zvládnuteľná.“ (priemer 3,2).","Reaguje na otázku „Mám dosť súvislého času na sústred
+PASS  [J6] Results – Tím Beta / Pulse – 40. týždeň: badge 'Čaká na krok' and the action list  => badge=0, DB actions=1; statuses UI=DONE DB=DONE
+PASS  [J6] Results – Tím Beta / Pulse – 40. týždeň: HR sees the same numbers as the manager; API equals the page  => HR page averages=3,8 | 3,2 | 3,6 | 4,2; API ok for both roles=true
+PASS  [J6] Report – Tím Beta / Pulse – 40. týždeň: printable report equals the results  => rows=3,8;0;0;2;2;1 | 3,2;0;0;4;1;0 | 3,6;0;0;2;3;0 | 4,2;0;0;2;0;3; actions ok=true; comment leak=false
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 42. týždeň: below the threshold  => participation ok; comment text in HTML=false
+PASS  [J6] Results – Tím Alfa / Pulse – 42. týždeň: badge 'Čaká na krok' and the action list  => badge=1, DB actions=0; statuses UI= DB=
+PASS  [J6] Results – Tím Alfa / Pulse – 42. týždeň: HR sees the same numbers as the manager; API equals the page  => HR page averages=(none); API ok for both roles=true
+PASS  [J6] Report – Tím Alfa / Pulse – 42. týždeň: printable report equals the results  => rows=(none); actions ok=true; comment leak=false
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 44. týždeň: participation, averages and distributions  => UI avg=3,67 | 4,17 | 2,17 | 3,17; DB avg=3,67 | 4,17 | 2,17 | 3,17; UI dist=[[0,0,3,2,1],[0,0,0,5,1],[0,5,1,0,0],[0,1,3,2,0]]
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 44. týždeň: lower-is-better note only on reversed scales  => UI=false,false,true,false; DB=false,false,true,false
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 44. týždeň: number and set of comments  => heading='Komentáre (3)'; DB comments=3; sets equal=true
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 44. týždeň: 'V skratke' and the two suggestions  => best ok=true, weakest ok=true; suggestions UI=["Reaguje na otázku „Keď odvediem dobrú prácu, niekto si to všimne.“ (priemer 3,17).","Reaguje na otázku „Ako často bolo za posledné dva týždne potrebné p
+PASS  [J6] Results – Tím Alfa / Pulse – 44. týždeň: badge 'Čaká na krok' and the action list  => badge=0, DB actions=1; statuses UI=PLANNED DB=PLANNED
+PASS  [J6] Results – Tím Alfa / Pulse – 44. týždeň: HR sees the same numbers as the manager; API equals the page  => HR page averages=3,67 | 4,17 | 2,17 | 3,17; API ok for both roles=true
+PASS  [J6] Report – Tím Alfa / Pulse – 44. týždeň: printable report equals the results  => rows=3,67;0;0;3;2;1 | 4,17;0;0;0;5;1 | 2,17;0;5;1;0;0 | 3,17;0;1;3;2;0; actions ok=true; comment leak=false
+PASS  [J6] Results (manager) – Tím Beta / Pulse – 44. týždeň: participation, averages and distributions  => UI avg=4,33 | 3,17 | 4,33 | 3,67; DB avg=4,33 | 3,17 | 4,33 | 3,67; UI dist=[[0,0,0,4,2],[0,1,3,2,0],[0,0,1,2,3],[0,0,3,2,1]]
+PASS  [J6] Results (manager) – Tím Beta / Pulse – 44. týždeň: lower-is-better note only on reversed scales  => UI=false,false,false,false; DB=false,false,false,false
+PASS  [J6] Results (manager) – Tím Beta / Pulse – 44. týždeň: number and set of comments  => heading='Komentáre (2)'; DB comments=2; sets equal=true
+PASS  [J6] Results (manager) – Tím Beta / Pulse – 44. týždeň: 'V skratke' and the two suggestions  => best ok=true, weakest ok=true; suggestions UI=["Reaguje na otázku „Priority nášho tímu boli za posledné dva týždne stabilné.“ (priemer 3,17).","Reaguje na otázku „Keď odvediem dobrú prácu, niekto si t
+PASS  [J6] Results – Tím Beta / Pulse – 44. týždeň: badge 'Čaká na krok' and the action list  => badge=1, DB actions=0; statuses UI= DB=
+PASS  [J6] Results – Tím Beta / Pulse – 44. týždeň: HR sees the same numbers as the manager; API equals the page  => HR page averages=4,33 | 3,17 | 4,33 | 3,67; API ok for both roles=true
+PASS  [J6] Report – Tím Beta / Pulse – 44. týždeň: printable report equals the results  => rows=4,33;0;0;0;4;2 | 3,17;0;1;3;2;0 | 4,33;0;0;1;2;3 | 3,67;0;0;3;2;1; actions ok=true; comment leak=false
+PASS  [J6] Results (manager) – Tím Beta / Pulse – záťaž a sústredenie: below the threshold  => participation ok; comment text in HTML=false
+PASS  [J6] Results – Tím Beta / Pulse – záťaž a sústredenie: badge 'Čaká na krok' and the action list  => badge=1, DB actions=0; statuses UI= DB=
+PASS  [J6] Results – Tím Beta / Pulse – záťaž a sústredenie: HR sees the same numbers as the manager; API equals the page  => HR page averages=(none); API ok for both roles=true
+PASS  [J6] Report – Tím Beta / Pulse – záťaž a sústredenie: printable report equals the results  => rows=(none); actions ok=true; comment leak=false
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 46. týždeň: participation, averages and distributions  => UI avg=3,6 | 3,8 | 2,8 | 4,8; DB avg=3,6 | 3,8 | 2,8 | 4,8; UI dist=[[0,0,2,3,0],[0,0,1,4,0],[0,2,2,1,0],[0,0,0,1,4]]
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 46. týždeň: lower-is-better note only on reversed scales  => UI=false,false,false,false; DB=false,false,false,false
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 46. týždeň: number and set of comments  => heading='Komentáre (2)'; DB comments=2; sets equal=true
+PASS  [J6] Results (manager) – Tím Alfa / Pulse – 46. týždeň: 'V skratke' and the two suggestions  => best ok=true, weakest ok=true; suggestions UI=["Reaguje na otázku „Keď potrebujem review, rozhodnutie alebo informáciu, dostanem ich dosť rýchlo.“ (priemer 2,8).","Reaguje na otázku „Mám dosť času rob
+PASS  [J6] Results – Tím Alfa / Pulse – 46. týždeň: badge 'Čaká na krok' and the action list  => badge=1, DB actions=0; statuses UI= DB=
+PASS  [J6] Results – Tím Alfa / Pulse – 46. týždeň: HR sees the same numbers as the manager; API equals the page  => HR page averages=3,6 | 3,8 | 2,8 | 4,8; API ok for both roles=true
+PASS  [J6] Report – Tím Alfa / Pulse – 46. týždeň: printable report equals the results  => rows=3,6;0;0;2;3;0 | 3,8;0;0;1;4;0 | 2,8;0;2;2;1;0 | 4,8;0;0;0;1;4; actions ok=true; comment leak=false
+PASS  [J6] HR list of rounds: every row (team, status, deadline, question count, participation, 'Čaká na krok') equals the DB, newest deadline first  => rows=9; mismatches=0 
+PASS  [J6] Manager list of rounds (Tím Alfa): only the own team's rounds with correct participation and badges  => rows=6 (DB 6); API rounds=6, all own team=true
+PASS  [J6] Manager list of rounds (Tím Beta): only the own team's rounds with correct participation and badges  => rows=3 (DB 3); API rounds=3, all own team=true
+PASS  [J6] Team page (Tím Alfa, employee, 360 px): rounds, participation, averages above the threshold, actions  => cards=5 (DB 5); mismatching rounds=none
+PASS  [J6] Team page (Tím Alfa): employee, manager and HR see identical rounds, numbers and actions  => employee=manager: true; manager=HR: true
+PASS  [J6] Team page (Tím Alfa): kudos feed equals the public kudos of the team's members, newest first  => UI=["Barbora Skúšobná → Cyril Ukážkový","Adam Vzorový → Barbora Skúšobná"]; DB=["Barbora Skúšobná → Cyril Ukážkový","Adam Vzorový → Barbora Skúšobná"]
+PASS  [J6] Team page (Tím Alfa): API summary equals the page  => rounds=5; values equal=true
+PASS  [J6] Team page (Tím Beta, employee, 360 px): rounds, participation, averages above the threshold, actions  => cards=3 (DB 3); mismatching rounds=none
+PASS  [J6] Team page (Tím Beta): employee, manager and HR see identical rounds, numbers and actions  => employee=manager: true; manager=HR: true
+PASS  [J6] Team page (Tím Beta): kudos feed equals the public kudos of the team's members, newest first  => UI=[]; DB=[]
+PASS  [J6] Team page (Tím Beta): API summary equals the page  => rounds=3; values equal=true
+PASS  [J6] Trend (Tím Alfa): every table cell equals the score recomputed from raw answers  => rows=5, columns=8; mismatches=none
+PASS  [J6] Trend (Tím Alfa): chart points, gaps and the labelled last value  => markers=4 (exp 4), gaps=1 (exp 1), label=3,6, tooltips equal=true, 'few rounds' notice=0
+PASS  [J6] Trend (Tím Alfa): API equals the DB and HR sees the same table  => API equal to DB=true; HR table identical=true
+PASS  [J6] Trend (Tím Beta): every table cell equals the score recomputed from raw answers  => rows=3, columns=9; mismatches=none
+PASS  [J6] Trend (Tím Beta): chart points, gaps and the labelled last value  => markers=2 (exp 2), gaps=1 (exp 1), label=4,33, tooltips equal=true, 'few rounds' notice=1
+PASS  [J6] Trend (Tím Beta): API equals the DB and HR sees the same table  => API equal to DB=true; HR table identical=true
+PASS  [J6] Comparison of teams: every cell equals the mean of round scores of the last 90 days (rounds under the threshold excluded)  => columns=8; mismatches=none; cells that differ only through rounding of already rounded round scores=none
+PASS  [J6] Comparison of teams: API equals the page  => topics=7; equal=true
+PASS  [J6] Comparison of teams: a round closed 91 days ago drops out, one closed 89 days ago counts  => 91 days: 'Tím Alfa 3 kolá' ok=true; 89 days: 'Tím Alfa 4 kolá' ok=true
+PASS  [J6] Reaction overview: headline, totals and per-team figures equal the DB  => headline expected='4 z 8 uzavretých kôl čakajú na krok. Najdlhšie Tím Alfa, 28 dní.'; mismatches=none
+PASS  [J6] Reaction overview: API equals the page figures  => closed=8, withAction=4, awaiting=2,2
+PASS  [J6] Home tasks of Hana Personálna (HR) equal the state of rounds, actions and issues in the DB  => UI=["4 uzavreté kolá čakajú na krok manažéra. Najdlhšie Tím Alfa, 28 dní."]; expected=["4 uzavreté kolá čakajú na krok manažéra. Najdlhšie Tím Alfa, 28 dní."]
+PASS  [J6] Home tasks of Alena Testová (MANAGER) equal the state of rounds, actions and issues in the DB  => UI=["Kolo „Pulse – 42. týždeň“ je uzavreté 28 dní a tím čaká, čo sa s výsledkami stane. Pozri výsledky a zapíš krok.","Kolo „Pulse – 46. týždeň“ je uzavreté 1 deň a tím čaká, čo sa s výsledkami stane.
+FAIL  [J6] Home tasks of Boris Testovací (MANAGER) equal the state of rounds, actions and issues in the DB  => UI=["Kolo „Pulse – 44. týždeň“ je uzavreté 14 dní a tím čaká, čo sa s výsledkami stane. Pozri výsledky a zapíš krok.","Kolo „Pulse – záťaž a sústredenie“ je uzavreté 3 dni a tím čaká, čo sa s výsledka
+PASS  [J6] Home tasks of Adam Vzorový (EMPLOYEE) equal the state of rounds, actions and issues in the DB  => UI=["Čaká na teba prieskum „Pulse – 48. týždeň“. Má 4 otázky a zaberie asi 2 minúty."]; expected=["Čaká na teba prieskum „Pulse – 48. týždeň“. Má 4 otázky a zaberie asi 2 minúty."]
+PASS  [J6] Home tasks of Filip Vzorka (EMPLOYEE) equal the state of rounds, actions and issues in the DB  => UI=[]; expected=[]
+PASS  [J6] Home of an employee with nothing to do  => back portál Filip Vzorka Zamestnanec Odhlásiť sa Domov Môj tím Kudos Čo treba urobiť teraz Nič nečaká. Momentálne nemáš žiadny prieskum na vyplnenie. Čo sa zmenilo po minulých, nájdeš v časti Môj tím.
+PASS  [J6] 'Moje kudos' of every user equals the Kudos table (13 users)  => users checked=13; mismatches=none
+PASS  [J6] 'Moje kudos' page of a recipient shows the DB rows with sender, value and visibility  => Adam Vzorový: cards=1, DB=1
+PASS  [J6] Open demo round: results page and API show participation only  => participation=0; api=not_closed
+PASS  [J6] New-round defaults on the demo data: the 3 preselected questions are the recommended ones the team has not had for the longest time  => UI=["Keď za manažérom prídem s problémom, niečo sa s ním začne diať.","Moja práca mi dáva príležitosť robiť to, čo mi ide najlepšie.","Priority nášho tímu boli za posledné dva týždne stabilné."]; expe
+
+J6 done: 82 checks, 1 failed
+exit 0

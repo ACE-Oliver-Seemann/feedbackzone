@@ -1,18 +1,22 @@
-# Feedback portál – MVP
+# Feedback portál
 
 Interná webová aplikácia Asseco CE: zamestnanec vyplní krátky pulse prieskum → manažér vidí výsledky tímu
 → zapíše krok → tím vidí „Povedali ste, urobili sme“. Plus kudos medzi kolegami.
-**Termín: 3 pracovné dni.** Beží iba na testovacích dátach.
+**Stav:** MVP (MVP-01 až MVP-17) je hotové a zlúčené v `main`. Projekt je vo fáze iterácií: rozširuje sa
+po malých krokoch, každý sa testuje a upravuje. Beží iba na testovacích dátach.
 
 ## Požiadavky a ich priorita
-1. **`docs/requirements/mvp.md`** – hlavný zdroj. Požiadavky MVP-01 až MVP-17 a NFR-01 až NFR-07
+1. **`docs/requirements/iteracie.md`** – nové požiadavky po MVP (IT-xx) s akceptačnými kritériami a stavom.
+   Implementuj iba položky so stavom **schválené**.
+2. **`docs/requirements/mvp.md`** – základ, ktorý sa nemení. Požiadavky MVP-01 až MVP-17 a NFR-01 až NFR-07
    s akceptačnými kritériami, matica oprávnení, dátový model, API, obrazovky.
-2. `docs/requirements/mvp-requirements.csv` – ten istý obsah rozpísaný na položky (FREQ_xxxx, NREQ_xxxx).
-   Používaj ho ako zoznam úloh.
-3. `docs/reference/specifikacia-v0.4/` – celá pôvodná špecifikácia. **Iba na kontext**
-   (napr. otázky do seedu sú v `07-kniznica-otazok.md`, kapitola 7.2). Nič z nej neimplementuj navyše.
+3. `docs/requirements/mvp-requirements.csv` – obsah mvp.md rozpísaný na položky (FREQ_xxxx, NREQ_xxxx).
+4. `docs/reference/specifikacia-v0.4/` – celá pôvodná špecifikácia. **Iba na kontext** a ako zásobník nápadov
+   pre ďalšie iterácie. Nič z nej neimplementuj, kým to nie je zapísané v `iteracie.md`.
+5. `docs/research/` – podklady z výskumu (napr. otázky do prieskumov). Sú to odporúčania, nie požiadavky.
 
-**Pri rozpore platí 1 pred 2 pred 3.** Ak rozpor nevieš vyriešiť podľa tohto poradia, zastav sa a opýtaj sa.
+**Pri rozpore platí 1 pred 2 pred 3 pred 4.** Iterácia smie zmeniť správanie z mvp.md iba vtedy, keď to
+v `iteracie.md` výslovne píše. Pravidlá zo sekcie „Pravidlá, ktoré sa nesmú porušiť“ iterácia zmeniť nesmie. Ak rozpor nevieš vyriešiť podľa tohto poradia, zastav sa a opýtaj sa.
 
 ## Známe rozpory v CSV (platí mvp.md)
 - **NREQ_0026** („API nevracia komentáre“) neplatí. Komentáre sa vracajú v `GET /api/rounds/:id/results`
@@ -22,12 +26,13 @@ Interná webová aplikácia Asseco CE: zamestnanec vyplní krátky pulse priesku
 - **FREQ_0024**: každý vypĺňa kolo svojho tímu sám za seba, nie „pre členov tímu“.
 - **Duplicity** (FREQ_0069 až FREQ_0083, NREQ_0027, NREQ_0029, NREQ_0038, NREQ_0040) opakujú iné položky.
   Neimplementuj ich zvlášť, iba over, že sú splnené.
-- **Plán v mvp.md je na 5 dní, termín je 3 dni.** Poradie práce z plánu platí, dni sú orientačné.
-  Ak čas nestačí, ako prvé sa vypustí kudos (MVP-16, MVP-17).
 
 ## Čo nerobiť
-- Nič zo sekcie „Mimo rozsahu“ v mvp.md ani nič s prioritou Won't v CSV.
-- Žiadne funkcie navyše. Nápad zapíš do odpovede, neimplementuj ho.
+- Nič zo sekcie „Mimo rozsahu“ v mvp.md ani nič s prioritou Won't v CSV, pokiaľ to nie je výslovne schválené
+  v `iteracie.md`.
+- Žiadne funkcie navyše. Nápad zapíš do sekcie „Nápady“ v `iteracie.md` a do odpovede, neimplementuj ho.
+- Nič, čo potrebuje externý systém (SSO, e-mail, Teams, AI služba) alebo skutočné údaje zamestnancov,
+  bez výslovného rozhodnutia používateľa.
 
 ## Pravidlá, ktoré sa nesmú porušiť
 - **NFR-01:** odpoveď sa nedá spárovať s používateľom. Tabuľka `Odpoveď` nemá stĺpec používateľa ani času,
@@ -59,17 +64,44 @@ v `node_modules/next/dist/docs/` (pozri `AGENTS.md`).
 | `npm run build` | Produkčný build |
 | `npm run db:migrate` | `prisma migrate dev` po zmene schémy |
 | `npm run db:seed` | Iba seed (zmaže a naplní `prisma/dev.db`) |
+| `npm run db:demo` | Seed + ukážkové dáta: uzavreté kolá s odpoveďami, krokmi a kudos, aby bolo vidno výsledky, grafy a prehľady HR. **Zmaže dáta.** Akceptačný scenár a testy potrebujú čistý seed, nie demo dáta. |
 
 Testovacie účty sú v `prisma/seed.ts` (doména `example.test`, spoločné heslo `Heslo123`).
 
 ### Kde čo je
 - `src/config/privacy.ts` – `MIN_GROUP_SIZE` (NFR-02), jediné miesto. `src/config/kudos.ts` – pravidlá kudos.
+  `src/config/scales.ts` – škály odpovedí (IT-03); popisy bodov sú v `texts.sk.ts`.
+- `prisma/seed.ts` – knižnica otázok podľa `docs/research/otazky-do-pulse.md`. Znenie otázok nemeň bez schválenia.
+- `src/config/suggestions.ts` – knižnica návrhov krokov (IT-09); `src/server/suggestions.ts` má rozhranie
+  `SuggestionProvider`. Skutočná AI sa nesmie zapojiť bez výslovného rozhodnutia používateľa.
+- `src/config/owner-groups.ts` – skupiny, zdroje a stavy podnetov HR (IT-10); logika v `src/server/hr-issues.ts`.
+- `src/server/trends.ts` – vývoj tímu a porovnanie tímov (IT-08). Kolo pod prahom dôvernosti nesmie prispieť
+  ani do priemeru za viac kôl.
+- Dátový model má po iteráciách 11 tabuliek (pribudli `Issue` a `MeetingNote`). `Response` a `Participation`
+  sa nemenili a meniť nesmú.
 - `src/lib/authz.ts` – matica oprávnení (NFR-03). `src/lib/session.ts` – podpísaná cookie, `requireUser`.
 - `src/lib/errors.ts` – `route()` obaľuje každý endpoint; loguje iba metódu, cestu a typ chyby (NFR-01).
 - `src/server/*` – logika. Volajú ju endpointy v `src/app/api/**/route.ts` aj serverové stránky; oprávnenia sa overujú tu.
 - `src/lib/page-auth.ts` – ochrana stránok (bez relácie → `/login`, zlá rola → 403).
 - `src/lib/texts.sk.ts` – všetky texty UI (NFR-07, NFR-04).
+- `src/components/ui/*` – spoločné stavebné prvky vzhľadu (tlačidlá, polia, panely, hlásenia, oslava po odoslaní)
+  a `src/app/globals.css` – farby Asseco CE a animácie. Vzhľad vlastní kolega; nové obrazovky skladaj z týchto
+  prvkov, nepíš vlastné farby ani tlačidlá. Ovládacie prvky majú na dotykových obrazovkách aspoň 44 px
+  (`pointer-coarse:`).
+- `src/components/app-nav.tsx` – hlavné menu (položky podľa IT-12 sú v `src/app/(app)/layout.tsx`),
+  `src/components/sub-nav.tsx` – záložky v stránke. Kudos je jedna stránka `/kudos` s dvoma záložkami;
+  `/kudos/new` a `/kudos/me` na ňu presmerujú.
 - `tests/` – testy volajú priamo handlery endpointov; `tests/helpers.ts` má fixtures.
+
+### Testovanie podľa TESTING_RULES.md
+- Pravidlá sú v `TESTING_RULES.md`. Správy z relácií sú v `testing/reports/<dátum>_<poradie>/`, skripty v `testing/scripts/`.
+- Agenti testujú proti produkčnému zostaveniu (`next start`) na vlastných portoch a vlastných databázach
+  `prisma/qa-*.db` (`DATABASE_URL="file:./qa-x.db"`), nikdy proti `prisma/dev.db`.
+- Na Windows treba pred `prisma generate` alebo migráciou zastaviť všetky bežiace servery (zamknutý súbor enginu).
+- Regresné testy opravených chýb sú v `tests/qa-fixes.test.ts`; ID chýb sú v `BUG_REGISTER.md` danej relácie.
+- Odhlásenie ukončí všetky relácie používateľa na serveri (`User.sessionsValidAfter`). Test, ktorý sa odhlási,
+  sa musí znova prihlásiť.
+- Text od používateľa prechádza cez `cleanText` a dĺžka sa počíta cez `charLength` (`src/lib/text.ts`).
 
 ### Pozor pri zmene schémy (NFR-01)
 `prisma/migrations/*_init/migration.sql` je ručne upravená: tabuľky `Response` a `Participation` sú `WITHOUT ROWID`
@@ -79,6 +111,8 @@ pretvára, doplň oboje ručne; `tests/schema.test.ts` na to upozorní.
 
 ## Ako pracovať
 - Pred väčšou úlohou najprv navrhni plán a počkaj na schválenie.
-- Každý commit, pull request a test odkazuje na ID požiadavky, napr. `feat(results): hide below threshold [MVP-11]`.
+- Každý commit, pull request a test odkazuje na ID požiadavky, napr. `feat(results): hide below threshold [MVP-11]`
+  alebo `feat(ui): brand colours [IT-01]`.
+- Jedna iterácia (IT-xx) = jedna vetva z `main` a jeden pull request.
 - Po každej úlohe spusti testy. NFR-01, NFR-02 a NFR-03 musia mať automatické testy.
 - Kód, názvy v kóde a commity po anglicky. Texty v UI po slovensky, v jednom súbore (NFR-07).

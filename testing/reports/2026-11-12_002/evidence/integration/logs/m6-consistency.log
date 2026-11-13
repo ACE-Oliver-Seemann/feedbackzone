@@ -1,0 +1,45 @@
+PASS  [D] HR list of rounds: every row's status and participation equals the database  => rows=9, DB=9, mismatching rows=none
+PASS  [D] HR list summary tiles equal the database  => UI='OtvorenĂ© kolĂˇ 1 ÄŚakajĂş na krok 4 VĹˇetky kolĂˇ 9' expected='OtvorenĂ© kolĂˇ 1 ÄŚakajĂş na krok 4 VĹˇetky kolĂˇ 9'
+PASS  [D] GET /api/rounds for HR equals the list on the page  => API=9, UI=9, same order=true
+PASS  [D] HR overview: totals recomputed from the database  => UI='UzavretĂ© kolĂˇ 8 So zapĂ­sanĂ˝m krokom 4 (50 %) ÄŚas do prvĂ©ho kroku 2,5 dĹa Kroky PlĂˇnovanĂ©: 1, Prebieha: 1, HotovĂ©: 3 Po termĂ­ne 1'; not matching: none
+PASS  [D] HR overview: headline, per-team line and the list of waiting rounds equal the database  => mismatches: none; team numbers collapsed by default=true
+PASS  [D] GET /api/hr/overview equals the page  => API total keys=closedRounds,roundsWithAction,sharePercent,medianDaysToFirstAction,actions; closed=8, withAction=4, share=50, overdue=1
+PASS  [D] Comparison of teams: every cell recomputed from raw responses (no rounding of intermediate values)  => cells compared=14; mismatches: none
+PASS  [D] GET /api/hr/heatmap equals the table  => topics equal=true; mismatching cells=none
+PASS  [D] Team trend table: every round row recomputed from raw responses; round below the threshold is a gap  => rows=5; mismatches: none; gap row='Pulse â€“ 42. tĂ˝ĹľdeĹ 16. 10. 2026 4 Nedostatok odpovedĂ­'
+PASS  [D] Trend chart has a point for every round above the threshold and a gap marker for the one below; no 'few rounds' note with 4 valid rounds  => 'bez hodnoty' occurrences in the chart=2; few-rounds note=false
+PASS  [D] GET /api/teams/:id/trend equals the table and has no values for the round below the threshold  => points=5; low point={"roundId":":id","roundName":"Pulse â€“ 42. tĂ˝ĹľdeĹ","closedAt":"2026-10-15T22:03:04.710Z","responded":4,"status":"insufficient_responses"}
+PASS  [D] Team page: every closed round's participation, date and question averages recomputed from raw responses  => blocks=5, DB closed rounds=5; mismatches: none
+PASS  [D] Team summary API equals the page and holds no comment text and no values below the threshold  => rounds=5; comments in DB=11, leaked=0; low round has averages=false; low round keys=id,name,closesAt,closedAt,participation,results,actions
+PASS  [D] Results page of every closed round of TĂ­m Alfa: averages, participation and comment count equal the database  => rounds checked=5; mismatches: none
+PASS  [D] Lower-is-better questions are flagged on the results page and reversed only in suggestions/trend, not in the shown average  => Ako ÄŤasto bolo za poslednĂ© dva tĂ˝Ĺľdne potrebnĂ© pracovaĹĄ nadÄŤas alebo mimo beĹľnĂ©ho pracovnĂ©ho ÄŤasu? Pri tejto otĂˇzke je niĹľĹˇia hodnota lepĹˇia. Priemer 2,17 Rozdelenie odpovedĂ­
+PASS  [G] Manager home: at most 3 tasks, most urgent first, and the own survey stays reachable below  => tasks=3 (awaiting, awaiting, overdue); 'VyplniĹĄ' in 'Moje prieskumy'=1
+PASS  [G] Manager home tasks lead to the exact place  => VĂ˝sledky a krokâ†’/rounds/:id/results | VĂ˝sledky a krokâ†’/rounds/:id/results | OtvoriĹĄ krokyâ†’/rounds/:id/results
+PASS  [G] Employee home: only the own unfilled survey; no manager or HR task  => ÄŚakĂˇ na teba prieskum â€žPulse â€“ 48. tĂ˝ĹľdeĹâ€ś. MĂˇ 4 otĂˇzky a zaberie asi 2 minĂşty.
+PASS  [G] Employee without an open round sees 'NiÄŤ neÄŤakĂˇ.'  => ÄŚo treba urobiĹĄ teraz NiÄŤ neÄŤakĂˇ. MomentĂˇlne nemĂˇĹˇ Ĺľiadny prieskum na vyplnenie. ÄŚo sa zmenilo po minulĂ˝ch, nĂˇjdeĹˇ v ÄŤasti MĂ´j tĂ­m.
+PASS  [G] HR home with all three kinds of tasks: 3 tasks in the order of urgency, each with its link  => 4 uzavretĂ© kolĂˇ ÄŤakajĂş na krok manaĹľĂ©ra. NajdlhĹˇie TĂ­m Alfa, 28 dnĂ­. [KtorĂ© kolĂˇâ†’/hr/overview] || 1 podnet je po termĂ­ne. [OtvoriĹĄ podnetyâ†’/hr/issues] || Kolo â€žPulse â€“ 48. tĂ˝ĹľdeĹâ€ś (TĂ­m Alfa) sa uzavri
+PASS  [G] Home tasks contain no content of answers  => comments in DB=16; home pages containing one: none
+PASS  [G] Sub-navigation tabs per area (IT-12)  => overview='Plnenie reakcie+Porovnanie tĂ­mov'; issues='Podnety+PoznĂˇmky'; team HR='Povedali ste, urobili sme+VĂ˝voj tĂ­mu'; team manager='Povedali ste, urobili sme+VĂ˝voj tĂ­mu'; team employee=''
+PASS  [G] The current area is highlighted in the main menu on inner pages  => PrehÄľady,Podnety,Prieskumy,Prieskumy,Domov,MĂ´j tĂ­m
+PASS  [G] NFR-04: the forbidden word does not appear on any page of any role  => pages checked=24; pages with the word: none
+PASS  [G] Generated Slovak sentences on the demo pages use correct plural forms  => wrong forms: none
+PASS  [G] Issues list: by default only unresolved issues; the form opens on a button  => filter=ACTIVE; listed=3, DB unresolved=3; form visible=false
+PASS  [G] From the results of a round: 'VytvoriĹĄ podnet z tohto kola' opens the form with the round and team prefilled, without any comment text  => note=true, source=SURVEY, team prefilled=true, description empty=true, warning=true
+PASS  [G] Invalid issue (title of 2 characters) is refused with a message  => message=true; issues 3â†’3
+PASS  [G] HR creates the issue from the round  => row='PomalĂ© notebooky v tĂ­me QA TĂ­m opakovane spomĂ­na pomalĂ© zariadenia (vlastnĂ˝mi slovami). Zdroj: Prieskum TĂ­m: TĂ­m Alfa Kolo: Pulse â€“ 38. tĂ˝ĹľdeĹ TermĂ­n 26. 11. 2026 PridanĂ© 12. 11. 2026 SprĂˇva budo
+PASS  [G] Changing the owner group and the status of an issue is saved after the server confirmed  => db=MANAGEMENT/IN_PROGRESS; after reload=MANAGEMENT/IN_PROGRESS
+PASS  [G] An issue set to 'HotovĂ©' leaves the default list and is found under 'HotovĂ©' and 'VĹˇetko'  => default list has it=0; 'HotovĂ©' list=1 (DB 1); 'VĹˇetko' list=4 (DB 4)
+PASS  [G] Filter by owner group equals the database  => listed=2, DB=2; selects=FACILITY/ALL
+PASS  [G] Unknown filter values in the address: the list and the selects agree  => page HTTP 200; selects=/ACTIVE; listed=3; DB unresolved=3; API with unknown status â†’ HTTP 400
+PASS  [G] Invalid note (no date) is refused with a message  => message=true; notes 1â†’1
+PASS  [G] HR writes a note from a meeting  => row='Stretnutie s TĂ­mom Alfa QA Stretnutie 11. 11. 2026 TĂ­m by privĂ­tal tichĂş miestnosĹĄ na sĂşstredenĂş prĂˇcu. VytvoriĹĄ podnet'; notes 1â†’2
+PASS  [G] From a note: 'VytvoriĹĄ podnet' prefills the source and links the issue to the note  => form note=true, source=MEETING, db noteId ok=true; note block='estnosĹĄ na sĂşstredenĂş prĂˇcu. Podnety z tejto poznĂˇmky TichĂˇ miestnosĹĄ pre TĂ­m Alfa QA OtvorenĂ© VytvoriĹĄ podnet'
+PASS  [G] Long unbroken text in an issue and a kudos does not widen the page on a 360 px phone  => issues page width=360, team page width=360
+PASS  [G] Manager of a team that never had a round is asked to create the first one  => TĂ­m eĹˇte nemal Ĺľiadny prieskum. Vytvor prvĂ© kolo. [NovĂ© koloâ†’/rounds/new]
+PASS  [G] Manager task sentences use the right plural for 1 day(s)  => manager: Kolo â€žPulse â€“ zĂˇĹĄaĹľ a sĂşstredenieâ€ś je uzavretĂ© 1 deĹ a tĂ­m ÄŤakĂˇ, ÄŤo sa s vĂ˝sledkami stane. Pozri vĂ˝sledky a zapĂ­Ĺˇ krok. || HR: 1 uzavretĂ© kolo ÄŤakĂˇ na krok manaĹľĂ©ra. NajdlhĹˇie TĂ­m Beta, 1 deĹ
+PASS  [G] Manager task sentences use the right plural for 2 day(s)  => manager: Kolo â€žPulse â€“ zĂˇĹĄaĹľ a sĂşstredenieâ€ś je uzavretĂ© 2 dni a tĂ­m ÄŤakĂˇ, ÄŤo sa s vĂ˝sledkami stane. Pozri vĂ˝sledky a zapĂ­Ĺˇ krok. || HR: 1 uzavretĂ© kolo ÄŤakĂˇ na krok manaĹľĂ©ra. NajdlhĹˇie TĂ­m Beta, 2 dni
+PASS  [G] Manager task sentences use the right plural for 5 day(s)  => manager: Kolo â€žPulse â€“ zĂˇĹĄaĹľ a sĂşstredenieâ€ś je uzavretĂ© 5 dnĂ­ a tĂ­m ÄŤakĂˇ, ÄŤo sa s vĂ˝sledkami stane. Pozri vĂ˝sledky a zapĂ­Ĺˇ krok. || HR: 1 uzavretĂ© kolo ÄŤakĂˇ na krok manaĹľĂ©ra. NajdlhĹˇie TĂ­m Beta, 5 dnĂ­
+PASS  [G] Manager task sentences use the right plural for 20 day(s)  => manager: Kolo â€žPulse â€“ zĂˇĹĄaĹľ a sĂşstredenieâ€ś je uzavretĂ© 20 dnĂ­ a tĂ­m ÄŤakĂˇ, ÄŤo sa s vĂ˝sledkami stane. Pozri vĂ˝sledky a zapĂ­Ĺˇ krok. | PoslednĂ© kolo sa skonÄŤilo pred 20 dĹami a Ĺľiadne ÄŹalĹˇie nebeĹľĂ­. Vytv
+PASS  [G] Known limitation of BUG-010: a draft with a passed deadline stays in the list and cannot be started or removed  => row controls='SpustiĹĄ'; 'create a round' task still shown=true
+PASS  [A] The HTTP acceptance scenario of mvp.md (steps 1â€“6) passes on a clean seed after the merge  => exit=0; lines=49; last=' / ALL PASSED'
+PASS  [G] No uncaught JavaScript error on the HR, manager and employee pages visited in this suite  => page errors=0 

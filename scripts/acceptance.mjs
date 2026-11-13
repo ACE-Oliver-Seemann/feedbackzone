@@ -30,7 +30,7 @@ async function login(email) {
     try {
       json = JSON.parse(text);
     } catch {}
-    return { status: res.status, json, text };
+    return { status: res.status, location: res.headers.get("location"), json, text };
   };
   return call;
 }
@@ -56,7 +56,8 @@ const created = await hr("/api/rounds", "POST", {
   name: "Pulse – 46. týždeň",
   teamId: teamA,
   closesAt: deadline,
-  questionIds: questions.slice(0, 4).map((q) => q.id),
+  // The fixed trend question is added by the server (IT-04): 1 fixed + 3 picked = 4.
+  questionIds: questions.filter((q) => !q.fixed).slice(0, 3).map((q) => q.id),
 });
 check("1  HR creates a round with 4 questions for team A", created.status === 201);
 const roundId = created.json.round.id;
@@ -128,7 +129,8 @@ const teamB = (await mgrB("/api/me")).json.user.teamId;
 const teamBText = text((await mgrB(`/team/${teamB}`)).text);
 check("5  team B page hides averages below the threshold", teamBText.includes("Nedostatok odpovedí") && !teamBText.includes("Posledný šprint"));
 check("5  HR can open the team page", (await hr(`/team/${teamA}`)).status === 200);
-check("5  menu has team and kudos links", (await alfa[0]("/")).text.includes(`/team/${teamA}`) && text((await alfa[0]("/")).text).includes("Poslať kudos"));
+const menuHtml = (await alfa[0]("/")).text;
+check("5  menu has team and kudos links", menuHtml.includes(`/team/${teamA}`) && menuHtml.includes('href="/kudos"') && !menuHtml.includes('href="/kudos/me"') && !menuHtml.includes('href="/kudos/new"'));
 
 // 6. An employee sends public kudos to a colleague; it shows in the team feed.
 const barboraId = (await alfa[1]("/api/me")).json.user.id;
@@ -139,13 +141,31 @@ const feed = text((await alfa[2](`/team/${teamA}`)).text);
 check("6  kudos shows in the team feed with the sender name", feed.includes("Ďakujem za pomoc s nasadením novej verzie.") && feed.includes("Adam Vzorový → Barbora Skúšobná") && feed.includes("Pomoc kolegom"));
 await mgrA("/api/kudos", "POST", { toUserId: barboraId, text: "Súkromné poďakovanie za prácu navyše.", value: "QUALITY", visibility: "PRIVATE" });
 check("6  private kudos is not in the feed (manager, HR, colleague)", ![await mgrA(`/team/${teamA}`), await hr(`/team/${teamA}`), await alfa[2](`/team/${teamA}`)].some((p) => p.text.includes("Súkromné poďakovanie")));
-const myKudos = text((await alfa[1]("/kudos/me")).text);
-check("6  recipient sees both in Moje kudos", myKudos.includes("Súkromné poďakovanie za prácu navyše.") && myKudos.includes("Ďakujem za pomoc s nasadením"));
-check("6  another user does not see them in Moje kudos", !text((await hr("/kudos/me")).text).includes("poďakovanie"));
-check("6  kudos form page renders", text((await alfa[0]("/kudos/new")).text).includes("Kudos je podpísané tvojím menom."));
+// /kudos renders both tabs (the inactive one hidden), so received kudos and
+// the send form are both in the HTML. The old routes redirect to it.
+const kudosHub = await alfa[1]("/kudos");
+const myKudos = text(kudosHub.text);
+check("6  /kudos renders for an employee", kudosHub.status === 200);
+check("6  recipient sees both on /kudos", myKudos.includes("Súkromné poďakovanie za prácu navyše.") && myKudos.includes("Ďakujem za pomoc s nasadením"));
+const hrKudos = await hr("/kudos");
+const hrKudosText = text(hrKudos.text);
+check("6  /kudos renders for HR", hrKudos.status === 200);
+check("6  another user does not see them on /kudos", !hrKudosText.includes("Súkromné poďakovanie") && !hrKudosText.includes("Ďakujem za pomoc s nasadením"));
+const kudosSend = await alfa[0]("/kudos?tab=send");
+check("6  kudos form renders on /kudos?tab=send", kudosSend.status === 200 && text(kudosSend.text).includes("Kudos je podpísané tvojím menom."));
+// redirect() answers 307 + Location (or a meta refresh if the response already streams).
+const redirectsTo = (res, target) => {
+  if (res.status >= 300 && res.status < 400 && res.location) {
+    const url = new URL(res.location, BASE);
+    return url.pathname + url.search === target;
+  }
+  return res.text.includes(`url=${target}`);
+};
+check("6  /kudos/me redirects to /kudos", redirectsTo(await alfa[1]("/kudos/me"), "/kudos"));
+check("6  /kudos/new redirects to /kudos?tab=send", redirectsTo(await alfa[0]("/kudos/new"), "/kudos?tab=send"));
 
 // NFR-04 on every rendered page.
-const pages = [await alfa[0]("/"), fillPage, teamPage, await mgrA(`/rounds/${roundId}/results`), await hr("/hr/rounds"), await hr("/rounds/new"), await alfa[0]("/kudos/new"), await alfa[1]("/kudos/me")];
+const pages = [await alfa[0]("/"), fillPage, teamPage, await mgrA(`/rounds/${roundId}/results`), await hr("/hr/rounds"), await hr("/rounds/new"), kudosHub, hrKudos, kudosSend];
 check("NFR-04  no rendered page contains the forbidden word", !pages.some((p) => /anonym/i.test(p.text)));
 
 console.log(failures === 0 ? "\nALL PASSED" : `\n${failures} FAILED`);

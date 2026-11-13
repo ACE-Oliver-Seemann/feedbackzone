@@ -1,0 +1,26 @@
+PASS  [J8] Six members (5 employees + manager) press 'Odoslať' at the same moment in six browsers  => DB=6/6; values=1234,2345,3333,3451,4512,5123
+PASS  [J8] The same user in two tabs submits the same round at the same moment  => thank-you tabs=1, 'already submitted' tabs=1, DB=1/1
+PASS  [J8] Ten parallel API submissions of the same user  => statuses=201,409,409,409,409,409,409,409,409,409; DB=1/1
+PASS  [J8] Twelve users of two teams submit to their own rounds in parallel (API)  => statuses=201,201,201,201,201,201,201,201,201,201,201,201; Alfa=6/6, Beta=6/6, wrong-team rows=0
+PASS  [J8] A member of another team submits to a foreign round while it is open  => HTTP 403; DB 1/1→1/1
+PASS  [J8] The manager closes the round while a member is on the last step  => DB=0/0
+PASS  [J8] Race: close and five submissions fired together (repeated 3×)  => [{"st":"200,201,409,409,409,409","p":1,"q":1,"shown":1},{"st":"200,409,409,409,409,409","p":0,"q":0,"shown":0},{"st":"200,409,409,409,409,409","p":0,"q":0,"shown":0}]
+PASS  [J8] HR and the manager both press 'Spustiť' on the same draft at the same time  => DB=OPEN; messages=["Kolo medzitým zmenilo stav. Obnov stránku."]; page errors=0
+PASS  [J8] HR and the manager both press 'Uzavrieť' at the same time  => DB=CLOSED, closedAt=2026-11-12T18:14:09.447Z; messages=["Kolo medzitým zmenilo stav. Obnov stránku."]
+PASS  [J8] Two parallel close requests through the API  => statuses=200,409
+PASS  [J8] Automatic close: several users load pages at the same moment after the deadline  => DB=CLOSED, closedAt=deadline=true; statuses=200,200,200,200,200,200,200
+PASS  [J8] Action status changed in two tabs of the manager  => tab 2 before its change showed=PLANNED; DB=IN_PROGRESS; tab 1 without reload still shows=DONE (stale, no warning); tab 1 after reload=IN_PROGRESS
+PASS  [J8] Two parallel PATCHes of the same action  => statuses=200,200; DB=DONE
+PASS  [J8] Double click on 'Poslať kudos'  => rows 0→1
+PASS  [J8] Double click on 'Pridať krok'  => rows 1→2
+PASS  [J8] Double click on 'Uložiť koncept'  => rows 0→1
+PASS  [J8] Double click on 'Pridať podnet'  => rows 2→3
+PASS  [J8] Double click on 'Uložiť poznámku'  => rows 1→2
+PASS  [J8] Double click on 'Pridať otázku' (own question)  => own questions=1; duplicate message shown=0
+PASS  [J8] Five parallel requests creating the same own question  => statuses=201,400,400,400,400; rows with the same text=1
+PASS  [J8] Five parallel kudos from five senders to one recipient  => statuses=201,201,201,201,201; listed=5
+PASS  [J8] Results of one round requested by manager and HR in parallel are identical (except comment order)  => identical=true; responseCount=6; averages=3,3,3,3
+PASS  [J8] An employee and the manager of the same team see the same averages for the same round  => employee=3,0 | 3,0 | 3,0 | 3,0; manager=3,0 | 3,0 | 3,0 | 3,0
+
+J8 done: 23 checks, 0 failed
+exit 0

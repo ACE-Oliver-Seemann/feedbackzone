@@ -104,10 +104,10 @@ describe("round results [MVP-10]", () => {
     expect(body.participation).toEqual({ responded: 5, teamSize: 6 });
     expect(body.round).toMatchObject({ id: round.id, status: "CLOSED", teamId: fx.a.team.id });
     expect(body.questions).toEqual([
-      { position: 1, text: fx.questions[0].text, average: 3, distribution: [1, 1, 1, 1, 1] },
-      { position: 2, text: fx.questions[1].text, average: 5, distribution: [0, 0, 0, 0, 5] },
-      { position: 3, text: fx.questions[2].text, average: 3.2, distribution: [0, 0, 4, 1, 0] },
-      { position: 4, text: fx.questions[3].text, average: 3.4, distribution: [0, 2, 0, 2, 1] },
+      { position: 1, text: fx.questions[0].text, scale: "AGREEMENT", average: 3, distribution: [1, 1, 1, 1, 1] },
+      { position: 2, text: fx.questions[1].text, scale: "AGREEMENT", average: 5, distribution: [0, 0, 0, 0, 5] },
+      { position: 3, text: fx.questions[2].text, scale: "AGREEMENT", average: 3.2, distribution: [0, 0, 4, 1, 0] },
+      { position: 4, text: fx.questions[3].text, scale: "AGREEMENT", average: 3.4, distribution: [0, 2, 0, 2, 1] },
     ]);
     expect([...body.comments].sort()).toEqual(["Druhý", "Prvý", "Tretí"]);
   });

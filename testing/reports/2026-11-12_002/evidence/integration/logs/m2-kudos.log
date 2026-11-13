@@ -1,0 +1,34 @@
+PASS  [B] Kudos opens from the main menu on the 'Moje kudos' tab with an empty state  => tabs=Moje kudos|PoslaĹĄ kudos; selected='Moje kudos'; empty state=true
+PASS  [B] Old addresses /kudos/new and /kudos/me lead to the single page  => /kudos/new â†’ /kudos?tab=send (form visible=true); /kudos/me â†’ /kudos (selected 'Moje kudos')
+PASS  [B] Recipient list offers everyone except the sender, with the team in brackets  => options=12; self listed=false; HR entry='Hana PersonĂˇlna'
+PASS  [B] Empty form is refused with field messages and nothing is sent  => recipient msg=true, text msg=true, kudos=0
+PASS  [B] Text of 19 characters without an emoji is refused  => message=true; kudos=0; counter='19 / 500'
+PASS  [B] Live preview shows recipient, text, value and visibility before sending  => NĂˇhÄľad Takto kudos uvidĂ­ prĂ­jemca. BS Pre: Barbora SkĂşĹˇobnĂˇ ÄŽakujem za pomoc s nasadenĂ­m, bolo to rĂ˝chle (QA). Pomoc kolegom VerejnĂ© v tĂ­me
+PASS  [B] Sending a public text kudos: confirmation after the server answered, confetti, one row in DB  => rows=1; from/to ok=true; TEAM/HELPING; confetti canvas=1
+PASS  [B] After sending, the form is empty and a second click cannot create a duplicate  => recipient='', text='', kudos=1
+PASS  [B] Sender sees the public kudos in the feed of the recipient's (own) team, signed, newest first  => Kudos v tĂ­me AV Adam VzorovĂ˝ â†’ Barbora SkĂşĹˇobnĂˇ 12. 11. 2026 ÄŽakujem za pomoc s nasadenĂ­m, bolo to rĂ˝chle (QA). Pomoc kolegom
+PASS  [B] Recipient sees the kudos in 'Moje kudos' with the sender's name, value and a count  => tab='Moje kudos 1'; sender shown=true; summary=true
+PASS  [B] GET /api/kudos/me equals the page and the database  => items=1; keys=id,fromName,toName,text,emoji,value,visibility,createdAt
+PASS  [B] 'New kudos' notice appears for a kudos that arrived since the last visit, and only once  => send HTTP 201; notice on first reload=true; on second reload=false
+FAIL  [B] 'New kudos' notice for the very first kudos a person receives  => seen-count keys stored on the empty visit=0; kudos listed after reload=1; notice shown=false
+PASS  [B] Sending a private kudos  => visibility=PRIVATE
+PASS  [B] Private kudos is visible to the recipient only, marked 'SĂşkromnĂ©'  => AV Od: Adam VzorovĂ˝ 12. 11. 2026 SĂşkromne: vÄŹaka za podporu v ĹĄaĹľkom tĂ˝Ĺľdni (QA). SpoluprĂˇca SĂşkromnĂ©
+PASS  [B] Private kudos is on no team page and in no other person's list: teammate, manager, HR, sender  => places where the private text leaked: none
+PASS  [B] Emoji-only kudos: text becomes optional and the kudos is sent with empty text  => hint=true, pressed=true, db text='', emoji=đźŽ‰
+PASS  [B] Emoji is shown in the team feed and in the recipient's list  => team feed=1, my kudos=1
+PASS  [B] Emoji can be deselected; then the 20-character minimum applies again  => pressed after 2 clicks=false, message=true, kudos 5â†’5
+PASS  [B] Emoji with a short text is accepted  => db text='VÄŹaka!'
+PASS  [B] Unknown emoji, kudos to oneself and unknown recipient are refused by the server  => 400 {"error":"validation_error","fields":{"emoji":"invalid"}} | 400 {"error":"validation_error","fields":{"toUserId":"self"}} | 400 {"error":"validation_error","fields":{"toUserId":"unknown"}}
+PASS  [B] Text boundaries: exactly 20 and exactly 500 characters are accepted, 501 cannot be typed  => 20-char stored=1, 500-char stored=1, typed length after 501=500, counter='500 / 500'
+PASS  [B] Public kudos to HR (no team) is refused with an explanation  => message=true; kudos 8â†’8; text kept=true
+PASS  [B] Private kudos to HR works and HR sees it in 'Moje kudos'  => HR sees it=true
+PASS  [B] HR can send kudos; a public one lands in the feed of the recipient's team only  => Beta feed has it=true; Alfa feed has it=false
+PASS  [B] Cross-team public kudos: shown on the recipient's team page, which the sender cannot open  => Beta feed=true; Adam on Beta page 403=true; in Alfa feed=false
+PASS  [B] Team feed is ordered newest first and equals the database  => UI=7 items, DB=7; first UI='Adam VzorovĂ˝ â†’ Barbora SkĂşĹˇobnĂˇ', first DB='Adam VzorovĂ˝ â†’ Barbora SkĂşĹˇobnĂˇ'
+PASS  [B] Received list is ordered newest first, with value counts equal to the database  => tab='Moje kudos 5', DB=5, list items=5, chips=SpoluprĂˇca Ă—3, Kvalita Ă—1, Pomoc kolegom Ă—1, expected=SpoluprĂˇca Ă—3, Kvalita Ă—1, Pomoc kolegom Ă—1
+PASS  [B] Kudos text is rendered as text, not as HTML  => shown as text=true, window.__xss=undefined, <b> elements=0
+PASS  [B] Manager sees only the public kudos of the own team and own received ones  => Beta recipient in Alfa feed=false; manager's own list empty=true
+PASS  [B] Tabs follow the address and survive a reload and Back  => after click '?tab=send', form after reload=true, after second tab '', Back â†’ /; page errors=0
+PASS  [B] 'PozrieĹĄ moje kudos' and 'PoslaĹĄ kudos' buttons switch the tabs  => after 'PozrieĹĄ moje kudos' â†’ 'Moje kudos'; after the panel button â†’ 'PoslaĹĄ kudos'
+PASS  [B] Kudos database integrity  => rows=13, invalid=0
+PASS  [B] No uncaught JavaScript error on the kudos pages  => page errors=0 

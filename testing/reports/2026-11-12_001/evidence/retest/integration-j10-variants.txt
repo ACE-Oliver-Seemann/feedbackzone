@@ -1,0 +1,36 @@
+PASS  [J10] Empty state: team page of a team without closed rounds and without kudos  => Odhlásiť sa Domov Môj tím Kudos Tím Alfa Povedali ste, urobili sme Tím zatiaľ nemá žiadne uzavreté kolo. Kudos v tíme V tíme zatiaľ nie je žiadne verejné kudos.
+PASS  [J10] Empty state: trend of a team without closed rounds  => tajú sa iba kolá s aspoň 5 odpoveďami; kolo s menej odpoveďami je v grafe medzera. Tím zatiaľ nemá žiadne uzavreté kolo.
+PASS  [J10] Empty state: comparison of teams when no round is above the threshold  =>  okruhov za posledných 90 dní. Počítajú sa iba uzavreté kolá s aspoň 5 odpoveďami. V tomto období nemá žiadny tím uzavreté kolo nad prahom dôvernosti.
+PASS  [J10] Empty state: manager whose team never had a round  => tasks=["Tím ešte nemal žiadny prieskum. Vytvor prvé kolo."]; href=/rounds/new; empty list text=true
+PASS  [J10] Empty state: 'Moje kudos' without kudos  => empty text shown
+PASS  [J10] Round form: empty name is refused, other inputs stay  => ticked=3; rounds=0
+PASS  [J10] Round form: a deadline in the past is refused  => error shown; rounds=0
+PASS  [J10] Round form: an emptied deadline is refused  => message shown=true
+FAIL  [J10] Round form: name with quotes and HTML is stored and shown literally everywhere  => SCRIPT/RUNTIME ERROR: locator.innerText: Timeout 30000ms exceeded. Call log: [2m - waiting for locator('main li h3').first()[22m 
+PASS  [J10] Wizard with 5 questions: intro and progress wording  => intro=true, progress=true
+PASS  [J10] Wizard: numeric scale shows end labels and the meaning of the chosen number  => end labels present; chosen label='Skôr zlé'
+PASS  [J10] Wizard: frequency scales show five labelled answers instead of numbers  => OVERTIME='Nikdy, Raz či dvakrát, Každý týždeň, Väčšinu dní, Takmer denne'; FREQUENCY='Nikdy, Zriedka, Občas, Často, Takmer vždy'; overflow=false
+PASS  [J10] Wizard: changing an earlier answer from the comment step  => stored=2,2,4,5,1; expected=2,2,4,5,1; comment=null
+PASS  [J10] Wizard can be completed with the keyboard only  => keyboard path ok=true; thank-you=1; stored=3,3,3,3,3
+PASS  [J10] Comment of exactly 1000 characters with diacritics and emoji is stored intact  => HTTP 201; stored identical=true; 1001 characters → HTTP 400 {"error":"validation_error","fields":{"comment":"too_long"}}
+PASS  [J10] The manager fills in the round of the own team from the home task  => manager participation=1; list='<i>QA</i> & "kolo" 5 otázok Otvorené Uzávierka 19. 11. 2026 · 5 otázok Účasť: 4 z 6 Výsledky Uzavrieť'
+PASS  [J10] Round with 5 questions: results after closing show 5 cards, the reversed-scale note twice, and all five stored columns are used  => responses=6; UI=3,5 | 2,67 | 3,5 | 3,83 | 3,5; DB=3,5 | 2,67 | 3,5 | 3,83 | 3,5; notes=2
+PASS  [J10] 'V skratke' treats a reversed scale correctly: a low average on 'how often overtime' counts as good  => Najlepšie: „Mám dosť času robiť prácu poriadne.“ (3,83). Najslabšie: „Ako často sa za posledné dva týždne pracovný deň skončil pocitom vyčerpania?“ (3,5). → present=true/true
+PASS  [J10] A draft created by HR appears in the team manager's list and the manager can start it  => before='QA kolo 3 otázky Koncept Uzávierka 19. 11. 2026 · 3 otázky Spustiť'; DB after=OPEN
+PASS  [J10] Results page of a draft opened by direct URL  => hlásiť sa Domov Prieskumy Môj tím Kudos Výsledky kola QA koncept Koncept Tím Beta · Uzávierka 19. 11. 2026 Kolo je koncept a ešte nebolo spustené. Kroky po kole Kroky sa dajú zapísať po uzavretí kola.
+FAIL  [J10] Wizard with 3 questions on a phone  => SCRIPT/RUNTIME ERROR: locator.click: Error: strict mode violation: getByRole('link', { name: 'Vyplniť' }) resolved to 2 elements: 1) <a href="/rounds/cmwdvclfz003rpk04h7ytikcp/fill" class="rounded-md 
+PASS  [J10] A round of another team is invisible to an employee and cannot be opened  => on home=false; fill page HTTP 403; API rounds of other teams=0
+FAIL  [J10] Round with 3 questions: results, report and team page show 3 questions  => DB=2,5 | 2,75 | 3,5; results=; report=; team page=
+PASS  [J10] Report: the print button opens the browser print dialog  => window.print calls=1
+PASS  [J10] Report can be saved as PDF from the browser  => PDF bytes=35578; app header visible in print=false
+PASS  [J10] NFR-04: the forbidden word does not appear on any page of any role  => pages scanned=28; pages containing the forbidden word=0; pages using 'dôvern…'=3
+PASS  [J10] NFR-07: pages declare Slovak as the document language  => app lang=sk; login lang=sk; <title>='Prihlásenie – Feedback portál'
+PASS  [J10] NFR-07: the not-found page is in Slovak like the rest of the UI  => main text='404 Túto stránku sme nenašli Adresa neexistuje alebo sa zmenila. Späť na úvod'; links inside main=1
+PASS  [J10] Long unbroken text (a 104-character URL) in a comment does not break the results page on a phone  => scrollWidth=360, clientWidth=360
+PASS  [J10] Long unbroken text in an action description does not break the team page on a phone  => scrollWidth=360, clientWidth=360
+PASS  [J10] Long unbroken text in a kudos does not break the team feed and 'Moje kudos' on a phone  => Moje kudos: 360/360; team page: 360/360
+PASS  [J10] Long unbroken text in an issue and a note does not break HR pages on a phone  => issues: 360/360; notes: 360/360
+PASS  [J10] Main pages of every role have no horizontal scroll at 360 px with ordinary content  => pages with overflow=none
+
+J10 done: 33 checks, 3 failed
+exit 0

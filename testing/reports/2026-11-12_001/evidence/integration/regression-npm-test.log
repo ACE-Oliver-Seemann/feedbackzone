@@ -1,0 +1,280 @@
+
+> feedbackzone@0.1.0 test
+> vitest run
+
+
+ RUN  v5.1.0 C:/Users/<user>/Documents/feedbackzone
+
+ ❯ tests/iterations.test.ts (0 test)
+ ❯ tests/responses.test.ts (0 test)
+ ❯ tests/kudos.test.ts (0 test)
+ ❯ tests/hr-issues.test.ts (0 test)
+ ❯ tests/rounds.test.ts (0 test)
+ ❯ tests/usability.test.ts (0 test)
+ ❯ tests/results.test.ts (0 test)
+ ❯ tests/trends.test.ts (0 test)
+ ❯ tests/suggestions.test.ts (0 test)
+ ❯ tests/actions.test.ts (0 test)
+ ❯ tests/teams.test.ts (0 test)
+ ❯ tests/permissions.test.ts (0 test)
+ ❯ tests/auth.test.ts (0 test)
+ ❯ tests/texts.test.ts (0 test)
+ ❯ tests/schema.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 15 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/actions.test.ts [ tests/actions.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/actions.test.ts:9:1
+      7|
+      8| let fx: Fixture;
+      9| beforeEach(async () => {
+       | ^
+     10|   fx = await resetDb();
+     11| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/15]⎯
+
+ FAIL  tests/auth.test.ts [ tests/auth.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/auth.test.ts:10:1
+      8|
+      9| let fx: Fixture;
+     10| beforeAll(async () => {
+       | ^
+     11|   fx = await resetDb();
+     12| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/15]⎯
+
+ FAIL  tests/hr-issues.test.ts [ tests/hr-issues.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/hr-issues.test.ts:11:1
+      9|
+     10| let fx: Fixture;
+     11| beforeEach(async () => {
+       | ^
+     12|   fx = await resetDb();
+     13| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/15]⎯
+
+ FAIL  tests/iterations.test.ts [ tests/iterations.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/iterations.test.ts:14:1
+     12|
+     13| let fx: Fixture;
+     14| beforeEach(async () => {
+       | ^
+     15|   fx = await resetDb();
+     16| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/15]⎯
+
+ FAIL  tests/kudos.test.ts [ tests/kudos.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/kudos.test.ts:9:1
+      7|
+      8| let fx: Fixture;
+      9| beforeEach(async () => {
+       | ^
+     10|   fx = await resetDb();
+     11| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/15]⎯
+
+ FAIL  tests/permissions.test.ts [ tests/permissions.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/permissions.test.ts:47:1
+     45| let actors: Record<Actor, { id: string } | undefined>;
+     46|
+     47| beforeAll(async () => {
+       | ^
+     48|   fx = await resetDb();
+     49|   actors = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/15]⎯
+
+ FAIL  tests/responses.test.ts [ tests/responses.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/responses.test.ts:9:1
+      7|
+      8| let fx: Fixture;
+      9| beforeEach(async () => {
+       | ^
+     10|   fx = await resetDb();
+     11| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/15]⎯
+
+ FAIL  tests/results.test.ts [ tests/results.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/results.test.ts:9:1
+      7|
+      8| let fx: Fixture;
+      9| beforeEach(async () => {
+       | ^
+     10|   fx = await resetDb();
+     11| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/15]⎯
+
+ FAIL  tests/rounds.test.ts [ tests/rounds.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/rounds.test.ts:10:1
+      8|
+      9| let fx: Fixture;
+     10| beforeEach(async () => {
+       | ^
+     11|   fx = await resetDb();
+     12| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/15]⎯
+
+ FAIL  tests/schema.test.ts [ tests/schema.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'config')
+ ❯ tests/schema.test.ts:18:1
+     16| };
+     17|
+     18| describe("Response table cannot be linked to a user [NFR-01]", () => {
+       | ^
+     19|   it("has no user column and no time column", async () => {
+     20|     const names = (await columns("Response")).map((column) => column.n…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/15]⎯
+
+ FAIL  tests/suggestions.test.ts [ tests/suggestions.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/suggestions.test.ts:12:1
+     10|
+     11| let fx: Fixture;
+     12| beforeEach(async () => {
+       | ^
+     13|   fx = await resetDb();
+     14| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/15]⎯
+
+ FAIL  tests/teams.test.ts [ tests/teams.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/teams.test.ts:8:1
+      6|
+      7| let fx: Fixture;
+      8| beforeEach(async () => {
+       | ^
+      9|   fx = await resetDb();
+     10| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/15]⎯
+
+ FAIL  tests/texts.test.ts [ tests/texts.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'config')
+ ❯ tests/texts.test.ts:14:1
+     12| }
+     13|
+     14| describe("wording of confidentiality [NFR-04]", () => {
+       | ^
+     15|   it("no file under src/ contains the forbidden word", () => {
+     16|     const forbidden = /anonym/i;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/15]⎯
+
+ FAIL  tests/trends.test.ts [ tests/trends.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/trends.test.ts:12:1
+     10|
+     11| let fx: Fixture;
+     12| beforeEach(async () => {
+       | ^
+     13|   fx = await resetDb();
+     14|   // q1 fixed trend question, q2 + q3 one topic, q4 a reversed scale i…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/15]⎯
+
+ FAIL  tests/usability.test.ts [ tests/usability.test.ts ]
+Error: Vitest failed to find the runner. One of the following is possible:
+- "vitest" is imported directly without running "vitest" command
+- "vitest" is imported inside "globalSetup" (to fix this, use "setupFiles" instead, because "globalSetup" runs in a different context)
+- "vitest" is imported inside Vite / Vitest config file
+- Otherwise, it might be a Vitest bug. Please report it to https://github.com/vitest-dev/vitest/issues
+
+ ❯ tests/usability.test.ts:13:1
+     11|
+     12| let fx: Fixture;
+     13| beforeEach(async () => {
+       | ^
+     14|   fx = await resetDb();
+     15| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/15]⎯
+
+
+ Test Files  15 failed (15)
+      Tests  no tests
+   Start at  16:51:56
+   Duration  9.02s (worker 97%, environment 3%)
+
+    Isolate  15 workers spawned · ~180ms startup each (spawn + environment, per file)
+             at least ~2.52s faster with isolate: false — reuses workers across files instead of one per file
+
+exit 1

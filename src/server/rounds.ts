@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { assertCanManageRounds, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
+import { charLength, cleanText } from "@/lib/text";
 
 export type RoundStatus = "DRAFT" | "OPEN" | "CLOSED";
 
@@ -31,10 +32,18 @@ export type RoundListItem = {
  * Called by every read that depends on round status.
  */
 export async function closeExpiredRounds(now = new Date()): Promise<void> {
-  await db.round.updateMany({
+  const expired = await db.round.findMany({
     where: { status: "OPEN", closesAt: { lt: now } },
-    data: { status: "CLOSED" },
+    select: { id: true, closesAt: true },
   });
+  for (const round of expired) {
+    // The round counts as closed at its deadline, not at the moment someone
+    // happened to load the page (IT-05 measures reaction time from here).
+    await db.round.updateMany({
+      where: { id: round.id, status: "OPEN" },
+      data: { status: "CLOSED", closedAt: round.closesAt },
+    });
+  }
 }
 
 /**
@@ -96,9 +105,9 @@ export async function createRound(
 
   const fields: Record<string, string> = {};
 
-  const name = typeof input.name === "string" ? input.name.trim() : "";
+  const name = cleanText(input.name);
   if (!name) fields.name = "required";
-  else if (name.length > MAX_NAME_LENGTH) fields.name = "too_long";
+  else if (charLength(name) > MAX_NAME_LENGTH) fields.name = "too_long";
 
   // A manager may omit the team; it defaults to their own.
   const teamId =
@@ -113,25 +122,50 @@ export async function createRound(
   if (!closesAt) fields.closesAt = "invalid";
   else if (closesAt.getTime() < Date.now()) fields.closesAt = "in_past";
 
-  const rawIds = Array.isArray(input.questionIds) ? input.questionIds : null;
-  const questionIds =
-    rawIds && rawIds.every((id): id is string => typeof id === "string") ? rawIds : null;
-  if (!questionIds) fields.questionIds = "invalid";
-  else if (new Set(questionIds).size !== questionIds.length) fields.questionIds = "duplicate";
-  else if (questionIds.length < MIN_QUESTIONS) fields.questionIds = "too_few";
-  else if (questionIds.length > MAX_QUESTIONS) fields.questionIds = "too_many";
-
   // Permission is checked before anything about the target team is revealed.
   if (teamId) assertCanManageRounds(user, teamId);
+
+  // IT-04: fixed (trend) questions open every round. The author picks the
+  // rest; the 3–5 limit from MVP-04 applies to the total.
+  const fixedIds = (
+    await db.question.findMany({
+      where: { fixed: true },
+      orderBy: { id: "asc" },
+      select: { id: true },
+    })
+  ).map((question) => question.id);
+
+  const rawIds = Array.isArray(input.questionIds) ? input.questionIds : null;
+  const pickedIds =
+    rawIds && rawIds.every((id): id is string => typeof id === "string") ? rawIds : null;
+  let questionIds: string[] | null = null;
+  if (!pickedIds) fields.questionIds = "invalid";
+  else if (new Set(pickedIds).size !== pickedIds.length) fields.questionIds = "duplicate";
+  else {
+    // A fixed question sent by the client is not counted twice.
+    questionIds = [...fixedIds, ...pickedIds.filter((id) => !fixedIds.includes(id))];
+    if (questionIds.length < MIN_QUESTIONS) fields.questionIds = "too_few";
+    else if (questionIds.length > MAX_QUESTIONS) fields.questionIds = "too_many";
+  }
 
   if (Object.keys(fields).length > 0) throw validationError(fields);
 
   const [team, knownQuestions] = await Promise.all([
     db.team.findUnique({ where: { id: teamId! }, select: { id: true } }),
-    db.question.count({ where: { id: { in: questionIds! } } }),
+    db.question.findMany({
+      where: { id: { in: questionIds! } },
+      select: { id: true, teamId: true },
+    }),
   ]);
   if (!team) throw validationError({ teamId: "unknown" });
-  if (knownQuestions !== questionIds!.length) throw validationError({ questionIds: "unknown" });
+  if (knownQuestions.length !== questionIds!.length) {
+    throw validationError({ questionIds: "unknown" });
+  }
+  // IT-07: an own question may be used only in rounds of the team that owns it.
+  // Reported like an unknown question, so nothing about other teams leaks.
+  if (knownQuestions.some((question) => question.teamId !== null && question.teamId !== team.id)) {
+    throw validationError({ questionIds: "unknown" });
+  }
 
   const round = await db.round.create({
     data: {
@@ -146,6 +180,53 @@ export async function createRound(
     select: { id: true },
   });
   return round;
+}
+
+/** How many rotating questions are preselected for a new round (IT-13). */
+export const DEFAULT_PICKED_QUESTIONS = 3;
+
+/**
+ * Questions preselected for a new round of a team (IT-13): recommended
+ * (starter) questions, least recently used by the team first, from different
+ * topics. Defaults are followed much more often than not, so they must rotate
+ * — otherwise every round would ask the same three things.
+ */
+export async function suggestRoundQuestions(user: SessionUser, teamId: string): Promise<string[]> {
+  requireRole(user, "MANAGER", "HR");
+  assertCanManageRounds(user, teamId);
+
+  const [starters, used] = await Promise.all([
+    db.question.findMany({
+      where: { starter: true, fixed: false, teamId: null },
+      orderBy: [{ topic: "asc" }, { text: "asc" }],
+      select: { id: true, topic: true },
+    }),
+    db.roundQuestion.findMany({
+      where: { round: { teamId } },
+      select: { questionId: true, round: { select: { closesAt: true } } },
+    }),
+  ]);
+
+  const lastUsed = new Map<string, number>();
+  for (const item of used) {
+    const time = item.round.closesAt.getTime();
+    if ((lastUsed.get(item.questionId) ?? 0) < time) lastUsed.set(item.questionId, time);
+  }
+  // Never used first, then the longest unused. The sort is stable, so ties keep topic order.
+  const candidates = [...starters].sort(
+    (a, b) => (lastUsed.get(a.id) ?? 0) - (lastUsed.get(b.id) ?? 0),
+  );
+
+  const picked: typeof candidates = [];
+  for (const question of candidates) {
+    if (picked.length === DEFAULT_PICKED_QUESTIONS) break;
+    if (!picked.some((item) => item.topic === question.topic)) picked.push(question);
+  }
+  for (const question of candidates) {
+    if (picked.length === DEFAULT_PICKED_QUESTIONS) break;
+    if (!picked.includes(question)) picked.push(question);
+  }
+  return picked.map((question) => question.id);
 }
 
 async function loadManagedRound(user: SessionUser, roundId: string) {
@@ -180,7 +261,7 @@ export async function closeRound(user: SessionUser, roundId: string): Promise<vo
 
   const updated = await db.round.updateMany({
     where: { id: round.id, status: "OPEN" },
-    data: { status: "CLOSED" },
+    data: { status: "CLOSED", closedAt: new Date() },
   });
   if (updated.count === 0) throw conflict("invalid_state");
 }

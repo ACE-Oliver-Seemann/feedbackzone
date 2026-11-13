@@ -45,6 +45,16 @@ export function route<C>(handler: Handler<C>): Handler<C> {
   };
 }
 
+/** True when every string anywhere in the value is well-formed Unicode. */
+function isWellFormed(value: unknown): boolean {
+  if (typeof value === "string") return value.isWellFormed();
+  if (Array.isArray(value)) return value.every(isWellFormed);
+  if (typeof value === "object" && value !== null) {
+    return Object.entries(value).every(([key, item]) => key.isWellFormed() && isWellFormed(item));
+  }
+  return true;
+}
+
 /** Parses a JSON object body; anything else is a 400. The body is never logged. */
 export async function readJsonObject(request: NextRequest): Promise<Record<string, unknown>> {
   let body: unknown;
@@ -56,5 +66,8 @@ export async function readJsonObject(request: NextRequest): Promise<Record<strin
   if (typeof body !== "object" || body === null || Array.isArray(body)) {
     throw new HttpError(400, "invalid_json");
   }
+  // A lone UTF-16 surrogate is valid JSON but cannot be stored; the database
+  // driver would fail with a 500 (QA BE-003).
+  if (!isWellFormed(body)) throw new HttpError(400, "invalid_text");
   return body as Record<string, unknown>;
 }

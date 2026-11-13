@@ -1,0 +1,15 @@
+PASS  [J10] Seed: 2 teams of 6 (1 manager + 5 employees) and 1 HR user  => users=13, teams=2, HR=1
+PASS  [J10] Seed: question library of IT-03  => questions=38, fixed=1, topics=8, starters=12, scales=QUALITY,AGREEMENT,OVERTIME,FREQUENCY
+PASS  [J5] Passwords are stored only as bcrypt hashes  => checked 13 hashes
+PASS  [J10] Only invented test accounts exist  => domains=example.test
+PASS  [J5] No registration, password reset or user administration screens exist  => /register=404; /signup=404; /forgot-password=404; /reset-password=404; /admin=404; /users=404; /api/register=404; /api/users=404
+PASS  [J6] Team page lists closed rounds newest first when one round was closed by hand before its deadline  => order=QA kolo Y (uzavreté neskôr) | QA kolo X (uzavreté ručne skôr); labels=Uzavreté 12. 11. 2026 · Odpovedalo 5 z 6 | Uzavreté 12. 11. 2026 · Odpovedalo 5 z 6; DB closedAt X=2026-11-12T18:16:40.972Z,
+PASS  [J6] Trend page and team page agree on which round is the newest  => trend first='QA kolo Y (uzavreté neskôr)'; team page first='QA kolo Y (uzavreté neskôr)'
+PASS  [J1] Thank-you screen shows the actions of the round that was closed last  => Čo sa urobilo po kole „QA kolo Y (uzavreté neskôr)“ QA krok kola Y Plánované QA Termín 13. 11. 2026 Späť na moje prieskumy
+PASS  [J4] Issues list with an unknown status in the URL  => filter shows 'Nevybavené'; list has 2 issues, includes the finished one=false
+PASS  [J4] Issue form opened with an unknown round id in the URL  => HTTP 200; prefill notice=false
+PASS  [J4] Issues filter keeps working together with the 'from round' link  => notice=1; list=["QA hotový podnet"]
+FAIL  [J9] Result and summary APIs do not send caching headers that would allow storing confidential data  => results: null; summary: null
+
+J11 done: 12 checks, 1 failed
+exit 0

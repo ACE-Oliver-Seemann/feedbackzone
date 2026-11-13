@@ -1,0 +1,17 @@
+[
+ { "match": "empty name — is the error visible|server error 500 shows the generic message, input kept, message visible", "ref": "FE2-001" },
+ { "match": "Animations last at most 1.5 s: questionnaire confetti", "ref": "FE2-002" },
+ { "match": "Question transition is animated in the direction", "ref": "FE2-003" },
+ { "match": "Keyboard walk on|Shift.Tab upwards", "ref": "FE2-004" },
+ { "match": "Sticky save bar does not hide", "ref": "FE2-005" },
+ { "match": "Motion menu at 320 px", "ref": "FE2-006" },
+ { "match": "Thank-you screen: focus", "ref": "FE2-007" },
+ { "match": ".403. as mgrA: title|404 page inside the app shell|403 page inside the app shell", "ref": "FE2-008" },
+ { "match": "Touch targets|Toast: dismiss button works and is big enough", "ref": "FE2-009" },
+ { "match": "Structure of /kudos.tab=send", "ref": "FE2-010" },
+ { "match": "accepts 1 000 characters|accepts 500 characters", "ref": "FE2-011" },
+ { "match": "focus after a rejected", "ref": "FE2-007" },
+ { "match": "Issue and note forms: error is linked|Required fields are marked", "ref": "FE2-013 (known BUG-029)" },
+ { "match": "Questionnaire question step has a heading", "ref": "FE2-014 (known BUG-028)" },
+ { "match": "Non-text contrast of form field borders", "ref": "FE2-012 (known BUG-030)" }
+]

@@ -1,0 +1,43 @@
+{
+ "executed": 281,
+ "PASS": 275,
+ "FAIL": 5,
+ "BLOCKED": 1,
+ "bySection": {
+  "A": {
+   "PASS": 59,
+   "FAIL": 1,
+   "BLOCKED": 0
+  },
+  "G": {
+   "PASS": 50,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "D": {
+   "PASS": 27,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "F": {
+   "PASS": 24,
+   "FAIL": 2,
+   "BLOCKED": 0
+  },
+  "C": {
+   "PASS": 43,
+   "FAIL": 0,
+   "BLOCKED": 0
+  },
+  "B": {
+   "PASS": 34,
+   "FAIL": 2,
+   "BLOCKED": 0
+  },
+  "E": {
+   "PASS": 38,
+   "FAIL": 0,
+   "BLOCKED": 1
+  }
+ }
+}

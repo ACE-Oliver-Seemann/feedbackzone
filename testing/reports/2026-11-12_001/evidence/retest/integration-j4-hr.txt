@@ -1,0 +1,32 @@
+PASS  [J4] Issues list opens with only unfinished issues by default  => UI=["Príliš veľa porád v jednom dni","Nefunguje klimatizácia v zasadačke na 3. poschodí"]; DB=2; filter=ACTIVE; form visible=false
+PASS  [J4] 'Vytvoriť podnet z tohto kola' opens the issue form prefilled with the round and its team  => url=http://localhost:3303/hr/issues?round=:id#new; source=SURVEY; team select=0
+PASS  [J4] Issue with a 2-character title is refused and the typed data stays  => rows 2→2; description kept='QA opis, ktorý má zostať.'
+PASS  [J4] HR creates an issue from the round  => row={"id":"cmwdv490p000ppk04ftki2yak","title":"QA podnet z kola","description":"QA opis, ktorý má zostať.","source":"SURVEY","ownerGroup":"MANAGEMENT","status":"OPEN","dueDate":"2026-11-22T22:59:59.99
+PASS  [J4] Notes tab lists the seeded note; empty note form is refused  => notes=1
+PASS  [J4] HR writes a meeting note  => first='QA stretnutie s Tímom Alfa Stretnutie 11. 11. 2026 QA: tlačiareň na 2. poschodí netlačí. QA: chýbajú monitory. Vytvoriť podnet'; createdBy=hr@example.test; title field after save=''
+PASS  [J4] HR creates an issue from the note, with a team and a due date in the past  => source=MEETING; description prefilled=''; row noteId ok=true, team ok=true, description=''
+PASS  [J4] The note lists the issue created from it with its status  => QA stretnutie s Tímom Alfa Stretnutie 11. 11. 2026 QA: tlačiareň na 2. poschodí netlačí. QA: chýbajú monitory. Podnety z tejto poznámky QA nefunkčná tlačiareň (Otvorené) Vytvoriť podnet
+PASS  [J4] HR home shows the overdue issue as a task  => DB overdue=1; tasks=["1 uzavreté kolo čaká na krok manažéra. Najdlhšie Tím Beta, 3 dni. Ktoré kolá","1 podnet je po termíne. Otvoriť podnety"]
+PASS  [J4] Filter: group 'IT podpora' + Nevybavené  => UI=["QA nefunkčná tlačiareň"]; DB=["QA nefunkčná tlačiareň"]; url=group=IT_SUPPORT&status=ACTIVE
+PASS  [J4] Filter: all groups + Všetko  => UI=["Nefunguje klimatizácia v zasadačke na 3. poschodí","Príliš veľa porád v jednom dni","QA nefunkčná tlačiareň","QA podnet z kola"]; DB=["Nefunguje klimatizácia v zasadačke na 3. poschodí","Príliš v
+PASS  [J4] Filter: status 'Rieši sa'  => UI=["Príliš veľa porád v jednom dni"]; DB=["Príliš veľa porád v jednom dni"]; url=group=&status=IN_PROGRESS
+PASS  [J4] Filter: status 'Hotové' (none yet)  => UI=[]; DB=[]; url=group=&status=DONE
+PASS  [J4] Filter: group 'Vedenie' + Otvorené  => UI=["QA podnet z kola"]; DB=["QA podnet z kola"]; url=group=MANAGEMENT&status=OPEN
+PASS  [J4] Status change in place: the overdue issue is set to 'Hotové'  => DB=DONE; still in default list=0
+PASS  [J4] HR home: the overdue-issue task disappears once the issue is done  => ["1 uzavreté kolo čaká na krok manažéra. Najdlhšie Tím Beta, 3 dni. Ktoré kolá"]
+PASS  [J4] Owner group change in place  => DB=FACILITY; UI=FACILITY
+PASS  [J4] The done issue is reachable through the 'Hotové' filter and the note shows the new status  => filter=["QA nefunkčná tlačiareň"]; note has (Hotové)=true
+PASS  [J4] Managers and employees cannot read or change issues and notes  => statuses=403,403,403,403,403,403,403,403,403,403,403,403,403,403; rows 4,2→4,2
+PASS  [J4] HR creates a round that closes today through the form (deadline = today is allowed)  => status=OPEN, closesAt=2026-11-12T22:59:59.999Z
+PASS  [J4] HR home warns about an open round closing soon with under half of the team in  => text='Kolo „QA kolo končí dnes“ (Tím Beta) sa uzavrie do zajtra a odpovedalo iba 0 z 6.', href ok=true
+PASS  [J4] The warning follows participation: 2 of 6 still warns, 3 of 6 does not  => submit statuses=201,201,201; after 2='Kolo „QA kolo končí dnes“ (Tím Beta) sa uzavrie do zajtra a odpovedalo iba 2 z 6. Pozrieť účasť'; after 3 tasks=0
+PASS  [J4] HR home never shows more than 3 tasks and orders them: rounds awaiting action, overdue issues, closing soon  => ["1 uzavreté kolo čaká na krok manažéra. Najdlhšie Tím Beta, 3 dni.","1 podnet je po termíne.","Kolo „QA končí dnes 2“ (Tím Alfa) sa uzavrie do zajtra a odpovedalo iba 0 z 6."]
+PASS  [J4] Manager home: closed round without an action, with the right number of days and wording  => days=3; UI='Kolo „Pulse – záťaž a sústredenie“ je uzavreté 3 dni a tím čaká, čo sa s výsledkami stane. Pozri výsledky a zapíš krok.'
+PASS  [J4] Manager home: an action past its due date becomes a task and disappears when done  => before=["1 krok je po termíne. Dokonči ho alebo uprav stav.","Čaká na teba prieskum „QA kolo končí dnes“. Má 4 otázky a zaberie asi 2 minúty."]; after=["Čaká na teba prieskum „QA kolo končí dnes“. Má 
+PASS  [J4] HR overview counts the overdue action while it is not done (recomputed from DB)  => DB overdue=1; card='Tím Beta Krok má 1 z 1 uzavretého kola. Podrobné čísla Uzavreté kolá 1 So zapísaným krokom 1 (100 %) Čas do prvého kroku 3 dni Kroky Plánované: 0, Prebieha: 1, Hotové: 0 Po termíne
+PASS  [J4] Manager home: 'start a new round' appears after 14 quiet days  => tasks=["Kolo „QA kolo končí dnes“ je uzavreté 15 dní a tím čaká, čo sa s výsledkami stane. Pozri výsledky a zapíš krok.","1 krok je po termíne. Dokonči ho alebo uprav stav.","Posledné kolo sa skončilo
+PASS  [J4] Home tasks of a manager never mention the other team  => ["Kolo „QA kolo končí dnes“ je uzavreté 15 dní a tím čaká, čo sa s výsledkami stane. Pozri výsledky a zapíš krok.","1 krok je po termíne. Dokonči ho alebo uprav stav.","Posledné kolo sa skončilo pred 
+PASS  [J4] HR reaches both team pages and trends from 'Prehľady'  => Alfa team page ok=true; Beta trend HTTP 200
+
+J4 done: 29 checks, 0 failed
+exit 0

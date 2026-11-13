@@ -1,5 +1,6 @@
 import { randomInt } from "node:crypto";
 import { MIN_GROUP_SIZE } from "@/config/privacy";
+import { SCALES, toScaleKey, type ScaleKey } from "@/config/scales";
 import { db } from "@/lib/db";
 import { assertCanViewResults, requireRole } from "@/lib/authz";
 import { forbidden, notFound } from "@/lib/errors";
@@ -9,6 +10,8 @@ import { closeExpiredRounds, type RoundStatus } from "@/server/rounds";
 export type QuestionResult = {
   position: number;
   text: string;
+  /** What the five points mean; for some scales a higher value is worse. */
+  scale: ScaleKey;
   /** Rounded to two decimals. */
   average: number;
   /** Number of answers with value 1, 2, 3, 4, 5. */
@@ -48,7 +51,10 @@ export async function loadRoundForResults(user: SessionUser, roundId: string) {
       team: { select: { name: true, _count: { select: { members: true } } } },
       questions: {
         orderBy: { position: "asc" },
-        select: { position: true, question: { select: { text: true } } },
+        select: {
+          position: true,
+          question: { select: { text: true, scale: true, topic: true, fixed: true } },
+        },
       },
     },
   });
@@ -62,7 +68,7 @@ type ResponseValues = { v1: number; v2: number; v3: number; v4: number | null; v
 
 /** Average and distribution per question. Callers check the threshold first. */
 export function computeQuestionResults(
-  questions: { position: number; question: { text: string } }[],
+  questions: { position: number; question: { text: string; scale: string } }[],
   responses: ResponseValues[],
 ): QuestionResult[] {
   return questions.map((item) => {
@@ -74,6 +80,7 @@ export function computeQuestionResults(
     return {
       position: item.position,
       text: item.question.text,
+      scale: toScaleKey(item.question.scale),
       average: values.length ? Math.round((sum / values.length) * 100) / 100 : 0,
       distribution,
     };
@@ -133,4 +140,21 @@ export async function getRoundResults(user: SessionUser, roundId: string): Promi
   );
 
   return { ...base, status: "ok", responseCount, questions, comments };
+}
+
+/**
+ * The question the team rated best and the one it rated worst (IT-13).
+ * Compared on favourability, so a reversed scale ("lower is better") is
+ * flipped first. Null when there is nothing to compare.
+ */
+export function summarizeResults(
+  questions: QuestionResult[],
+): { strongest: QuestionResult; weakest: QuestionResult } | null {
+  if (questions.length < 2) return null;
+  const favourability = (question: QuestionResult) =>
+    SCALES[question.scale].higherIsBetter ? question.average : 6 - question.average;
+  const sorted = [...questions].sort(
+    (a, b) => favourability(b) - favourability(a) || a.position - b.position,
+  );
+  return { strongest: sorted[0], weakest: sorted[sorted.length - 1] };
 }

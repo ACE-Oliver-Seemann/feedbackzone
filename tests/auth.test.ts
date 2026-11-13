@@ -21,7 +21,7 @@ describe("login [MVP-01]", () => {
     expect((await employee.json()).home).toBe("/");
 
     const hr = await loginAs(fx.hr.email, PASSWORD);
-    expect((await hr.json()).home).toBe("/hr/rounds");
+    expect((await hr.json()).home).toBe("/");
   });
 
   it("returns the same generic error for an unknown e-mail and a wrong password", async () => {

@@ -3,17 +3,24 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { PATCH as patchAction } from "@/app/api/actions/[id]/route";
 import { GET as getMyKudos } from "@/app/api/kudos/me/route";
 import { POST as postKudos } from "@/app/api/kudos/route";
+import { PATCH as patchIssue } from "@/app/api/hr/issues/[id]/route";
+import { GET as getIssues, POST as postIssue } from "@/app/api/hr/issues/route";
+import { GET as getNotes, POST as postNote } from "@/app/api/hr/notes/route";
+import { GET as getHrOverview } from "@/app/api/hr/overview/route";
 import { POST as logout } from "@/app/api/logout/route";
 import { GET as getMe } from "@/app/api/me/route";
-import { GET as getQuestions } from "@/app/api/questions/route";
+import { GET as getQuestions, POST as postQuestion } from "@/app/api/questions/route";
 import { POST as postAction } from "@/app/api/rounds/[id]/actions/route";
 import { POST as closeRound } from "@/app/api/rounds/[id]/close/route";
 import { POST as openRound } from "@/app/api/rounds/[id]/open/route";
 import { POST as postResponse } from "@/app/api/rounds/[id]/responses/route";
 import { GET as getResults } from "@/app/api/rounds/[id]/results/route";
 import { GET as getRound } from "@/app/api/rounds/[id]/route";
+import { GET as getSuggestions } from "@/app/api/rounds/[id]/suggestions/route";
 import { GET as getRounds, POST as postRound } from "@/app/api/rounds/route";
 import { GET as getSummary } from "@/app/api/teams/[id]/summary/route";
+import { GET as getTrend } from "@/app/api/teams/[id]/trend/route";
+import { GET as getHeatmap } from "@/app/api/hr/heatmap/route";
 import { db } from "@/lib/db";
 import { createRound, dateInDays, params, request, resetDb, type Fixture } from "./helpers";
 
@@ -80,6 +87,16 @@ const CASES: Case[] = [
     expected: status([401, 403, 200, 403, 200, 200]),
   },
   {
+    // Each manager adds to their own team; nobody else may add at all.
+    name: "POST /api/questions",
+    call: (as) =>
+      invoke(postQuestion, "/api/questions", as, {
+        method: "POST",
+        body: { text: `Vlastná otázka ${as?.id ?? "anon"} je jasná.` },
+      }),
+    expected: status([401, 403, 201, 403, 201, 403]),
+  },
+  {
     name: "GET /api/rounds",
     call: (as) => invoke(getRounds, "/api/rounds", as),
     expected: status([401, 200, 200, 200, 200, 200]),
@@ -143,6 +160,14 @@ const CASES: Case[] = [
     expected: status([401, 403, 200, 403, 403, 200]),
   },
   {
+    name: "GET /api/rounds/:id/suggestions",
+    call: async (as) => {
+      const round = await createRound(fx, fx.a.team.id, "CLOSED");
+      return invoke(getSuggestions, `/api/rounds/${round.id}/suggestions`, as, { id: round.id });
+    },
+    expected: status([401, 403, 200, 403, 403, 200]),
+  },
+  {
     name: "POST /api/rounds/:id/actions",
     call: async (as) => {
       const round = await createRound(fx, fx.a.team.id, "CLOSED");
@@ -187,6 +212,63 @@ const CASES: Case[] = [
         },
       }),
     expected: status([401, 201, 201, 201, 201, 201]),
+  },
+  {
+    name: "GET /api/hr/overview",
+    call: (as) => invoke(getHrOverview, "/api/hr/overview", as),
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/teams/:id/trend",
+    call: (as) => invoke(getTrend, `/api/teams/${fx.a.team.id}/trend`, as, { id: fx.a.team.id }),
+    expected: status([401, 403, 200, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/hr/heatmap",
+    call: (as) => invoke(getHeatmap, "/api/hr/heatmap", as),
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/hr/issues",
+    call: (as) => invoke(getIssues, "/api/hr/issues", as),
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "POST /api/hr/issues",
+    call: (as) =>
+      invoke(postIssue, "/api/hr/issues", as, {
+        method: "POST",
+        body: { title: "Testovací podnet", source: "OTHER", ownerGroup: "FACILITY" },
+      }),
+    expected: status([401, 403, 403, 403, 403, 201]),
+  },
+  {
+    name: "PATCH /api/hr/issues/:id",
+    call: async (as) => {
+      const issue = await db.issue.create({
+        data: { title: "Podnet", source: "OTHER", ownerGroup: "OTHER", createdById: fx.hr.id },
+      });
+      return invoke(patchIssue, `/api/hr/issues/${issue.id}`, as, {
+        method: "PATCH",
+        id: issue.id,
+        body: { status: "DONE" },
+      });
+    },
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "GET /api/hr/notes",
+    call: (as) => invoke(getNotes, "/api/hr/notes", as),
+    expected: status([401, 403, 403, 403, 403, 200]),
+  },
+  {
+    name: "POST /api/hr/notes",
+    call: (as) =>
+      invoke(postNote, "/api/hr/notes", as, {
+        method: "POST",
+        body: { title: "Stretnutie", meetingDate: dateInDays(-1), text: "Testovacia poznámka." },
+      }),
+    expected: status([401, 403, 403, 403, 403, 201]),
   },
   {
     name: "GET /api/kudos/me",

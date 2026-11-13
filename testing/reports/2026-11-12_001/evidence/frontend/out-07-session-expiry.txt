@@ -1,0 +1,4 @@
+FAIL    [C-Forms] Session ends while the kudos form is open => API answered 401; still on /kudos/new; message: "Niečo sa nepodarilo. Skús to znova."
+FAIL    [C-Forms] Session ends while the questionnaire is being filled in => API answered 401; still on the questionnaire: true; message: "Niečo sa nepodarilo. Skús to znova."
+PASS    [C-Forms] Session ends, then the user clicks a menu link => landed on /login; Feedback portál Prihlásenie E-mail Heslo Prihlásiť sa Demo n
+PASS    [C-Forms] Logout while the server does not answer => after the failed logout the page shows /; the session is still valid: true; error shown: false

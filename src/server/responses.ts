@@ -1,11 +1,19 @@
 import { Prisma } from "@prisma/client";
+import { toScaleKey, type ScaleKey } from "@/config/scales";
 import { db } from "@/lib/db";
 import { assertCanFillRound, requireRole } from "@/lib/authz";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
 import type { SessionUser } from "@/lib/session";
+import { charLength, cleanText, serialQueue } from "@/lib/text";
 import { closeExpiredRounds, type RoundStatus } from "@/server/rounds";
 
 export const MAX_COMMENT_LENGTH = 1000;
+
+// One submission is written at a time (BE2-001): many interactive transactions
+// started together only queue on SQLite's single write lock until some time out.
+// The order of writing says nothing about who answered: a Response has no
+// timestamp and its key is a random UUID (NFR-01).
+const submitInTurn = serialQueue();
 
 export type FillRound = {
   id: string;
@@ -15,7 +23,7 @@ export type FillRound = {
   closesAt: string;
   /** Whether the current user already answered. */
   submitted: boolean;
-  questions: { position: number; text: string }[];
+  questions: { position: number; text: string; scale: ScaleKey }[];
 };
 
 async function loadFillableRound(user: SessionUser, roundId: string) {
@@ -31,7 +39,7 @@ async function loadFillableRound(user: SessionUser, roundId: string) {
       closesAt: true,
       questions: {
         orderBy: { position: "asc" },
-        select: { position: true, question: { select: { text: true } } },
+        select: { position: true, question: { select: { text: true, scale: true } } },
       },
     },
   });
@@ -60,6 +68,7 @@ export async function getRoundForFill(user: SessionUser, roundId: string): Promi
     questions: round.questions.map((item) => ({
       position: item.position,
       text: item.question.text,
+      scale: toScaleKey(item.question.scale),
     })),
   };
 }
@@ -94,17 +103,34 @@ export async function submitResponse(
   let comment: string | null = null;
   if (input.comment !== undefined && input.comment !== null) {
     if (typeof input.comment !== "string") fields.comment = "invalid";
-    else if (input.comment.trim().length > MAX_COMMENT_LENGTH) fields.comment = "too_long";
-    else comment = input.comment.trim() || null;
+    else if (charLength(cleanText(input.comment)) > MAX_COMMENT_LENGTH) fields.comment = "too_long";
+    else comment = cleanText(input.comment) || null;
   }
 
   if (Object.keys(fields).length > 0) throw validationError(fields);
   const values = answers as number[];
 
+  // A repeated submission is refused before it takes a place in the queue, so
+  // repeating a request many times cannot hold up other people's answers.
+  const already = await db.participation.findUnique({
+    where: { roundId_userId: { roundId: round.id, userId: user.id } },
+    select: { userId: true },
+  });
+  if (already) throw conflict("already_submitted");
+
   try {
-    await db.$transaction([
-      db.participation.create({ data: { roundId: round.id, userId: user.id } }),
-      db.response.create({
+    await submitInTurn(() => db.$transaction(async (tx) => {
+      // A real write on the round takes the database write lock first, so the
+      // check "still open and before the deadline" and the two inserts cannot
+      // be separated by someone closing the round (QA BE-002).
+      const stillOpen = await tx.round.updateMany({
+        where: { id: round.id, status: "OPEN", closesAt: { gte: new Date() } },
+        data: { status: "OPEN" },
+      });
+      if (stillOpen.count === 0) throw conflict("round_closed");
+
+      await tx.participation.create({ data: { roundId: round.id, userId: user.id } });
+      await tx.response.create({
         data: {
           roundId: round.id,
           teamId: round.teamId,
@@ -115,8 +141,8 @@ export async function submitResponse(
           v5: values[4] ?? null,
           comment,
         },
-      }),
-    ]);
+      });
+    }));
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       throw conflict("already_submitted");

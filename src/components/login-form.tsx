@@ -1,11 +1,17 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Field, Input } from "@/components/ui/field";
+import { useFocusFirstError } from "@/components/ui/focus-error";
+import { Notice } from "@/components/ui/notice";
 import { t } from "@/lib/texts.sk";
 
 export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  useFocusFirstError(formRef, error);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -31,37 +37,22 @@ export function LoginForm() {
     setPending(false);
   }
 
-  const inputClass =
-    "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-1 focus:ring-teal-600";
-
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-4">
-      <label className="block text-sm font-medium">
-        {t.login.email}
-        <input name="email" type="email" autoComplete="username" required className={inputClass} />
-      </label>
-      <label className="block text-sm font-medium">
-        {t.login.password}
-        <input
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          className={inputClass}
-        />
-      </label>
+    <form ref={formRef} onSubmit={onSubmit} className="mt-8 space-y-5">
+      <Field label={t.login.email}>
+        <Input name="email" type="email" autoComplete="username" required />
+      </Field>
+      <Field label={t.login.password}>
+        <Input name="password" type="password" autoComplete="current-password" required />
+      </Field>
       {error && (
-        <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-800">
+        <Notice tone="error" role="alert">
           {error}
-        </p>
+        </Notice>
       )}
-      <button
-        type="submit"
-        disabled={pending}
-        className="w-full rounded-md bg-teal-700 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-60"
-      >
+      <Button type="submit" size="lg" disabled={pending} pending={pending} className="w-full">
         {pending ? t.login.submitting : t.login.submit}
-      </button>
+      </Button>
     </form>
   );
 }

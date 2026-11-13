@@ -1,6 +1,6 @@
 // Seed with invented test data only (MVP-02, NFR-06).
 // Creates 2 teams of 6 (1 manager + 5 employees), 1 HR user, the question
-// library from specification chapter 7.2, and one closed round of team Beta
+// library from the research (IT-03), and one closed round of team Beta
 // with 4 responses — below the confidentiality threshold, for acceptance
 // scenario step 4.
 //
@@ -14,38 +14,80 @@ const db = new PrismaClient();
 /** Shared password of all test accounts. */
 export const TEST_PASSWORD = "Heslo123";
 
-// Rotating topics, spec v0.4 chapter 7.2. "Dôvody odchodu" is left out:
-// the spec says HR will supply those questions later.
-const QUESTIONS: Record<string, string[]> = {
-  Manažér: [
-    "Môj manažér mi dáva feedback, podľa ktorého viem niečo zlepšiť.",
-    "Za posledné 2 týždne sme mali 1:1, ktoré mi pomohlo.",
-    "Môj manažér sa zaujíma o to, ako sa mám.",
+// Question library from the research in docs/research/otazky-do-pulse.md (IT-03).
+// Own wording inspired by published constructs; nothing is copied from
+// licensed instruments. `starter` marks the recommended starting set of 12.
+type SeedQuestion = { text: string; starter?: boolean; scale?: string };
+
+/** The fixed trend question, added automatically to every round (IT-04). */
+const FIXED_QUESTION = {
+  text: "Celkovo, aké boli pre mňa posledné dva týždne v práci?",
+  topic: "Stála otázka",
+  scale: "QUALITY",
+};
+
+const QUESTIONS: Record<string, SeedQuestion[]> = {
+  "Manažér a spätná väzba": [
+    { text: "Spätná väzba od môjho manažéra mi pomáha zlepšovať sa.", starter: true },
+    { text: "Rozhovory 1:1 s manažérom sú pre mňa užitočné." },
+    { text: "S manažérom sa rozprávame 1:1 dosť často na to, čo potrebujem." },
+    { text: "Môjmu manažérovi záleží na tom, ako sa mám." },
+    { text: "Keď za manažérom prídem s problémom, niečo sa s ním začne diať.", starter: true },
+    { text: "Mám dosť voľnosti rozhodnúť sa, ako svoju prácu urobím." },
   ],
-  Vyťaženosť: [
-    "Moja pracovná záťaž bola posledné 2 týždne zvládnuteľná.",
-    "Mám dosť času robiť prácu kvalitne.",
+  "Jasnosť a priority": [
+    { text: "Viem, čo sa odo mňa v najbližších dvoch týždňoch očakáva.", starter: true },
+    { text: "Priority nášho tímu sú mi jasné." },
+    { text: "Priority nášho tímu boli za posledné dva týždne stabilné.", starter: true },
+    { text: "Keď sa priority zmenia, viem prečo." },
+    { text: "Rozumiem, ako moja práca prispieva k cieľom firmy alebo zákazníka." },
   ],
-  Rozvoj: [
-    "Za posledný mesiac som sa naučil niečo, čo využijem.",
-    "Viem, kam sa môžem v práci posunúť.",
+  "Záťaž a energia": [
+    { text: "Moja pracovná záťaž bola za posledné dva týždne zvládnuteľná.", starter: true },
+    { text: "Mám dosť času robiť prácu poriadne.", starter: true },
+    {
+      text: "Ako často bolo za posledné dva týždne potrebné pracovať nadčas alebo mimo bežného pracovného času?",
+      scale: "OVERTIME",
+    },
+    { text: "Po práci dokážem vypnúť a oddýchnuť si." },
+    {
+      text: "Ako často sa za posledné dva týždne pracovný deň skončil pocitom vyčerpania?",
+      scale: "FREQUENCY",
+    },
+    { text: "Pohotovosti a riešenie incidentov sú v tíme rozdelené spravodlivo." },
   ],
-  Uznanie: ["Moja práca bola v poslednom čase niekým ocenená."],
-  "Jasnosť očakávaní": [
-    "Viem, čo sa odo mňa tento týždeň očakáva.",
-    "Priority tímu sú mi jasné.",
+  "Sústredenie, nástroje a tok práce": [
+    { text: "Mám dosť súvislého času na sústredenú prácu.", starter: true },
+    { text: "Porady, na ktorých sa zúčastňujem, stoja za čas, ktorý im venujem." },
+    { text: "Nástroje a prostredia, ktoré používam, mi prácu uľahčujú." },
+    {
+      text: "Keď potrebujem review, rozhodnutie alebo informáciu, dostanem ich dosť rýchlo.",
+      starter: true,
+    },
+    { text: "Máme dosť priestoru opravovať veci, ktoré nás dlhodobo brzdia." },
+    { text: "Nové úlohy dostávam s dostatkom informácií na to, aby sa dalo začať." },
   ],
-  Tím: [
-    "V tíme si navzájom pomáhame, keď je to potrebné.",
-    "V tíme môžem povedať aj nepopulárny názor.",
+  "Tím a psychologické bezpečie": [
+    { text: "V tíme môžem otvorene povedať, že s niečím nesúhlasím.", starter: true },
+    { text: "Keď sa v tíme stane chyba, hľadáme príčinu, nie vinníka.", starter: true },
+    { text: "Pripomienky k mojej práci dostávam s rešpektom." },
+    { text: "Keď potrebujem pomoc, v tíme ju dostanem." },
+    { text: "Na dohody v našom tíme sa dá spoľahnúť." },
   ],
-  "Pracovné prostredie": [
-    "V kancelárii sa mi dobre pracuje (hluk, miesto, vybavenie).",
-    "Mám miesto, kde sa viem sústrediť alebo nerušene telefonovať.",
+  "Rast, uznanie a silné stránky": [
+    { text: "Posledný mesiac mi v práci priniesol niečo nové, čo viem využiť." },
+    { text: "Viem, aké mám vo firme možnosti ďalšieho rastu." },
+    { text: "Za posledné tri mesiace sme s manažérom hovorili o mojom rozvoji." },
+    { text: "Keď odvediem dobrú prácu, niekto si to všimne.", starter: true },
+    { text: "Moja práca mi dáva príležitosť robiť to, čo mi ide najlepšie.", starter: true },
   ],
-  "Silné stránky": [
-    "Tento týždeň som mohol robiť to, v čom som dobrý.",
-    "Môj manažér vie, v čom sú moje silné stránky.",
+  "Hybridná práca a prostredie": [
+    { text: "Pri práci z domu mám rovnaký prístup k informáciám ako pri práci z kancelárie." },
+    { text: "Na poradách, kde je časť ľudí online, sa viem zapojiť rovnako ako ostatní." },
+    { text: "V kancelárii mám kde nerušene pracovať." },
+  ],
+  "Dôvera v prieskum": [
+    { text: "Na základe týchto prieskumov sa v našom tíme niečo mení." },
   ],
 };
 
@@ -84,6 +126,8 @@ async function main() {
 
   // Children first, because of foreign keys. User.teamId and Team.managerId
   // reference each other, so the link from users is cut before deleting.
+  await db.issue.deleteMany();
+  await db.meetingNote.deleteMany();
   await db.kudos.deleteMany();
   await db.action.deleteMany();
   await db.response.deleteMany();
@@ -97,9 +141,17 @@ async function main() {
 
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 10);
 
-  for (const [topic, texts] of Object.entries(QUESTIONS)) {
-    for (const text of texts) {
-      await db.question.create({ data: { text, topic } });
+  const fixedQuestion = await db.question.create({ data: { ...FIXED_QUESTION, fixed: true } });
+  for (const [topic, questions] of Object.entries(QUESTIONS)) {
+    for (const question of questions) {
+      await db.question.create({
+        data: {
+          text: question.text,
+          topic,
+          starter: question.starter ?? false,
+          scale: question.scale ?? "AGREEMENT",
+        },
+      });
     }
   }
 
@@ -126,18 +178,29 @@ async function main() {
 
   // Demo: closed round of team Beta with 4 responses (below the threshold).
   const beta = teams[1];
-  const demoQuestions = await db.question.findMany({
-    where: { topic: { in: ["Vyťaženosť", "Tím"] } },
+  // The fixed question first, then three from the starting set.
+  const rotating = await db.question.findMany({
+    where: {
+      text: {
+        in: [
+          "Moja pracovná záťaž bola za posledné dva týždne zvládnuteľná.",
+          "Mám dosť času robiť prácu poriadne.",
+          "Mám dosť súvislého času na sústredenú prácu.",
+        ],
+      },
+    },
     orderBy: { text: "asc" },
   });
+  const demoQuestions = [fixedQuestion, ...rotating];
   const day = 24 * 60 * 60 * 1000;
   const round = await db.round.create({
     data: {
       teamId: beta.id,
-      name: "Pulse – vyťaženosť a tím",
+      name: "Pulse – záťaž a sústredenie",
       status: "CLOSED",
       startsAt: new Date(Date.now() - 10 * day),
       closesAt: new Date(Date.now() - 3 * day),
+      closedAt: new Date(Date.now() - 3 * day),
       questions: {
         create: demoQuestions.map((question, index) => ({
           questionId: question.id,
@@ -171,6 +234,41 @@ async function main() {
       }),
     ]);
   }
+
+  // Demo for IT-10: one note from a meeting and two issues. Invented content.
+  const hr = await db.user.findFirstOrThrow({ where: { role: "HR" } });
+  const note = await db.meetingNote.create({
+    data: {
+      title: "Stretnutie s Tímom Beta",
+      meetingDate: new Date(Date.now() - 2 * day),
+      text: "V zasadačke na 3. poschodí je už druhý týždeň teplo, klimatizácia nechladí.\nTím by privítal menej prekrývajúcich sa porád v utorok.",
+      createdById: hr.id,
+    },
+  });
+  await db.issue.create({
+    data: {
+      title: "Nefunguje klimatizácia v zasadačke na 3. poschodí",
+      description: "Podľa tímu nechladí už druhý týždeň.",
+      source: "MEETING",
+      ownerGroup: "FACILITY",
+      teamId: beta.id,
+      noteId: note.id,
+      dueDate: new Date(Date.now() + 7 * day),
+      createdById: hr.id,
+    },
+  });
+  await db.issue.create({
+    data: {
+      title: "Príliš veľa porád v jednom dni",
+      description: "Téma z posledného kola aj zo stretnutia.",
+      source: "SURVEY",
+      ownerGroup: "TEAM_MANAGER",
+      status: "IN_PROGRESS",
+      roundId: round.id,
+      teamId: beta.id,
+      createdById: hr.id,
+    },
+  });
 
   const counts = {
     users: await db.user.count(),

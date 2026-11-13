@@ -17,17 +17,22 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(cuid())
-  name         String
-  email        String  @unique
-  passwordHash String
-  role         String // EMPLOYEE | MANAGER | HR
-  teamId       String?
-  team         Team?   @relation("TeamMembers", fields: [teamId], references: [id])
+  id                 String    @id @default(cuid())
+  name               String
+  email              String    @unique
+  passwordHash       String
+  role               String // EMPLOYEE | MANAGER | HR
+  // Set at logout: session tokens issued before this moment are no longer
+  // accepted, so a copied cookie stops working (MVP-01, QA BE-001).
+  sessionsValidAfter DateTime?
+  teamId             String?
+  team               Team?     @relation("TeamMembers", fields: [teamId], references: [id])
 
   managedTeam    Team?           @relation("TeamManager")
   participations Participation[]
   kudosSent      Kudos[]         @relation("KudosFrom")
+  notesWritten   MeetingNote[]
+  issuesCreated  Issue[]
   kudosReceived  Kudos[]         @relation("KudosTo")
 }
 
@@ -38,17 +43,33 @@ model Team {
   manager   User   @relation("TeamManager", fields: [managerId], references: [id])
 
   members   User[]     @relation("TeamMembers")
+  questions Question[]
+  issues    Issue[]
   rounds    Round[]
   responses Response[]
 }
 
 model Question {
-  id    String @id @default(cuid())
-  text  String
-  type  String @default("SCALE_1_5")
-  topic String
+  id      String  @id @default(cuid())
+  text    String
+  type    String  @default("SCALE_1_5")
+  topic   String
+  // Which labels the five points carry; keys are in src/config/scales.ts (IT-03).
+  scale   String  @default("AGREEMENT")
+  // Recommended starting set, highlighted when a round is created (IT-03).
+  starter Boolean @default(false)
+  // Null = shared library. Otherwise the question was written by the manager of
+  // this team and only this team may use it (IT-07).
+  teamId  String?
+  team    Team?   @relation(fields: [teamId], references: [id])
+  // Trend question: added automatically as the first question of every round (IT-04).
+  fixed   Boolean @default(false)
 
   rounds RoundQuestion[]
+
+  // One wording per team (QA BE-005). SQLite treats NULL team ids as distinct,
+  // so this does not constrain the shared library.
+  @@unique([teamId, text])
 }
 
 model Round {
@@ -58,12 +79,14 @@ model Round {
   name     String
   startsAt DateTime? // set when the round is opened
   closesAt DateTime
+  closedAt DateTime? // when it was actually closed; used for reaction time (IT-05)
   status   String    @default("DRAFT") // DRAFT | OPEN | CLOSED
 
   questions      RoundQuestion[]
   participations Participation[]
   responses      Response[]
   actions        Action[]
+  issues         Issue[]
 }
 
 model RoundQuestion {
@@ -112,6 +135,9 @@ model Action {
   description String
   dueDate     DateTime
   status      String   @default("PLANNED") // PLANNED | IN_PROGRESS | DONE
+  // Actions are written by the manager and are not confidential, so they may
+  // carry a timestamp. Response and Participation must never get one (NFR-01).
+  createdAt   DateTime @default(now())
 }
 
 model Kudos {
@@ -123,5 +149,41 @@ model Kudos {
   text       String
   value      String
   visibility String // TEAM | PRIVATE
+  // Optional emoji from KUDOS_EMOJIS; with it the text may be empty (IT-06).
+  emoji      String?
   createdAt  DateTime @default(now())
+}
+
+// HR's note from an offline meeting; typed text only (IT-10). HR only.
+model MeetingNote {
+  id          String   @id @default(cuid())
+  title       String
+  meetingDate DateTime
+  text        String
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+
+  issues Issue[]
+}
+
+// Something HR wants solved, assigned to an owner group (IT-10). HR only.
+// May point to a round and a team, never to a Response (NFR-01).
+model Issue {
+  id          String       @id @default(cuid())
+  title       String
+  description String       @default("")
+  source      String // SURVEY | MEETING | OTHER
+  ownerGroup  String // keys in src/config/owner-groups.ts
+  status      String       @default("OPEN") // OPEN | IN_PROGRESS | DONE
+  dueDate     DateTime?
+  roundId     String?
+  round       Round?       @relation(fields: [roundId], references: [id])
+  teamId      String?
+  team        Team?        @relation(fields: [teamId], references: [id])
+  noteId      String?
+  note        MeetingNote? @relation(fields: [noteId], references: [id])
+  createdById String
+  createdBy   User         @relation(fields: [createdById], references: [id])
+  createdAt   DateTime     @default(now())
 }

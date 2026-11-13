@@ -1,0 +1,8 @@
+FAIL    [G] Questionnaire question step has a heading (BUG-028, known partial) => headings in main: none; question is a <legend>: "Celkovo, aké boli pre mňa posledné dva t"
+PASS    [D] Progress bar does not animate under reduced motion (BUG-031) => reduce: opacity, color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, box-shadow; full: transform, translate, scale, rotate
+FAIL    [C] Comment field accepts 1 000 characters when emoji are used (BUG-006 residual) => accepted 995 characters (1000 UTF-16 units, maxlength=1000); counter "995 / 1000"
+FAIL    [C] Kudos text accepts 500 characters when emoji are used (BUG-006 residual) => accepted 495 characters (500 UTF-16 units)
+FAIL    [G] Kudos: focus after a rejected submit stays on a meaningful element (BUG-016 residual) => after mouse click: BODY; after Enter on the button: BODY
+FAIL    [G] Login: focus after a rejected login stays on a meaningful element => focus after the error: BODY
+FAIL    [G] Issue and note forms: error is linked to the invalid field (BUG-029, known open) => issue title: aria-invalid=null describedby=null; note title: aria-invalid=null; note meetingDate: aria-invalid=null; note text: aria-invalid=null
+FAIL    [G] Required fields are marked as required (BUG-029, known open) => /rounds/new name: required=false; /rounds/new closesAt: required=false; /kudos?tab=send toUserId: required=false; /hr/notes title: required=false; /hr/notes meetingDate: required=false; /hr/notes text: required=false

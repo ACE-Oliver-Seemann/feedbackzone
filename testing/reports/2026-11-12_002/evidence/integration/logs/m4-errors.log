@@ -1,0 +1,36 @@
+PASS  [E] Submit answered with 500: understandable message, wizard stays on the last step with the answers  => comment kept=true, thank-you=0, confetti=0, responses=0
+PASS  [E] Back from the failed last step still shows the chosen answers  => pressed='2 â€“ SkĂ´r nesĂşhlasĂ­m', comment after returning='KomentĂˇr pri chybe 500 (QA Ada'
+PASS  [E] Submit with the connection cut: message, nothing lost  => comment kept=true, responses=0
+PASS  [E] Submit while the browser is offline, then again online  => responses=1; values=4,3,5,2
+PASS  [E] Slow submit: button shows progress, is disabled, and a double click sends one request  => pending button disabled=true, back disabled=true, thank-you before answer=0, requests=1, responses=2
+PASS  [E] Lost reply: the server stored the answer but the reply never arrived; a retry must not store it twice  => participations of Cyril=1, responses=3
+PASS  [E] Invalid server answer (HTML with status 200 instead of JSON 201) does not break the wizard  => thank-you on invalid answer=0, page errors=0, responses=4
+PASS  [E] Refresh in the middle of the wizard: starts again from the intro, nothing stored, no error  => intro after reload=1, responses=4, browser storage keys=none
+PASS  [E] Browser Back and Forward in the middle of the wizard  => Back â†’ /; Forward â†’ /rounds/:id/fill with intro=1, question=0; page errors=0
+PASS  [E] Rapid clicks on 'ZaÄŤaĹĄ' and 'ÄŽalej' do not skip a question  => after double 'ZaÄŤaĹĄ': 'OtĂˇzka 1 z 4'; after double 'ÄŽalej': 'OtĂˇzka 2 z 4'
+PASS  [E] Round closed by the manager while a member is in the wizard  => confetti=0, responses=4
+PASS  [E] Kudos answered with 500: message, no confirmation, no confetti, form content stays  => confirmation=0, confetti=0, text kept=true, recipient kept=true, kudos=0
+PASS  [E] Kudos confirmation and confetti appear only after the server confirmed (slow answer), double click sends once  => confirmation before answer=0, confetti before answer=0, button='Posielamâ€¦/true', requests=1, kudos=1
+PASS  [E] Kudos with the connection cut, then a retry  => kudos=2, error still shown after success=0
+PASS  [E] Step answered with 500: message, no toast, form content stays, nothing stored  => toast=0, topic kept='TĂ©ma pri chybe QA', actions=0
+PASS  [E] Step toast appears only after the server confirmed; double click stores one step  => toast before answer=0, list items before answer=0, requests=1, actions=1
+PASS  [E] Status change answered with 500: message, select returns to the stored value, no toast  => select=PLANNED, toast=0, db=PLANNED
+PASS  [E] Status change: toast only after the server confirmed; select is busy meanwhile  => aria-busy/disabled=true/true, toast before answer=0, db=IN_PROGRESS
+PASS  [E] Starting a round answered with 500: message in the row, no toast, round stays a draft  => toast=0, dialog open=0, row has Koncept=true, db=DRAFT
+PASS  [E] Starting a round: toast only after the server confirmed; double confirm sends one request  => toast before answer=0, row still Koncept before answer=true, requests=1, error text=0
+PASS  [E] Closing a round with the connection cut: message, round stays open; retry works  => after failure db=OPEN; after retry db=CLOSED
+PASS  [E] Stale list: starting a round that someone else already started gives a clear message  => message shown; toast=0
+PASS  [E] Draft whose deadline has passed cannot be started and says why  => db=DRAFT
+PASS  [E] New round answered with 500: stays on the form with the entered values, nothing stored  => path=/rounds/new, name kept=true, ticked=3, toast=0, rounds 6â†’6
+PASS  [E] New round saved with a slow answer and a double click creates one draft  => pending button disabled=true, requests=1, rounds 6â†’7, toast=true
+PASS  [E] Known BUG-037: lost reply on saving a round + retry creates a second identical draft  => drafts named 'Pulse â€“ stratenĂˇ odpoveÄŹ QA'=2 (known BUG-037); delete control=0
+PASS  [E] Own question answered with 500: message, nothing ticked, nothing stored  => toast=0, counter='OtĂˇzok v kole: 4 (treba 3 aĹľ 5)', text kept=true, team questions=0
+PASS  [E] Issue answered with 500: message, no toast, form content stays, nothing stored  => toast=0, title kept=true, issues 2â†’2
+PASS  [E] Issue toast only after the server confirmed; double click stores one issue  => toast before answer=0, requests=1, issues 2â†’3
+PASS  [E] Issue status change answered with 500: message, select returns, nothing changed  => select=OPEN, toast=0, db=OPEN
+PASS  [E] Note with the connection cut: message, text stays; retry stores one note  => text kept=true, notes 1â†’2
+PASS  [E] Login answered with 500 or with the connection cut shows a general error, not 'wrong password'  => general error on abort=true, 'wrong password' shown=0, final path='/'=true
+PASS  [E] Slow login with a double click logs in once  => pending disabled=true, requests=1, path=/
+PASS  [E] No duplicates and no half-written records after all failed and repeated requests  => rounds with responsesâ‰ participations=0; {"actions":1,"kudos":2,"issues":3,"notes":2}; duplicate round names=Pulse â€“ stratenĂˇ odpoveÄŹ QA
+PASS  [E] Server log contains no request bodies (comments, kudos texts, answers) after the error scenarios  => log size=157 bytes, lines=6; needles found=none
+PASS  [E] No uncaught JavaScript error during the error scenarios  => page errors=0 

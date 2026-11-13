@@ -1,0 +1,49 @@
+PASS  1  HR creates a round with 4 questions for team A
+PASS  1  HR opens the round
+PASS  2  employee sees the round with a 'VyplniĹĄ' link
+PASS  2  fill page shows the confidentiality text  [HTTP 200]
+PASS  2  member 1 submits
+PASS  2  member 2 submits
+PASS  2  member 3 submits
+PASS  2  member 4 submits
+PASS  2  member 5 submits
+PASS  2  second attempt is rejected with 409  [already_submitted]
+PASS  2  fill page now says already submitted
+PASS  2  home shows 'OdoslanĂ©'
+PASS     open round shows participation only
+PASS     HR closes the round
+PASS     response to a closed round is rejected
+PASS  3  manager A gets averages  [[3.6,3,4.4,4]]
+PASS  3  manager A gets 3 comments
+PASS  3  results page renders averages and comments
+PASS  3  results page marks the round 'ÄŚakĂˇ na krok'
+PASS  3  manager B gets 403 from the API
+PASS  3  manager B gets 403 from the page  [HTTP 403]
+PASS  3  employee gets 403 from the page
+PASS  4  API returns insufficient_responses and the count
+PASS  4  page shows 'Nedostatok odpovedĂ­' and no comments
+PASS  5  manager A adds an action
+PASS  5  HR cannot add an action
+PASS  5  manager changes the status
+PASS  5  results page shows the action and no 'ÄŚakĂˇ na krok'
+PASS  5  HR sees the action on the results page
+PASS  5  employee sees the action on the team page
+PASS  5  team page shows averages but no comments
+PASS  5  member of team B gets 403 on team A page
+PASS  5  team B page hides averages below the threshold
+PASS  5  HR can open the team page
+PASS  5  menu has team and kudos links
+PASS  6  employee sends public kudos
+PASS  6  kudos to oneself is rejected
+PASS  6  kudos shows in the team feed with the sender name
+PASS  6  private kudos is not in the feed (manager, HR, colleague)
+PASS  6  /kudos renders for an employee
+PASS  6  recipient sees both on /kudos
+PASS  6  /kudos renders for HR
+PASS  6  another user does not see them on /kudos
+PASS  6  kudos form renders on /kudos?tab=send
+PASS  6  /kudos/me redirects to /kudos
+PASS  6  /kudos/new redirects to /kudos?tab=send
+PASS  NFR-04  no rendered page contains the forbidden word
+
+ALL PASSED

@@ -1,0 +1,139 @@
+[
+ {
+  "scenario": "12 first-time submissions, 2 rounds (one per team)",
+  "requests": 12,
+  "statuses": {
+   "201": 12
+  },
+  "maxMs": 244.1,
+  "minMs": 78.8,
+  "wallMs": 245,
+  "participations": 12,
+  "responses": 12,
+  "note": "expected 12 x 201"
+ },
+ {
+  "scenario": "24 first-time submissions, 4 rounds (two per team)",
+  "requests": 24,
+  "statuses": {
+   "201": 11,
+   "500": 13
+  },
+  "maxMs": 6061.7,
+  "minMs": 5599,
+  "wallMs": 6064,
+  "participations": 11,
+  "responses": 11,
+  "note": "expected 24 x 201"
+ },
+ {
+  "scenario": "6 members x 2 identical submissions at once (double click)",
+  "requests": 12,
+  "statuses": {
+   "201": 6,
+   "409": 6
+  },
+  "maxMs": 177.1,
+  "minMs": 31.5,
+  "wallMs": 178,
+  "participations": 6,
+  "responses": 6,
+  "note": "expected 6 x 201 and 6 x 409"
+ },
+ {
+  "scenario": "1 member x 2 identical submissions at once",
+  "requests": 2,
+  "statuses": {
+   "201": 1,
+   "409": 1
+  },
+  "maxMs": 20.5,
+  "minMs": 13.6,
+  "wallMs": 21,
+  "participations": 1,
+  "responses": 1,
+  "note": "expected 1 x 201 and 1 x 409"
+ },
+ {
+  "scenario": "1 member x 3 identical submissions at once",
+  "requests": 3,
+  "statuses": {
+   "201": 1,
+   "409": 2
+  },
+  "maxMs": 40.9,
+  "minMs": 12.9,
+  "wallMs": 41,
+  "participations": 1,
+  "responses": 1,
+  "note": "expected 1 x 201 and 2 x 409"
+ },
+ {
+  "scenario": "1 member x 5 identical submissions at once",
+  "requests": 5,
+  "statuses": {
+   "201": 1,
+   "409": 4
+  },
+  "maxMs": 81.7,
+  "minMs": 20.1,
+  "wallMs": 82,
+  "participations": 1,
+  "responses": 1,
+  "note": "expected 1 x 201 and 4 x 409"
+ },
+ {
+  "scenario": "1 member x 10 identical submissions at once",
+  "requests": 10,
+  "statuses": {
+   "201": 1,
+   "409": 9
+  },
+  "maxMs": 145.3,
+  "minMs": 41.4,
+  "wallMs": 146,
+  "participations": 1,
+  "responses": 1,
+  "note": "expected 1 x 201 and 9 x 409"
+ },
+ {
+  "scenario": "6 concurrent duplicates after all 6 answered",
+  "requests": 6,
+  "statuses": {
+   "409": 6
+  },
+  "maxMs": 65.9,
+  "minMs": 23.3,
+  "wallMs": 66,
+  "participations": 6,
+  "responses": 6,
+  "note": "expected 6 x 409"
+ },
+ {
+  "scenario": "12 concurrent duplicates after all 6 answered",
+  "requests": 12,
+  "statuses": {
+   "409": 12
+  },
+  "maxMs": 154.1,
+  "minMs": 13.9,
+  "wallMs": 155,
+  "participations": 6,
+  "responses": 6,
+  "note": "expected 12 x 409"
+ },
+ {
+  "scenario": "18 concurrent duplicates after all 6 answered",
+  "requests": 18,
+  "statuses": {
+   "409": 10,
+   "500": 8
+  },
+  "maxMs": 5815.9,
+  "minMs": 5536.3,
+  "wallMs": 5817,
+  "participations": 6,
+  "responses": 6,
+  "note": "expected 18 x 409"
+ }
+]

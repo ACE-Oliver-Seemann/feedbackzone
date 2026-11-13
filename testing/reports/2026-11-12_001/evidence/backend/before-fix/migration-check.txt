@@ -1,0 +1,15 @@
+  └─ 20261111140553_init/
+    └─ migration.sql
+  └─ 20261112103031_question_scales_fixed_and_reaction_time/
+    └─ migration.sql
+  └─ 20261112142130_kudos_emoji/
+    └─ migration.sql
+  └─ 20261112142427_question_team/
+    └─ migration.sql
+  └─ 20261112143135_hr_issues_and_notes/
+    └─ migration.sql
+      
+All migrations have been successfully applied.
+Participation WITHOUT ROWID: true CHECK constraints: 0
+Response WITHOUT ROWID: true CHECK constraints: 6
+tables: Action,Issue,Kudos,MeetingNote,Participation,Question,Response,Round,RoundQuestion,Team,User,_prisma_migrations

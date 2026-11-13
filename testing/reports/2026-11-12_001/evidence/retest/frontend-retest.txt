@@ -1,0 +1,87 @@
+RT-001 PASS  [BUG-004] manager with 3 tasks on the home page still has a 'Vyplniť' link to the open round => tasks=3; fill links=1
+RT-002 PASS  [BUG-004] the link opens the questionnaire of the own team => /rounds/:id/fill
+RT-003 PASS  [BUG-022] menu item 'Domov' is marked while an employee fills in the questionnaire => Domov
+RT-004 PASS  [BUG-016] after 'Začať' the keyboard focus is inside the questionnaire, not lost on <body> => activeElement=DIV:-1
+RT-005 PASS  [BUG-016] after 'Ďalej' the focus moves to the new question again => activeElement=DIV:-1
+RT-006 PASS  [BUG-016] the questionnaire can be completed to the comment step with the keyboard only => reached the comment step
+RT-007 PASS  [BUG-031] with 'reduce motion' the progress bar has no transition => transition-property=none
+RT-008 PASS  [BUG-006] the comment counter counts one emoji as one character => 3 / 1000
+RT-009 PASS  [BUG-012] questionnaire: after the session ends, submitting says to log in again and keeps the answers => Prihlásenie vypršalo. Prihlás sa znova v novej karte a potom to tu skús ešte raz. Čo máš vyplnené, zostane. | comment kept=true
+RT-010 PASS  [BUG-012] kudos form: after the session ends, the message asks to log in again => Prihlásenie vypršalo. Prihlás sa znova v novej karte a potom to tu skús ešte raz. Čo máš vyplnené, zostane.
+RT-011 PASS  [BUG-001] after logout in one window, a second window of the same user is sent to the login page => second window path=/login; old cookie on /api/me=401
+RT-012 PASS  [BUG-038] a failed logout request shows a message instead of silently staying logged in => Odhlásenie sa nepodarilo. Skús to znova.
+RT-013 PASS  [BUG-013] unknown address as logged-in employee: Slovak 404 page with a link back => HTTP 404; h1="Túto stránku sme nenašli"; back link=1; lang=sk
+RT-014 PASS  [BUG-013] unknown address as HR: Slovak 404 page with a link back => HTTP 404; h1="Túto stránku sme nenašli"; back link=1; lang=sk
+RT-015 PASS  [BUG-011] setup: long unbroken text stored as action, kudos, issue, note and round name => action/kudos/issue/note/round = 201/201/201/201/201
+RT-016 PASS  [BUG-011] 360 px: list of rounds with a 110-character unbroken round name does not scroll sideways => page wider than the screen by 0 px
+RT-017 PASS  [BUG-011] 360 px: results page (action) with a 420-character unbroken link does not scroll sideways => page wider than the screen by 0 px
+RT-018 PASS  [BUG-011] 360 px: team page (action, kudos) with a 420-character unbroken link does not scroll sideways => page wider than the screen by 0 px
+RT-019 PASS  [BUG-011] 360 px: my kudos with a 420-character unbroken link does not scroll sideways => page wider than the screen by 0 px
+RT-020 PASS  [BUG-011] 360 px: HR issues with a 420-character unbroken link does not scroll sideways => page wider than the screen by 0 px
+RT-021 PASS  [BUG-011] 360 px: HR notes with a 420-character unbroken link does not scroll sideways => page wider than the screen by 0 px
+RT-022 PASS  [BUG-011] 360 px: report with a 420-character unbroken link does not scroll sideways => page wider than the screen by 0 px
+RT-023 PASS  [REGRESSION] HTML in an action is shown as text and runs no script => shown literally=true; injected elements=0; dialog=false
+RT-024 PASS  [BUG-015] manager Beta home: 'uzavreté 3 dni' (was '3 dní') => Kolo „Pulse – 44. týždeň“ je uzavreté 14 dní a tím čaká, čo sa s výsledkami stane. | Kolo „Pulse – záťaž a sústredenie“ je uzavreté 3 dni a tím čaká, čo sa s výsledkami stane.
+RT-025 PASS  [BUG-015] HR home and overview: number of days and verb agree => 3 z 8 uzavretých kôl čakajú na krok. Najdlhšie Tím Alfa, 28 dní.
+RT-026 PASS  [BUG-009] issues page with an unknown filter in the address falls back to 'Nevybavené' and lists only unfinished => page HTTP 200; filter=ACTIVE; finished issue shown=0; API with unknown filter=400
+RT-027 PASS  [BUG-033] the page behind menu 'Prieskumy' is headed 'Prieskumy…' for manager and HR => manager="Prieskumy môjho tímu"; HR="Prieskumy všetkých tímov"
+RT-028 PASS  [BUG-028] lists of rounds use h1 then h2 (no skipped level) and the main menu has a name => levels=H1,H2; nav label=Hlavné menu
+RT-029 PASS  [BUG-017] new round as HR: after switching the team every preselected question is in an expanded topic => {"checked":3,"hidden":0,"open":3}
+RT-030 PASS  [BUG-018] new round as manager: an own question added to a full round is saved with an explanation and its topic is expanded => notice shown; question visible=true; counter still 5=true
+RT-031 PASS  [BUG-021] report of a draft says it is a draft and shows no participation => AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA Tím Alfa, uzávierka 31. 12. 2026 Kolo je koncept a ešte nebolo spustené. Komentá
+RT-032 PASS  [BUG-024] public kudos to HR is refused with an explanation; private kudos to HR is sent => error shown, then private kudos sent
+RT-033 PASS  [BUG-023] trend table: keyboard-focusable scroll region with a hint => regions=1; hint=1
+RT-034 PASS  [BUG-025] trend chart labels are at least 11 px at 360 px => smallest label height=15 px of 8 labels
+RT-035 PASS  [BUG-032] comparison legend: steps do not overlap ('pod 3,0', 'od 3,0', …) => Skóre: pod 3,0 od 3,0 od 3,5 od 4,0 od 4,5 – bez dát
+RT-036 PASS  [BUG-035] comparison: Tím Beta 'Stála otázka' shows 4,07 (was 4,06) => API=4.07; shown on the page=true
+RT-037 PASS  [BUG-023] comparison table: keyboard-focusable scroll region => regions=1
+RT-038 PASS  [BUG-030] comparison: the dash for 'no data' has a contrast of at least 4.5 : 1 => lab(35.5623 -1.74978 -15.4316) on white = 19.3 : 1
+RT-039 PASS  [BUG-030] placeholder text has a contrast of at least 4.5 : 1 => rgb(100, 116, 139) on white = 4.76 : 1
+RT-040 PASS  [BUG-027] every screen has its own browser title => 9 distinct of 9: Domov – Feedback portál | Prieskumy – Feedback portál | Plnenie reakcie – Feedback portál | Porovnanie tímov – Feedback portál
+RT-041 PASS  [BUG-026] 360 px: main menu links are at least 44 px tall => smallest=44 px
+RT-042 PASS  [BUG-026] 360 px: logout button are at least 44 px tall => smallest=46 px
+RT-043 PASS  [BUG-026] 360 px: home task and list buttons are at least 44 px tall => smallest=44 px
+RT-044 PASS  [BUG-026] 360 px: tabs inside a page are at least 44 px tall => smallest=46 px
+RT-045 PASS  [BUG-026] 360 px: kudos form: selects, text, submit are at least 44 px tall => smallest=44 px
+RT-046 PASS  [BUG-026] 360 px: round list buttons (manager) are at least 44 px tall => smallest=44 px
+RT-047 PASS  [BUG-026] 360 px: new round: inputs, question rows, submit are at least 44 px tall => smallest=44 px
+RT-048 PASS  [BUG-026] 360 px: issues: filters and controls (HR) are at least 44 px tall => smallest=45 px
+RT-049 PASS  [BUG-026] 360 px: login inputs and button are at least 44 px tall => smallest=44 px
+RT-050 PASS  [BUG-026] 360 px: 'Rozdelenie odpovedí' toggle is at least 24 px tall (WCAG minimum) => smallest=36 px
+RT-051 PASS  [REGRESSION] 360 px: HR home loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-052 PASS  [REGRESSION] 360 px: HR rounds loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-053 PASS  [REGRESSION] 360 px: HR overview loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-054 PASS  [REGRESSION] 360 px: HR comparison loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-055 PASS  [REGRESSION] 360 px: HR issues loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-056 PASS  [REGRESSION] 360 px: HR notes loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-057 PASS  [REGRESSION] 360 px: manager home loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-058 PASS  [REGRESSION] 360 px: manager rounds loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-059 PASS  [REGRESSION] 360 px: new round loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-060 PASS  [REGRESSION] 360 px: results loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-061 PASS  [REGRESSION] 360 px: report loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-062 PASS  [REGRESSION] 360 px: trend loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-063 PASS  [REGRESSION] 360 px: team page loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-064 PASS  [REGRESSION] 360 px: employee home loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-065 PASS  [REGRESSION] 360 px: kudos form loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-066 PASS  [REGRESSION] 360 px: my kudos loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-067 PASS  [REGRESSION] 1280 px: HR home loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-068 PASS  [REGRESSION] 1280 px: HR rounds loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-069 PASS  [REGRESSION] 1280 px: HR overview loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-070 PASS  [REGRESSION] 1280 px: HR comparison loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-071 PASS  [REGRESSION] 1280 px: HR issues loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-072 PASS  [REGRESSION] 1280 px: HR notes loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-073 PASS  [REGRESSION] 1280 px: manager home loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-074 PASS  [REGRESSION] 1280 px: manager rounds loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-075 PASS  [REGRESSION] 1280 px: new round loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-076 PASS  [REGRESSION] 1280 px: results loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-077 PASS  [REGRESSION] 1280 px: report loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-078 PASS  [REGRESSION] 1280 px: trend loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-079 PASS  [REGRESSION] 1280 px: team page loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-080 PASS  [REGRESSION] 1280 px: employee home loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-081 PASS  [REGRESSION] 1280 px: kudos form loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-082 PASS  [REGRESSION] 1280 px: my kudos loads with HTTP 200 and no sideways scrolling => HTTP 200; overflow=0 px
+RT-083 PASS  [REGRESSION] employee completes the questionnaire at 360 px and sees the thank-you screen => thank-you shown; second submission=409
+RT-084 PASS  [REGRESSION] permissions still hold in the browser: employee gets 403 on results, trend and HR pages => 403,403,403,403,403
+RT-085 PASS  [REGRESSION] no uncaught JavaScript error in any window during the retest => none
+
+TOTAL 85  PASS 85  FAIL 0

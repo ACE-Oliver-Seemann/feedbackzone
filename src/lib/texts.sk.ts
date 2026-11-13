@@ -2,10 +2,39 @@
 // NFR-04: confidentiality is always worded as "dôverný". The word forbidden by
 // NFR-04 must not appear anywhere under src/ (tests/texts.test.ts checks it).
 
+/** Slovak plural: 1 → one, 2–4 → few, 0 and 5+ → many. */
+const plural = (count: number, one: string, few: string, many: string) =>
+  count === 1 ? one : count >= 2 && count <= 4 ? few : many;
+const dayCount = (days: number) => `${days} ${plural(days, "deň", "dni", "dní")}`;
+
 export const t = {
   app: {
     name: "Feedback portál",
+    company: "Asseco Central Europe",
     testDataNotice: "Demo na testovacích dátach",
+  },
+  motion: {
+    menuButton: "Nastavenie animácií",
+    legend: "Animácie",
+    options: {
+      system: "Podľa systému",
+      on: "Zapnuté",
+      reduced: "Obmedzené",
+    },
+    hintSystemReduced: "Systém má animácie vypnuté. Voľbou „Zapnuté“ ich povolíš iba v tejto aplikácii.",
+    hintSystemFull: "Systém má animácie zapnuté.",
+    hintOn: "Animácie sú zapnuté bez ohľadu na systém.",
+    hintReduced: "Bez pohybu, iba krátke prelínanie.",
+    toastRegion: "Oznámenia",
+    toastDismiss: "Zavrieť oznámenie",
+  },
+  ui: {
+    skipToContent: "Preskočiť na obsah",
+    mainNav: "Hlavná navigácia",
+    subNav: "Časti stránky",
+    cancel: "Zrušiť",
+    loading: "Načítavam…",
+    back: "Späť",
   },
   roles: {
     EMPLOYEE: "Zamestnanec",
@@ -13,8 +42,18 @@ export const t = {
     HR: "HR",
   },
   nav: {
+    home: "Domov",
+    mainLabel: "Hlavné menu",
+    rounds: "Prieskumy",
+    hrInsights: "Prehľady",
+    kudos: "Kudos",
     mySurveys: "Moje prieskumy",
     hrRounds: "Prehľad kôl",
+    hrOverview: "Plnenie reakcie",
+    hrHeatmap: "Porovnanie tímov",
+    teamTrend: "Vývoj tímu",
+    hrIssues: "Podnety",
+    hrNotes: "Poznámky",
     newRound: "Nové kolo",
     myTeam: "Môj tím",
     sendKudos: "Poslať kudos",
@@ -27,14 +66,61 @@ export const t = {
     password: "Heslo",
     submit: "Prihlásiť sa",
     submitting: "Prihlasujem…",
+    subtitle: "Prihlás sa svojím e-mailom a heslom.",
+    tagline: "Povedali ste, urobili sme.",
+    taglineDetail: "Krátke prieskumy v tíme, výsledky za celý tím a kroky, ktoré z nich vzniknú.",
     // MVP-01: one generic message, no hint which of the two was wrong.
     invalid: "Nesprávny e-mail alebo heslo.",
   },
   errors: {
     generic: "Niečo sa nepodarilo. Skús to znova.",
+    sessionExpired:
+      "Prihlásenie vypršalo. Prihlás sa znova v novej karte a potom to tu skús ešte raz. Čo máš vyplnené, zostane.",
+    notFoundTitle: "Túto stránku sme nenašli",
+    notFoundText: "Adresa neexistuje alebo sa zmenila.",
+    logoutFailed: "Odhlásenie sa nepodarilo. Skús to znova.",
     forbiddenTitle: "Sem nemáš prístup",
     forbiddenText: "Táto stránka nie je dostupná pre tvoju rolu alebo tím.",
+    forbiddenCode: "Chyba 403",
+    notFoundCode: "Chyba 404",
     backHome: "Späť na úvod",
+  },
+  // IT-11: what needs doing now. One sentence per task.
+  home: {
+    title: "Čo treba urobiť teraz",
+    nothing: "Nič nečaká.",
+    empty: {
+      EMPLOYEE: "Momentálne nemáš žiadny prieskum na vyplnenie. Čo sa zmenilo po minulých, nájdeš v časti Môj tím.",
+      MANAGER: "Každé uzavreté kolo má zapísaný krok a žiadny krok nie je po termíne.",
+      HR: "Každé uzavreté kolo má zapísaný krok a žiadny podnet nie je po termíne.",
+    },
+    tasks: {
+      fillSurvey: (round: string, questions: number) =>
+        `Čaká na teba prieskum „${round}“. Má ${questions} ${questions >= 5 ? "otázok" : "otázky"} a zaberie asi 2 minúty.`,
+      roundAwaitingAction: (round: string, days: number) =>
+        `Kolo „${round}“ je uzavreté ${days === 0 ? "od dnes" : dayCount(days)} a tím čaká, čo sa s výsledkami stane. Pozri výsledky a zapíš krok.`,
+      actionsOverdue: (count: number) =>
+        `${count === 1 ? "1 krok je" : count >= 2 && count <= 4 ? `${count} kroky sú` : `${count} krokov je`} po termíne. Dokonči ${count === 1 ? "ho" : "ich"} alebo uprav stav.`,
+      startRound: (days: number | null) =>
+        days === null
+          ? "Tím ešte nemal žiadny prieskum. Vytvor prvé kolo."
+          : `Posledné kolo sa skončilo ${days === 0 ? "dnes" : days === 1 ? "pred 1 dňom" : `pred ${days} dňami`} a žiadne ďalšie nebeží. Vytvor nové.`,
+      roundsAwaitingAction: (count: number, team: string, days: number) =>
+        `${count === 1 ? "1 uzavreté kolo čaká" : count >= 2 && count <= 4 ? `${count} uzavreté kolá čakajú` : `${count} uzavretých kôl čaká`} na krok manažéra. Najdlhšie ${team}, ${dayCount(days)}.`,
+      issuesOverdue: (count: number) =>
+        `${count === 1 ? "1 podnet je" : count >= 2 && count <= 4 ? `${count} podnety sú` : `${count} podnetov je`} po termíne.`,
+      lowParticipation: (round: string, team: string, responded: number, size: number, days: number) =>
+        `Kolo „${round}“ (${team}) sa uzavrie ${days <= 1 ? "do zajtra" : `o ${dayCount(days)}`} a odpovedalo iba ${responded} z ${size}.`,
+    },
+    actions: {
+      fill: "Vyplniť",
+      results: "Výsledky a krok",
+      actions: "Otvoriť kroky",
+      newRound: "Nové kolo",
+      overview: "Ktoré kolá",
+      issues: "Otvoriť podnety",
+      participation: "Pozrieť účasť",
+    },
   },
   roundStatus: {
     DRAFT: "Koncept",
@@ -46,8 +132,8 @@ export const t = {
     mySurveysEmpty: "Momentálne nemáš žiadny otvorený prieskum.",
     submitted: "Odoslané",
     notSubmitted: "Čaká na vyplnenie",
-    teamRoundsTitle: "Kolá môjho tímu",
-    allRoundsTitle: "Prehľad kôl",
+    teamRoundsTitle: "Prieskumy môjho tímu",
+    allRoundsTitle: "Prieskumy všetkých tímov",
     empty: "Zatiaľ tu nie je žiadne kolo.",
     createFirst: "Vytvoriť kolo",
     colName: "Kolo",
@@ -62,8 +148,14 @@ export const t = {
     awaitingAction: "Čaká na krok",
     open: "Spustiť",
     close: "Uzavrieť",
-    confirmOpen: "Spustiť kolo? Po spustení sa už nedá upravovať.",
-    confirmClose: "Uzavrieť kolo? Potom sa do neho už nedá odpovedať.",
+    confirmOpenTitle: "Spustiť kolo?",
+    confirmOpenText: "Po spustení sa už nedá upravovať.",
+    confirmCloseTitle: "Uzavrieť kolo?",
+    confirmCloseText: "Potom sa do neho už nedá odpovedať.",
+    summaryLabel: "Súhrn kôl",
+    summaryOpen: "Otvorené kolá",
+    summaryAwaiting: "Čakajú na krok",
+    summaryTotal: "Všetky kolá",
     invalidState: "Kolo medzitým zmenilo stav. Obnov stránku.",
     deadlinePassed: "Uzávierka kola už prešla, kolo sa nedá spustiť.",
     fill: "Vyplniť",
@@ -73,17 +165,18 @@ export const t = {
     // NFR-04: exact wording from mvp.md.
     confidentiality:
       "Tvoje odpovede sú dôverné. Manažér ani tím neuvidia, kto čo napísal, výsledky vidia iba za skupinu aspoň 5 ľudí.",
+    pageTitle: "Vyplnenie prieskumu",
     introTitle: "Skôr než začneš",
     introDuration: (count: number) => `${count} ${count >= 5 ? "otázok" : "otázky"}, zaberie to do 2 minút.`,
     start: "Začať",
     progress: (current: number, total: number) => `${current} z ${total}`,
-    scaleLow: "Vôbec nesúhlasím",
-    scaleHigh: "Úplne súhlasím",
+    progressLabel: (current: number, total: number) => `Otázka ${current} z ${total}`,
     scaleLegend: "Vyber hodnotu od 1 do 5",
     back: "Späť",
     next: "Ďalej",
-    commentTitle: "Chceš k tomu niečo dodať?",
-    commentHint: "Nepovinné. Komentár uvidí manažér bez tvojho mena, preto v ňom neuvádzaj údaje, podľa ktorých by ťa bolo možné spoznať.",
+    commentTitle: "Čo by nášmu tímu najviac uľahčilo prácu v najbližších dvoch týždňoch?",
+    commentHint:
+      "Nepovinné, stačí jedna veta. Odpoveď je dôverná, preto do nej nepíš mená ani podrobnosti, podľa ktorých by sa dalo spoznať, kto ju napísal.",
     commentLabel: "Komentár",
     commentCounter: (length: number) => `${length} / 1000`,
     submit: "Odoslať",
@@ -97,11 +190,32 @@ export const t = {
     backToSurveys: "Späť na moje prieskumy",
     latestActionsTitle: (roundName: string) => `Čo sa urobilo po kole „${roundName}“`,
     latestActionsEmpty: "K poslednému uzavretému kolu zatiaľ nie je zapísaný žiadny krok.",
+    sessionExpiredTitle: "Prihlásenie vypršalo",
+    sessionExpiredText:
+      "Odpovede sa neodoslali. Prihlás sa znova v novej karte, potom sa sem vráť a klikni na „Odoslať“.",
+    sessionExpiredLink: "Prihlásiť sa v novej karte",
+    // One is picked at random after a successful submission.
+    cheers: [
+      "Výborne, prieskum je hotový!",
+      "Ďakujeme, tvoj hlas sa počíta.",
+      "Hotovo. Vďaka, že pomáhaš tímu napredovať.",
+      "Super, máš to za sebou. Tvoj názor pomáha celému tímu.",
+    ],
+  },
+  // Labels of the answer scales; keys match src/config/scales.ts (IT-03).
+  scales: {
+    AGREEMENT: ["Rozhodne nesúhlasím", "Skôr nesúhlasím", "Ani tak, ani tak", "Skôr súhlasím", "Rozhodne súhlasím"],
+    QUALITY: ["Veľmi zlé", "Skôr zlé", "Priemerné", "Skôr dobré", "Veľmi dobré"],
+    OVERTIME: ["Nikdy", "Raz či dvakrát", "Každý týždeň", "Väčšinu dní", "Takmer denne"],
+    FREQUENCY: ["Nikdy", "Zriedka", "Občas", "Často", "Takmer vždy"],
+    lowerIsBetter: "Pri tejto otázke je nižšia hodnota lepšia.",
   },
   results: {
     title: "Výsledky kola",
     participation: (responded: number, teamSize: number) =>
       `Odpovedalo ${responded} z ${teamSize} členov tímu`,
+    participationValue: (responded: number, teamSize: number) => `${responded} z ${teamSize}`,
+    participationLabel: "členov tímu odpovedalo",
     notClosed: "Výsledky sa zobrazia až po uzavretí kola. Dovtedy je viditeľná iba účasť.",
     draft: "Kolo je koncept a ešte nebolo spustené.",
     insufficientTitle: "Nedostatok odpovedí",
@@ -110,9 +224,138 @@ export const t = {
     questionsTitle: "Otázky",
     average: "Priemer",
     distributionLabel: (value: number, count: number) => `Hodnota ${value}: ${count}×`,
+    summaryTitle: "V skratke",
+    strongest: (question: string, average: string) => `Najlepšie: „${question}“ (${average}).`,
+    weakest: (question: string, average: string) => `Najslabšie: „${question}“ (${average}).`,
+    suggestedStep: "Navrhovaný krok:",
+    toActions: "Prejsť na kroky",
+    showDistribution: "Rozdelenie odpovedí",
     commentsTitle: "Komentáre",
     commentsHint: "V náhodnom poradí, bez mien.",
     commentsEmpty: "Nikto nepridal komentár.",
+  },
+  // IT-08: results over time, across teams, and the printable report.
+  trend: {
+    title: "Vývoj tímu",
+    intro:
+      "Výsledky uzavretých kôl v čase. Počítajú sa iba kolá s aspoň 5 odpoveďami; kolo s menej odpoveďami je v grafe medzera.",
+    empty: "Tím zatiaľ nemá žiadne uzavreté kolo.",
+    chartTitle: "Stála otázka: ako sa tímu pracovalo",
+    chartCaption: "Priemer na škále 1 (veľmi zlé) až 5 (veľmi dobré). Prerušovaná čiara označuje kolo bez hodnoty.",
+    noFixed: "Žiadne uzavreté kolo nad prahom dôvernosti zatiaľ nemá stálu otázku, preto nie je čo vykresliť.",
+    noValue: "bez hodnoty",
+    fewRounds: (count: number) =>
+      `Graf vychádza iba z ${count} ${count === 1 ? "kola" : "kôl"}. Na posúdenie vývoja je to málo, ber ho s rezervou.`,
+    tableTitle: "Skóre podľa okruhov",
+    scrollHint: "Tabuľka je širšia než obrazovka, dá sa posúvať do strán.",
+    tableHint:
+      "Skóre 1 až 5, kde vyššie je vždy lepšie. Pri otázkach, kde je nižšia odpoveď lepšia (nadčasy, vyčerpanie), je hodnota otočená.",
+    colRound: "Kolo",
+    colResponded: "Odpovedí",
+    showTrend: "Vývoj v čase",
+  },
+  heatmap: {
+    title: "Porovnanie tímov",
+    intro: (days: number) =>
+      `Priemerné skóre tímov podľa okruhov za posledných ${days} dní. Počítajú sa iba uzavreté kolá s aspoň 5 odpoveďami.`,
+    empty: "V tomto období nemá žiadny tím uzavreté kolo nad prahom dôvernosti.",
+    colTeam: "Tím",
+    roundsCounted: (count: number) =>
+      `${count} ${count === 1 ? "kolo" : count >= 2 && count <= 4 ? "kolá" : "kôl"}`,
+    noData: "Bez dát",
+    legend: "Skóre:",
+    legendBelow: (to: string) => `pod ${to}`,
+    legendFrom: (from: string) => `od ${from}`,
+    legendNoData: "– bez dát",
+    scoreHint:
+      "Skóre 1 až 5, kde vyššie je vždy lepšie. Porovnávaj opatrne: tímy mohli dostať rôzne otázky a jedno kolo je málo na záver.",
+  },
+  report: {
+    title: "Report kola",
+    print: "Vytlačiť alebo uložiť ako PDF",
+    back: "Späť na výsledky",
+    open: "Report na tlač",
+    colQuestion: "Otázka",
+    distributionHint: "Stĺpce 1 až 5 ukazujú, koľko ľudí zvolilo danú hodnotu.",
+    noComments:
+      "Komentáre nie sú súčasťou reportu, aby sa voľný text nedostal mimo aplikáciu. Sú dostupné na obrazovke výsledkov.",
+    generated: (date: string) => `Vytvorené ${date}. Výsledky sú dôverné a zobrazujú sa iba za skupinu aspoň 5 ľudí.`,
+  },
+  // IT-10: HR's issues and notes from offline meetings.
+  ownerGroups: {
+    FACILITY: "Správa budovy",
+    IT_SUPPORT: "IT podpora",
+    HR: "HR",
+    MANAGEMENT: "Vedenie",
+    TEAM_MANAGER: "Manažér tímu",
+    OTHER: "Iné",
+  },
+  issueSources: {
+    SURVEY: "Prieskum",
+    MEETING: "Stretnutie",
+    OTHER: "Iné",
+  },
+  issueStatuses: {
+    OPEN: "Otvorené",
+    IN_PROGRESS: "Rieši sa",
+    DONE: "Hotové",
+  },
+  issues: {
+    pageTitle: "Podnety",
+    intro: "Čo treba vyriešiť a kto to má na starosti. Vidí iba HR; skupine to treba odovzdať mimo aplikácie.",
+    filterActive: "Nevybavené",
+    empty: "Žiadny podnet nezodpovedá výberu.",
+    filter: "Filtrovať",
+    filterAll: "Všetko",
+    newTitle: "Nový podnet",
+    title: "Názov",
+    titlePlaceholder: "napr. Nefunguje klimatizácia v zasadačke",
+    description: "Opis",
+    ownerGroup: "Zodpovedná skupina",
+    source: "Zdroj",
+    status: "Stav",
+    team: "Tím",
+    teamNone: "Bez tímu",
+    round: "Kolo",
+    note: "Poznámka",
+    dueDate: "Termín",
+    created: (date: string) => `Pridané ${date}`,
+    fromRound: (round: string, team: string) => `Podnet z kola „${round}“ (${team}).`,
+    fromNote: (note: string) => `Podnet z poznámky „${note}“.`,
+    confidentialityWarning:
+      "Komentáre z prieskumu neprepisuj doslova. Podnet opíš vlastnými slovami a bez podrobností, podľa ktorých by sa dal spoznať autor.",
+    submit: "Pridať podnet",
+    submitting: "Ukladám…",
+    saved: "Podnet je pridaný.",
+    invalid: "Vyplň názov (3 až 120 znakov), skupinu a zdroj. Termín musí byť platný dátum.",
+    createFromRound: "Vytvoriť podnet z tohto kola",
+  },
+  notes: {
+    pageTitle: "Poznámky zo stretnutí",
+    intro: "Zápisy z osobných stretnutí, z ktorých sa dajú vytvoriť podnety. Vidí iba HR.",
+    newTitle: "Nová poznámka",
+    listTitle: "Uložené poznámky",
+    empty: "Zatiaľ tu nie je žiadna poznámka.",
+    title: "Názov",
+    titlePlaceholder: "napr. Stretnutie s Tímom Beta",
+    meetingDate: "Dátum stretnutia",
+    text: "Text poznámky",
+    warning:
+      "Aplikácia beží iba na testovacích dátach. Nepíš sem skutočné mená ani údaje o skutočných ľuďoch.",
+    submit: "Uložiť poznámku",
+    submitting: "Ukladám…",
+    invalid: "Vyplň názov (3 až 120 znakov), dátum stretnutia a text.",
+    heldOn: (date: string) => `Stretnutie ${date}`,
+    issuesTitle: "Podnety z tejto poznámky",
+    createIssue: "Vytvoriť podnet",
+  },
+  suggestions: {
+    title: "Návrhy krokov",
+    // IT-09: must stay honest about where the suggestions come from.
+    rulesNote:
+      "Návrhy podľa pravidiel, nie AI: k dvom najslabším otázkam kola sa vyberie pripravený krok. Vychádzajú iba z priemerov, komentáre sa nepoužívajú. Ber ich ako inšpiráciu a uprav si ich.",
+    because: (question: string, average: string) => `Reaguje na otázku „${question}“ (priemer ${average}).`,
+    use: "Použiť ako krok",
   },
   actions: {
     title: "Kroky po kole",
@@ -133,6 +376,15 @@ export const t = {
     submit: "Pridať krok",
     submitting: "Ukladám…",
     invalid: "Vyplň tému, čo sa urobí a platný termín.",
+    // Per-field messages for the 400 response's `fields`.
+    fieldErrors: {
+      topic: "Zadaj tému (najviac 120 znakov).",
+      description: "Napíš, čo sa urobí (najviac 1 000 znakov).",
+      dueDate: "Zadaj platný termín.",
+      status: "Vyber stav.",
+    },
+    added: "Krok je pridaný.",
+    statusSaved: "Stav je uložený.",
   },
   team: {
     title: "Povedali ste, urobili sme",
@@ -150,12 +402,18 @@ export const t = {
     showTeamPage: "Stránka tímu",
   },
   kudos: {
+    hubTitle: "Kudos",
+    hubIntro: "Poďakuj kolegom za pomoc a pozri si, za čo ocenili teba.",
     newTitle: "Poslať kudos",
     newIntro: "Kudos je podpísané tvojím menom.",
     recipient: "Komu",
     recipientPlaceholder: "Vyber kolegu",
+    emoji: "Rýchle kudos emotikonom",
+    emojiHint: "Nechce sa ti písať? Vyber emotikon a text môžeš vynechať.",
+    emojiNone: "Bez emotikonu",
     text: "Za čo",
     textHint: "20 až 500 znakov.",
+    textHintWithEmoji: "Nepovinné, najviac 500 znakov.",
     textCounter: (length: number) => `${length} / 500`,
     value: "Hodnota",
     values: {
@@ -171,7 +429,7 @@ export const t = {
       PRIVATE: "Súkromné",
     },
     visibilityHints: {
-      TEAM: "Zobrazí sa na stránke tímu príjemcu.",
+      TEAM: "Zobrazí sa na stránke tímu príjemcu. Príjemcovi bez tímu pošli súkromné.",
       PRIVATE: "Uvidí ho iba príjemca.",
     },
     submit: "Poslať kudos",
@@ -179,36 +437,139 @@ export const t = {
     sent: "Kudos je odoslané.",
     fieldErrors: {
       toUserId: "Vyber kolegu (sebe sa kudos poslať nedá).",
-      text: "Text musí mať 20 až 500 znakov.",
+      text: "Napíš 20 až 500 znakov alebo vyber emotikon.",
+      emoji: "Vyber emotikon z ponuky.",
       value: "Vyber hodnotu.",
-      visibility: "Vyber viditeľnosť.",
+      visibility: "Vyber viditeľnosť. Príjemca bez tímu (HR) môže dostať iba súkromné kudos.",
     },
     myTitle: "Moje kudos",
     myEmpty: "Zatiaľ tu nemáš žiadne kudos.",
     fromTo: (from: string, to: string) => `${from} → ${to}`,
     from: (from: string) => `Od: ${from}`,
+    // Kudos hub: tabs, summary and the "new kudos" moment
+    tabsLabel: "Kudos",
+    receivedLabel: "kudos od kolegov",
+    summaryLabel: "Kudos podľa hodnôt",
+    valueCount: (label: string, count: number) => `${label} ×${count}`,
+    newKudos: (count: number) => `Máš ${count} ${plural(count, "nové", "nové", "nových")} kudos`,
+    newKudosText: "Pozri si, čo ti kolegovia poslali.",
+    myEmptyHint: "Začni ty – poďakuj kolegovi, ktorý ti nedávno pomohol.",
+    // Live preview in the send form
+    previewTitle: "Náhľad",
+    previewHint: "Takto kudos uvidí príjemca.",
+    previewFor: (name: string) => `Pre: ${name}`,
+    previewRecipientEmpty: "Pre: vyber kolegu",
+    previewTextEmpty: "Sem sa zobrazí tvoje poďakovanie…",
+    sentText: "Príjemca ho uvidí vo svojich kudos.",
+    sendAnother: "Poslať ďalšie",
+    showReceived: "Pozrieť moje kudos",
+  },
+  hrOverview: {
+    title: "Plnenie reakcie",
+    intro: "Ako často a ako rýchlo tímy reagujú na výsledky.",
+    headlineWaiting: (waiting: number, closed: number, team: string, days: number) =>
+      `${waiting} z ${closed} ${closed === 1 ? "uzavretého kola" : "uzavretých kôl"} ${plural(waiting, "čaká", "čakajú", "čaká")} na krok. Najdlhšie ${team}, ${dayCount(days)}.`,
+    headlineAllDone: (closed: number) =>
+      closed === 1
+        ? "Jediné uzavreté kolo má zapísaný krok."
+        : closed <= 4
+          ? `Všetky ${closed} uzavreté kolá majú zapísaný krok.`
+          : `Všetkých ${closed} uzavretých kôl má zapísaný krok.`,
+    teamLine: (withAction: number, closed: number) =>
+      closed === 0
+        ? "Zatiaľ žiadne uzavreté kolo."
+        : `Krok má ${withAction} z ${closed} ${closed === 1 ? "uzavretého kola" : "uzavretých kôl"}.`,
+    details: "Podrobné čísla",
+    empty: "Zatiaľ nie je uzavreté žiadne kolo.",
+    totalTitle: "Všetky tímy",
+    closedRounds: "Uzavreté kolá",
+    withAction: "So zapísaným krokom",
+    share: (percent: number) => `${percent} %`,
+    awaiting: "Čaká na krok",
+    reactionTime: "Čas do prvého kroku",
+    days: (value: number) =>
+      `${value.toLocaleString("sk-SK", { maximumFractionDigits: 1 })} ${!Number.isInteger(value) ? "dňa" : value === 1 ? "deň" : value >= 2 && value <= 4 ? "dni" : "dní"}`,
+    reactionTimeUnknown: "zatiaľ žiadny krok",
+    reactionTimeHint: "Medián počtu dní od uzavretia kola po zapísanie prvého kroku.",
+    actionsTitle: "Kroky",
+    overdue: "Po termíne",
+    awaitingRoundsTitle: "Kolá, ktoré čakajú na krok",
+    awaitingSince: (days: number) =>
+      days === 0 ? "uzavreté dnes" : `uzavreté pred ${days} ${days === 1 ? "dňom" : "dňami"}`,
   },
   newRound: {
     title: "Nové kolo",
     intro: "Kolo sa uloží ako koncept. Členovia tímu ho uvidia až po spustení.",
+    basicsTitle: "Základné údaje",
     name: "Názov kola",
     namePlaceholder: "napr. Pulse – 46. týždeň",
     team: "Tím",
     closesAt: "Dátum uzávierky",
     questions: "Otázky",
-    questionsHint: "Vyber 3 až 5 otázok. Zobrazia sa v poradí, v akom ich vyberieš.",
-    selected: (count: number) => `Vybrané: ${count} (treba 3 až 5)`,
+    questionsHint: "Kolo má spolu 3 až 5 otázok. Zobrazia sa v poradí, v akom ich vyberieš.",
+    defaultName: (week: number) => `Pulse – ${week}. týždeň`,
+    preselected:
+      "Predvybrali sme odporúčané otázky, ktoré tím dlhšie nemal. Skontroluj ich a pokojne zmeň; ostatné nájdeš po rozbalení okruhov.",
+    topicCount: (selected: number, total: number) =>
+      selected > 0 ? `(vybrané ${selected} z ${total})` : `(${total})`,
+    fixedTitle: "Stála otázka",
+    fixedHint: "Je v každom kole ako prvá, aby sa dal sledovať vývoj v čase.",
+    starter: "Odporúčaná",
+    starterHint: "Otázky označené „Odporúčaná“ sú štartovacia sada podľa výskumu.",
+    selected: (count: number) => `Otázok v kole: ${count} (treba 3 až 5)`,
+    custom: {
+      title: "Pridať vlastnú otázku",
+      placeholder: "napr. Rozdelenie úloh v tíme je spravodlivé.",
+      // Checklist from docs/research/otazky-do-pulse.md, chapter 3.
+      rules: [
+        "Pýtaj sa na jednu vec, nie na dve naraz.",
+        "Napíš ju ako tvrdenie, s ktorým sa dá súhlasiť alebo nesúhlasiť (škála 1 až 5).",
+        "Pýtaj sa na niečo, čo vie tím alebo ty ovplyvniť.",
+        "Nepíš ju tak, aby sa podľa odpovede dal spoznať konkrétny človek.",
+      ],
+      permanent:
+        "Otázka zostane v knižnici tvojho tímu. Po pridaní sa nedá upraviť ani zmazať, lebo by sa zmenil význam starších výsledkov.",
+      add: "Pridať otázku",
+      addedNotSelected:
+        "Otázka je uložená v knižnici tímu, ale kolo je už plné. Ak ju chceš použiť, najprv niektorú otázku odober.",
+      adding: "Pridávam…",
+      errors: {
+        length: "Otázka musí mať 10 až 200 znakov.",
+        duplicate: "Takáto otázka už v knižnici je.",
+        generic: "Otázku sa nepodarilo pridať. Skús to znova.",
+      },
+    },
     submit: "Uložiť koncept",
     submitting: "Ukladám…",
     fieldErrors: {
       name: "Zadaj názov kola (najviac 120 znakov).",
       teamId: "Vyber tím.",
       closesAt: "Zadaj dátum uzávierky, ktorý je dnes alebo neskôr.",
-      questionIds: "Vyber 3 až 5 otázok.",
+      questionIds: "Kolo musí mať spolu 3 až 5 otázok.",
     },
+  },
+  // Short confirmations after a successful operation (errors stay inline).
+  toasts: {
+    actionAdded: "Krok je pridaný.",
+    actionStatusSaved: "Stav kroku je uložený.",
+    roundOpened: "Kolo je spustené. Tím ho už vidí.",
+    roundClosed: "Kolo je uzavreté.",
+    roundCreated: "Koncept kola je uložený.",
+    issueAdded: "Podnet je pridaný.",
+    issueSaved: "Podnet je uložený.",
+    noteAdded: "Poznámka je uložená.",
+    questionAdded: "Otázka je pridaná do knižnice tímu.",
   },
 } as const;
 
 export function formatDate(iso: string | Date): string {
-  return new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium" }).format(new Date(iso));
+  // Fixed time zone: server and browser render the same date (no hydration mismatch).
+  return new Intl.DateTimeFormat("sk-SK", { dateStyle: "medium", timeZone: "Europe/Bratislava" }).format(
+    new Date(iso),
+  );
+}
+
+/** Message for a failed request: an expired session gets its own wording (QA FE-003). */
+export function errorForStatus(status: number): string {
+  return status === 401 ? t.errors.sessionExpired : t.errors.generic;
 }

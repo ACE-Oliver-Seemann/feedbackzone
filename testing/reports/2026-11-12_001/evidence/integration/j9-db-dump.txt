@@ -1,0 +1,15 @@
+Response columns: id,roundId,teamId,v1,v2,v3,v4,v5,comment
+SELECT rowid FROM Response → no such column
+Participation columns: roundId,userId
+SELECT rowid FROM Participation → no such column
+tables: Action, Issue, Kudos, MeetingNote, Participation, Question, Response, Round, RoundQuestion, Team, User
+triggers: 0
+indexes on Response: Response_roundId_idx
+round cmwdvb34g0039pk04guxssqlm: submission order (member #) 103245 | storage order 502314
+round cmwdvb3mi003bpk046yroyjnk: submission order (member #) 013254 | storage order 150342
+round cmwdvb3y7003dpk045u4uvb43: submission order (member #) 401352 | storage order 034152
+round cmwdvb4aq003fpk04gwqugemo: submission order (member #) 103254 | storage order 510324
+round cmwdvb4of003hpk0468i1qq78: submission order (member #) 234015 | storage order 231504
+round cmwdvb50v003jpk04pvt8p3zf: submission order (member #) 523014 | storage order 103245
+participation storage orders over 6 rounds: 501234
+files: qa-e2e.db; journal_mode=delete

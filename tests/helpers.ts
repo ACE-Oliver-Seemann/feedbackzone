@@ -10,6 +10,8 @@ export const PASSWORD = "Heslo123";
 export type Fixture = Awaited<ReturnType<typeof resetDb>>;
 
 export async function wipeDb() {
+  await db.issue.deleteMany();
+  await db.meetingNote.deleteMany();
   await db.kudos.deleteMany();
   await db.action.deleteMany();
   await db.response.deleteMany();
