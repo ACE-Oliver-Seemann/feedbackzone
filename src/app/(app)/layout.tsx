@@ -15,6 +15,12 @@ import { t } from "@/lib/texts.sk";
 function navFor(role: Role, teamId: string | null): NavItem[] {
   const home: NavItem = { href: "/", label: t.nav.home, match: ["/"] };
   const kudos: NavItem = { href: "/kudos", label: t.nav.kudos, match: ["/kudos"] };
+  // IT-14: for HR this area also holds the meeting notes (tabs on the page).
+  const responsibilities: NavItem = {
+    href: "/responsibilities",
+    label: t.nav.responsibilities,
+    match: ["/responsibilities", "/hr/issues", "/hr/notes"],
+  };
   const team: NavItem[] = teamId
     ? [{ href: `/team/${teamId}`, label: t.nav.myTeam, match: ["/team"] }]
     : [];
@@ -24,15 +30,15 @@ function navFor(role: Role, teamId: string | null): NavItem[] {
       home,
       { href: "/hr/rounds", label: t.nav.rounds, match: ["/hr/rounds", "/rounds"] },
       { href: "/hr/overview", label: t.nav.hrInsights, match: ["/hr/overview", "/hr/heatmap", "/team"] },
-      { href: "/hr/issues", label: t.nav.hrIssues, match: ["/hr/issues", "/hr/notes"] },
+      responsibilities,
       kudos,
     ];
   }
   if (role === "MANAGER") {
-    return [home, { href: "/rounds", label: t.nav.rounds, match: ["/rounds"] }, ...team, kudos];
+    return [home, { href: "/rounds", label: t.nav.rounds, match: ["/rounds"] }, ...team, responsibilities, kudos];
   }
   // An employee reaches the questionnaire from the home page, so it stays marked there.
-  return [{ ...home, match: ["/", "/rounds"] }, ...team, kudos];
+  return [{ ...home, match: ["/", "/rounds"] }, ...team, responsibilities, kudos];
 }
 
 function initials(name: string): string {

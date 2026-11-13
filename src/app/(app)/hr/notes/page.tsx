@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { NoteForm } from "@/components/note-form";
-import { SubNav } from "@/components/sub-nav";
-import { Badge, type BadgeTone } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/responsibility-meta";
+import { ResponsibilitySubNav } from "@/components/responsibility-sub-nav";
+import Link from "next/link";
 import { ButtonLink } from "@/components/ui/button";
 import { IconCalendar, IconClipboard, IconPlus } from "@/components/ui/icons";
 import { EmptyState, Page, PageHeader } from "@/components/ui/page";
@@ -11,15 +12,8 @@ import { FORWARD } from "@/lib/page-motion";
 import { formatDate, t } from "@/lib/texts.sk";
 import { listNotes } from "@/server/hr-issues";
 
-// Screen "Poznámky zo stretnutí" for HR (IT-10).
+// Screen "Poznámky zo stretnutí" for HR (IT-10), a tab of "Zodpovednosti" (IT-14).
 export const metadata: Metadata = { title: t.notes.pageTitle };
-
-// Same tones as the action statuses elsewhere (neutral, info, success).
-const STATUS_TONE: Record<keyof typeof t.issueStatuses, BadgeTone> = {
-  OPEN: "neutral",
-  IN_PROGRESS: "info",
-  DONE: "success",
-};
 
 export default async function HrNotesPage() {
   const user = await requirePageUser("HR");
@@ -27,14 +21,7 @@ export default async function HrNotesPage() {
 
   return (
     <Page>
-      <SubNav
-        label={t.nav.hrIssues}
-        current="/hr/notes"
-        items={[
-          { href: "/hr/issues", label: t.nav.hrIssues },
-          { href: "/hr/notes", label: t.nav.hrNotes },
-        ]}
-      />
+      <ResponsibilitySubNav current="/hr/notes" />
       <PageHeader title={t.notes.pageTitle} description={t.notes.intro} />
 
       <div>
@@ -65,17 +52,21 @@ export default async function HrNotesPage() {
                       <ul className="mt-1.5 space-y-1.5 text-sm text-ink">
                         {note.issues.map((issue) => (
                           <li key={issue.id} className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <span className="min-w-0 break-words">{issue.title}</span>
-                            <Badge tone={STATUS_TONE[issue.status]}>
-                              {t.issueStatuses[issue.status]}
-                            </Badge>
+                            <Link
+                              href={`/responsibilities/${issue.id}`}
+                              transitionTypes={FORWARD}
+                              className="min-w-0 rounded font-medium break-words text-brand-700 underline underline-offset-2 hover:text-brand-900"
+                            >
+                              {issue.title}
+                            </Link>
+                            <StatusBadge status={issue.status} />
                           </li>
                         ))}
                       </ul>
                     </div>
                   )}
                   <ButtonLink
-                    href={`/hr/issues?note=${note.id}#new`}
+                    href={`/responsibilities/new?note=${note.id}`}
                     transitionTypes={FORWARD}
                     variant="secondary"
                     size="sm"

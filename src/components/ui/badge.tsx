@@ -1,6 +1,6 @@
 import { cx } from "./cx";
 
-export type BadgeTone = "neutral" | "brand" | "success" | "warning" | "info";
+export type BadgeTone = "neutral" | "brand" | "success" | "warning" | "info" | "danger";
 
 const TONES: Record<BadgeTone, { badge: string; dot: string }> = {
   neutral: { badge: "bg-slate-100 text-ink-soft", dot: "bg-slate-400" },
@@ -8,6 +8,7 @@ const TONES: Record<BadgeTone, { badge: string; dot: string }> = {
   success: { badge: "bg-emerald-50 text-emerald-800", dot: "bg-emerald-500" },
   warning: { badge: "bg-amber-50 text-amber-900", dot: "bg-amber-500" },
   info: { badge: "bg-sky-50 text-sky-900", dot: "bg-sky-500" },
+  danger: { badge: "bg-red-50 text-red-800", dot: "bg-red-500" },
 };
 
 /** Status pill. The dot repeats the tone so status is not carried by text color alone. */

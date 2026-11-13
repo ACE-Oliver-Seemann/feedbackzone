@@ -81,7 +81,7 @@ export default async function ResultsPage({ params }: PageProps<"/rounds/[id]/re
           </ButtonLink>
           {user.role === "HR" && (
             <ButtonLink
-              href={`/hr/issues?round=${round.id}#new`}
+              href={`/responsibilities/new?round=${round.id}`}
               transitionTypes={FORWARD}
               variant="secondary"
               size="sm"

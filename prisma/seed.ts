@@ -126,6 +126,7 @@ async function main() {
 
   // Children first, because of foreign keys. User.teamId and Team.managerId
   // reference each other, so the link from users is cut before deleting.
+  await db.issueComment.deleteMany();
   await db.issue.deleteMany();
   await db.meetingNote.deleteMany();
   await db.kudos.deleteMany();

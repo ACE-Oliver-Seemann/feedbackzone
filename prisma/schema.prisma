@@ -33,6 +33,9 @@ model User {
   kudosSent      Kudos[]         @relation("KudosFrom")
   notesWritten   MeetingNote[]
   issuesCreated  Issue[]
+  issuesAssigned Issue[]         @relation("IssueAssignee")
+  issuesRelated  Issue[]         @relation("IssueRelatedUser")
+  issueComments  IssueComment[]
   kudosReceived  Kudos[]         @relation("KudosTo")
 }
 
@@ -167,23 +170,48 @@ model MeetingNote {
   issues Issue[]
 }
 
-// Something HR wants solved, assigned to an owner group (IT-10). HR only.
+// Something HR wants solved, assigned to an owner group (IT-10). Since IT-14
+// also a "responsibility": it may have a responsible person (assignee), who
+// sees it, and a related employee, who does not. Managers create their own.
 // May point to a round and a team, never to a Response (NFR-01).
 model Issue {
-  id          String       @id @default(cuid())
-  title       String
-  description String       @default("")
-  source      String // SURVEY | MEETING | OTHER
-  ownerGroup  String // keys in src/config/owner-groups.ts
-  status      String       @default("OPEN") // OPEN | IN_PROGRESS | DONE
-  dueDate     DateTime?
-  roundId     String?
-  round       Round?       @relation(fields: [roundId], references: [id])
-  teamId      String?
-  team        Team?        @relation(fields: [teamId], references: [id])
-  noteId      String?
-  note        MeetingNote? @relation(fields: [noteId], references: [id])
-  createdById String
-  createdBy   User         @relation(fields: [createdById], references: [id])
-  createdAt   DateTime     @default(now())
+  id            String         @id @default(cuid())
+  title         String
+  description   String         @default("")
+  source        String // SURVEY | MEETING | OTHER
+  ownerGroup    String // keys in src/config/owner-groups.ts
+  status        String         @default("OPEN") // OPEN | IN_PROGRESS | WAITING | DONE
+  priority      String         @default("MEDIUM") // LOW | MEDIUM | HIGH | URGENT (IT-14)
+  dueDate       DateTime?
+  completedAt   DateTime? // set when the status becomes DONE (IT-14)
+  roundId       String?
+  round         Round?         @relation(fields: [roundId], references: [id])
+  teamId        String?
+  team          Team?          @relation(fields: [teamId], references: [id])
+  noteId        String?
+  note          MeetingNote?   @relation(fields: [noteId], references: [id])
+  createdById   String
+  createdBy     User           @relation(fields: [createdById], references: [id])
+  assigneeId    String?
+  assignee      User?          @relation("IssueAssignee", fields: [assigneeId], references: [id])
+  relatedUserId String?
+  relatedUser   User?          @relation("IssueRelatedUser", fields: [relatedUserId], references: [id])
+  createdAt     DateTime       @default(now())
+  comments      IssueComment[]
+
+  @@index([assigneeId])
+}
+
+// Progress update on an issue (IT-14). `internal` = HR only.
+model IssueComment {
+  id        String   @id @default(cuid())
+  issueId   String
+  issue     Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  text      String
+  internal  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([issueId])
 }

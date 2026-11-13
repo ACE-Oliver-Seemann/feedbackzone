@@ -254,6 +254,142 @@ async function createRound(teamId: string, memberIds: string[], plan: RoundPlan,
   }
 }
 
+/** A deadline `days` from today, stored like the app stores it (end of that local day). */
+function deadline(days: number): Date {
+  const date = new Date(Date.now() + days * DAY);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+/** IT-14 Zodpovednosti: cards from HR and from managers, with a few comments. */
+async function createResponsibilities() {
+  const byEmail = (email: string) =>
+    db.user.findUniqueOrThrow({ where: { email }, select: { id: true, teamId: true } });
+  const hr = await byEmail("hr@example.test");
+  const alena = await byEmail("manazer.alfa@example.test");
+  const boris = await byEmail("manazer.beta@example.test");
+  const adam = await byEmail("adam.alfa@example.test");
+  const barbora = await byEmail("barbora.alfa@example.test");
+  const cyril = await byEmail("cyril.alfa@example.test");
+
+  const base = { source: "OTHER", ownerGroup: "TEAM_MANAGER" };
+
+  const training = await db.issue.create({
+    data: {
+      ...base,
+      title: "Zabezpečiť školenie Excel pre Adama",
+      description: "Adam pri reportoch potrebuje kontingenčné tabuľky. Vyber vhodný termín kurzu.",
+      priority: "HIGH",
+      status: "IN_PROGRESS",
+      dueDate: deadline(14),
+      teamId: alena.teamId,
+      assigneeId: alena.id,
+      relatedUserId: adam.id,
+      createdById: hr.id,
+      createdAt: new Date(Date.now() - 5 * DAY),
+    },
+  });
+  const overdue = await db.issue.create({
+    data: {
+      ...base,
+      title: "Doplniť plán zastupovania počas sviatkov",
+      description: "Plán zastupovania tímu na december chýba v zdieľanom kalendári.",
+      priority: "URGENT",
+      dueDate: deadline(-3),
+      teamId: alena.teamId,
+      assigneeId: alena.id,
+      createdById: hr.id,
+      createdAt: new Date(Date.now() - 10 * DAY),
+    },
+  });
+  await db.issue.create({
+    data: {
+      ...base,
+      title: "Pripraviť rozdelenie úloh na nový kvartál",
+      description: "Osobná úloha: návrh rozdelenia a prebrať ho na tímovej porade.",
+      priority: "MEDIUM",
+      dueDate: deadline(7),
+      teamId: alena.teamId,
+      assigneeId: alena.id,
+      createdById: alena.id,
+      createdAt: new Date(Date.now() - 2 * DAY),
+    },
+  });
+  const docs = await db.issue.create({
+    data: {
+      ...base,
+      title: "Aktualizovať návod na nasadenie",
+      description: "Návod vo wiki nezodpovedá novej verzii pipeline.",
+      priority: "LOW",
+      status: "WAITING",
+      dueDate: deadline(5),
+      teamId: alena.teamId,
+      assigneeId: barbora.id,
+      createdById: alena.id,
+      createdAt: new Date(Date.now() - 4 * DAY),
+    },
+  });
+  await db.issue.create({
+    data: {
+      ...base,
+      title: "Zaučiť Cyrila na pohotovosť",
+      description: "Dve spoločné služby pred prvou samostatnou pohotovosťou.",
+      priority: "MEDIUM",
+      status: "DONE",
+      completedAt: new Date(Date.now() - 1 * DAY),
+      dueDate: deadline(-1),
+      teamId: alena.teamId,
+      assigneeId: alena.id,
+      relatedUserId: cyril.id,
+      createdById: alena.id,
+      createdAt: new Date(Date.now() - 12 * DAY),
+    },
+  });
+  await db.issue.create({
+    data: {
+      ...base,
+      title: "Prebrať s tímom pravidlá hybridnej práce",
+      description: "Tím Beta sa pýtal na pravidlá pre dni v kancelárii.",
+      priority: "HIGH",
+      dueDate: deadline(10),
+      teamId: boris.teamId,
+      assigneeId: boris.id,
+      createdById: hr.id,
+      createdAt: new Date(Date.now() - 3 * DAY),
+    },
+  });
+
+  await db.issueComment.createMany({
+    data: [
+      {
+        issueId: training.id,
+        authorId: alena.id,
+        text: "Oslovila som dvoch dodávateľov kurzu, čakám na termíny.",
+        createdAt: new Date(Date.now() - 3 * DAY),
+      },
+      {
+        issueId: training.id,
+        authorId: hr.id,
+        text: "Interné: rozpočet na školenia tímu Alfa je na tento rok takmer vyčerpaný.",
+        internal: true,
+        createdAt: new Date(Date.now() - 2 * DAY),
+      },
+      {
+        issueId: overdue.id,
+        authorId: hr.id,
+        text: "Prosím o doplnenie do konca týždňa.",
+        createdAt: new Date(Date.now() - 1 * DAY),
+      },
+      {
+        issueId: docs.id,
+        authorId: barbora.id,
+        text: "Čakám na prístup do nového repozitára.",
+        createdAt: new Date(Date.now() - 1 * DAY),
+      },
+    ],
+  });
+}
+
 async function main() {
   if (process.env.NODE_ENV === "production") {
     throw new Error("Demo data must not be created in production.");
@@ -335,6 +471,8 @@ async function main() {
       },
     ],
   });
+
+  await createResponsibilities();
 
   const closed = await db.round.count({ where: { status: "CLOSED" } });
   const responses = await db.response.count();

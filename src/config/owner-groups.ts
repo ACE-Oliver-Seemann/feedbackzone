@@ -14,5 +14,6 @@ export type OwnerGroup = (typeof OWNER_GROUPS)[number];
 export const ISSUE_SOURCES = ["SURVEY", "MEETING", "OTHER"] as const;
 export type IssueSource = (typeof ISSUE_SOURCES)[number];
 
-export const ISSUE_STATUSES = ["OPEN", "IN_PROGRESS", "DONE"] as const;
+// WAITING ("Čaká sa") was added with IT-14 Zodpovednosti.
+export const ISSUE_STATUSES = ["OPEN", "IN_PROGRESS", "WAITING", "DONE"] as const;
 export type IssueStatus = (typeof ISSUE_STATUSES)[number];

@@ -21,6 +21,16 @@ import { GET as getRounds, POST as postRound } from "@/app/api/rounds/route";
 import { GET as getSummary } from "@/app/api/teams/[id]/summary/route";
 import { GET as getTrend } from "@/app/api/teams/[id]/trend/route";
 import { GET as getHeatmap } from "@/app/api/hr/heatmap/route";
+import { POST as postResponsibilityComment } from "@/app/api/responsibilities/[id]/comments/route";
+import {
+  GET as getResponsibility,
+  PATCH as patchResponsibility,
+} from "@/app/api/responsibilities/[id]/route";
+import { GET as getResponsibilityOptions } from "@/app/api/responsibilities/options/route";
+import {
+  GET as getResponsibilities,
+  POST as postResponsibility,
+} from "@/app/api/responsibilities/route";
 import { db } from "@/lib/db";
 import { createRound, dateInDays, params, request, resetDb, type Fixture } from "./helpers";
 
@@ -66,6 +76,19 @@ const invoke = (
     request(path, { method: options.method, as, body: options.body }),
     (options.id ? params({ id: options.id }) : undefined) as never,
   );
+
+/** An HR card for employee A: the assignee, their manager and HR see it (IT-14). */
+const responsibilityForEmployeeA = () =>
+  db.issue.create({
+    data: {
+      title: "Zodpovednosť",
+      source: "OTHER",
+      ownerGroup: "TEAM_MANAGER",
+      createdById: fx.hr.id,
+      assigneeId: fx.a.employees[0].id,
+      teamId: fx.a.team.id,
+    },
+  });
 
 const status = (codes: [number, number, number, number, number, number]) =>
   Object.fromEntries(ACTORS.map((actor, index) => [actor, codes[index]])) as Record<Actor, number>;
@@ -269,6 +292,59 @@ const CASES: Case[] = [
         body: { title: "Stretnutie", meetingDate: dateInDays(-1), text: "Testovacia poznámka." },
       }),
     expected: status([401, 403, 403, 403, 403, 201]),
+  },
+  {
+    // Everyone gets a list; what is in it is tested in responsibilities.test.ts.
+    name: "GET /api/responsibilities",
+    call: (as) => invoke(getResponsibilities, "/api/responsibilities", as),
+    expected: status([401, 200, 200, 200, 200, 200]),
+  },
+  {
+    name: "POST /api/responsibilities",
+    call: (as) =>
+      invoke(postResponsibility, "/api/responsibilities", as, {
+        method: "POST",
+        // A manager may send ownerGroup; it is ignored (always TEAM_MANAGER).
+        body: { title: "Testovacia zodpovednosť", ownerGroup: "OTHER" },
+      }),
+    expected: status([401, 403, 201, 403, 201, 201]),
+  },
+  {
+    name: "GET /api/responsibilities/:id",
+    call: async (as) => {
+      const issue = await responsibilityForEmployeeA();
+      return invoke(getResponsibility, `/api/responsibilities/${issue.id}`, as, { id: issue.id });
+    },
+    expected: status([401, 200, 200, 403, 403, 200]),
+  },
+  {
+    name: "PATCH /api/responsibilities/:id (status)",
+    call: async (as) => {
+      const issue = await responsibilityForEmployeeA();
+      return invoke(patchResponsibility, `/api/responsibilities/${issue.id}`, as, {
+        method: "PATCH",
+        id: issue.id,
+        body: { status: "IN_PROGRESS" },
+      });
+    },
+    expected: status([401, 200, 200, 403, 403, 200]),
+  },
+  {
+    name: "POST /api/responsibilities/:id/comments",
+    call: async (as) => {
+      const issue = await responsibilityForEmployeeA();
+      return invoke(postResponsibilityComment, `/api/responsibilities/${issue.id}/comments`, as, {
+        method: "POST",
+        id: issue.id,
+        body: { text: "Priebežný stav" },
+      });
+    },
+    expected: status([401, 201, 201, 403, 403, 201]),
+  },
+  {
+    name: "GET /api/responsibilities/options",
+    call: (as) => invoke(getResponsibilityOptions, "/api/responsibilities/options", as),
+    expected: status([401, 200, 200, 200, 200, 200]),
   },
   {
     name: "GET /api/kudos/me",

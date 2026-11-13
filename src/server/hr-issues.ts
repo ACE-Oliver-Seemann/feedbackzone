@@ -123,7 +123,7 @@ export async function listIssues(
     where: {
       ...(oneOf(OWNER_GROUPS, filter.ownerGroup) ? { ownerGroup: filter.ownerGroup } : {}),
       ...(filter.status === ACTIVE_FILTER
-        ? { status: { in: ["OPEN", "IN_PROGRESS"] } }
+        ? { status: { not: "DONE" } }
         : oneOf(ISSUE_STATUSES, filter.status)
           ? { status: filter.status }
           : {}),
@@ -209,15 +209,27 @@ export async function updateIssue(
   input: Record<string, unknown>,
 ): Promise<IssueItem> {
   requireRole(user, "HR");
-  const existing = await db.issue.findUnique({ where: { id: issueId }, select: { id: true } });
+  const existing = await db.issue.findUnique({
+    where: { id: issueId },
+    select: { id: true, status: true, completedAt: true },
+  });
   if (!existing) throw notFound();
 
   const fields: Record<string, string> = {};
-  const data: { status?: string; ownerGroup?: string; dueDate?: Date | null } = {};
+  const data: {
+    status?: string;
+    completedAt?: Date | null;
+    ownerGroup?: string;
+    dueDate?: Date | null;
+  } = {};
 
   if (input.status !== undefined) {
-    if (oneOf(ISSUE_STATUSES, input.status)) data.status = input.status;
-    else fields.status = "invalid";
+    if (oneOf(ISSUE_STATUSES, input.status)) {
+      data.status = input.status;
+      // Completion time for IT-14 Zodpovednosti; kept when DONE is sent again.
+      if (input.status !== "DONE") data.completedAt = null;
+      else if (existing.status !== "DONE") data.completedAt = new Date();
+    } else fields.status = "invalid";
   }
   if (input.ownerGroup !== undefined) {
     if (oneOf(OWNER_GROUPS, input.ownerGroup)) data.ownerGroup = input.ownerGroup;
@@ -295,7 +307,7 @@ export async function getIssuePrefill(
   user: SessionUser,
   ids: { roundId?: string; noteId?: string },
 ): Promise<{
-  round: { id: string; name: string; teamName: string } | null;
+  round: { id: string; name: string; teamId: string; teamName: string } | null;
   note: { id: string; title: string } | null;
 }> {
   requireRole(user, "HR");
@@ -303,7 +315,7 @@ export async function getIssuePrefill(
     ids.roundId
       ? db.round.findUnique({
           where: { id: ids.roundId },
-          select: { id: true, name: true, team: { select: { name: true } } },
+          select: { id: true, name: true, teamId: true, team: { select: { name: true } } },
         })
       : null,
     ids.noteId
@@ -311,7 +323,9 @@ export async function getIssuePrefill(
       : null,
   ]);
   return {
-    round: round ? { id: round.id, name: round.name, teamName: round.team.name } : null,
+    round: round
+      ? { id: round.id, name: round.name, teamId: round.teamId, teamName: round.team.name }
+      : null,
     note,
   };
 }
