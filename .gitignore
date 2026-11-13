@@ -48,3 +48,6 @@ next-env.d.ts
 /testing/reports/**/*.png
 /testing/reports/**/*.pdf
 /testing/reports/**/earlier-runs/
+
+# Office lock files
+~$*
